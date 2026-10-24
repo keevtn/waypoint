@@ -1,0 +1,20 @@
+# Keep the build context small and secret-free.
+.git
+.github
+**/node_modules
+frontend/dist
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.venv
+**/.env
+**/.env.*
+!**/.env.example
+backend/*.db
+backend/rag/index.npz
+backend/rag/index_meta.json
+.cache
+**/.DS_Store
+docs
+*.md
+!backend/corpus/**/*.md

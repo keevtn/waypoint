@@ -1,0 +1,28 @@
+# Render Blueprint: one Docker web service that auto-deploys main (SPEC.md §13, §15.5).
+# Values are set in the Render dashboard; sync: false keeps them out of git.
+services:
+  - type: web
+    name: waypoint
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    branch: main
+    autoDeployTrigger: commit
+    healthCheckPath: /api/health
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: PLAID_CLIENT_ID
+        sync: false
+      - key: PLAID_SECRET
+        sync: false
+      - key: PLAID_ENV
+        sync: false
+      - key: DATA_MODE
+        sync: false
+      - key: DEV_MODE
+        sync: false
+      - key: LLM_FAKE
+        sync: false
+      - key: TALK_TO_HUMAN_URL
+        sync: false

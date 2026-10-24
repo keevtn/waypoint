@@ -1,0 +1,22 @@
+{
+  "_comment": "Monthly premium ESTIMATES in cents per option id (SPEC.md §6.4 pricing.json). Public state averages for ALL ages; a 21-year-old will typically pay more, which the source_title says so the UI shows it. Verified 2026-10-24. Replace with user quotes whenever available.",
+  "retrieved": "2026-10-24",
+  "default_source": {
+    "source_url": "https://insurify.com/car-insurance/pennsylvania/average-cost-of-car-insurance-pennsylvania/",
+    "source_title": "Average cost of car insurance in Pennsylvania (Insurify, updated Oct 21, 2026) — state average, all ages"
+  },
+  "options": {
+    "pa_min_limited": {
+      "cents": 9000,
+      "source_title": "PA liability-only state average, all ages (Insurify, updated Oct 21, 2026); young drivers typically pay more"
+    },
+    "std_limited_1000": {
+      "cents": 16100,
+      "source_title": "PA full-coverage state average with $1,000 comp/collision deductible, all ages (Insurify, updated Oct 21, 2026); young drivers typically pay more"
+    },
+    "std_full_500": {
+      "cents": 18500,
+      "source_title": "PA full-coverage state average, all ages (Insurify, updated Oct 21, 2026) plus ~15% for a $500 deductible, 100/300/50 limits and full tort (our adjustment, not a published figure); young drivers typically pay more"
+    }
+  }
+}

@@ -4,7 +4,8 @@
 Codes
 - below_floor (warn): month min < safety floor. detail.contributors = outflow
   events in the CONTRIBUTOR_WINDOW_DAYS up to the min date, plus the variable
-  drip over that window, so "why is this month tight" can be answered.
+  drip over that window, so "why is this month tight" can be answered;
+  detail.largest_outflows = the month's biggest outflow events regardless of day.
 - negative (danger): month min < 0 (also listed as below_floor).
 - low_slack (warn): monthly slack after the commitment < LOW_SLACK_CENTS.
 - deductible_ok / deductible_unaffordable: for each commitment with
@@ -56,6 +57,14 @@ def contributors(w: engine.Walk, min_date: date) -> list[dict]:
     return items
 
 
+def largest_outflows(w: engine.Walk, month: str) -> list[dict]:
+    outs = sorted((e for e in w.events if e.amount_cents < 0 and engine.month_key(e.date) == month), key=lambda e: e.amount_cents)
+    return [
+        {"id": e.source_id, "label": e.label, "amount_cents": e.amount_cents, "date": e.date.isoformat(), "kind": e.kind}
+        for e in outs[:MAX_CONTRIBUTORS]
+    ]
+
+
 def derive(
     profile: Profile,
     commitments: list[Commitment],
@@ -78,6 +87,7 @@ def derive(
                 "floor_cents": floor,
                 "shortfall_cents": floor - p.min_balance_cents,
                 "contributors": contrib,
+                "largest_outflows": largest_outflows(w, p.month),
             }
             out.append(Flag(id=f"flag_below_floor_{p.month}", severity="warn", month=p.month, code="below_floor", detail=base))
             if p.min_balance_cents < 0:

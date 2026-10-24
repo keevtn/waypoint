@@ -76,6 +76,8 @@ def test_decisions_list(client):
     assert r.status_code == 200
     ids = {d["id"] for d in r.json()}
     assert "auto_insurance" in ids
+    auto = next(d for d in r.json() if d["id"] == "auto_insurance")
+    assert "financed" in auto["input_schema"]["properties"]
 
 
 def test_evaluate_state_minimum_disallowed(client):
@@ -100,6 +102,26 @@ def test_evaluate_state_minimum_disallowed(client):
         assert oid in ev["projections"]
     # every constraint carries at least one citation
     assert all(c["citation_ids"] for c in ev["constraints"])
+    # Phase 3: computed by the real pipeline
+    lender = next(c for c in ev["constraints"] if c["id"] == "c_lender_comp_coll")
+    assert lender["kind"] == "disallowed" and "pa_min_limited" in lender["applies_to"]
+    assert by_id["std_limited_1000"]["status"] == "flagged" and by_id["std_full_500"]["status"] == "allowed"
+    assert all(o["price"]["source_url"] and o["price"]["source_title"] for o in ev["options"])  # never "Unsourced"
+    assert ev["projections"]["baseline"]["months_negative"] == []
+    # §8 outcome 3: both standard options flag January; the $500/full-tort option dips lower
+    lim, full = ev["projections"]["std_limited_1000"], ev["projections"]["std_full_500"]
+    assert "2027-01" in lim["months_below_floor"] and "2027-01" in full["months_below_floor"]
+    assert full["min_balance_cents"] < lim["min_balance_cents"]
+    # §8 outcome 4: $1,000 deductible fails the stress test, $500 passes
+    assert any(f["code"] == "deductible_unaffordable" for f in lim["flags"])
+    assert any(f["code"] == "deductible_ok" for f in full["flags"])
+    assert len(ev["projections"]["std_full_500"]["series"]) == 12
+
+
+def test_evaluate_rejects_bad_inputs(client):
+    r = client.post("/api/decisions/auto_insurance/evaluate", json={"inputs": {"financed": True}})
+    assert r.status_code == 422
+    assert r.json()["error"]["code"] == "invalid_inputs"
 
 
 def test_unknown_decision_is_error_envelope(client):

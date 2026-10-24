@@ -28,16 +28,28 @@ def test_connect_then_profile(client):
     assert len(p["recurring"]) >= 4
     assert all(i["amount_cents"] > 0 for i in p["income"])
     assert all(i["amount_cents"] < 0 for i in p["recurring"])
+    # Phase 1: detection on the persona, not a fixture
+    assert {r["label"] for r in p["recurring"]} >= {"Rent", "Phone", "Gym", "Music streaming"}
+    assert {i["cadence"] for i in p["income"]} == {"biweekly", "monthly"}
+    assert all(x["confidence"] > 0.8 for x in p["income"] + p["recurring"])
+    assert p["variable"]["months_observed"] >= 3
+    assert 50000 <= p["monthly_slack_cents"] <= 70000  # §8 outcome 1: ~$600
+    assert {o["id"] for o in p["one_offs"] if o["source"] == "user"} == {"oo_registration", "oo_tuition", "oo_textbooks"}
 
     r = client.get("/api/profile/transactions?limit=5")
     assert r.status_code == 200
-    assert len(r.json()) <= 5
+    txns = r.json()
+    assert len(txns) == 5
+    assert txns == sorted(txns, key=lambda t: t["date"], reverse=True)
 
 
 def test_put_profile_floor(client):
     r = client.put("/api/profile", json={"safety_floor_cents": 30000})
     assert r.status_code == 200
     assert r.json()["safety_floor_cents"] == 30000
+    assert client.get("/api/profile").json()["safety_floor_cents"] == 30000  # persisted
+    r = client.put("/api/profile", json={"safety_floor_cents": 20000})
+    assert r.json()["safety_floor_cents"] == 20000
 
 
 def test_baseline_no_negative_months(client):

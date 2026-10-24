@@ -1,0 +1,853 @@
+{
+ "persona_id": "persona_student",
+ "as_of": "2026-10-24",
+ "balance_cents": 124000,
+ "safety_floor_cents": 20000,
+ "account": {
+  "name": "Student Checking",
+  "mask": "4321",
+  "currency": "USD"
+ },
+ "transactions": [
+  {
+   "date": "2026-06-01",
+   "amount_cents": -85000,
+   "raw_name": "RENT - THE META",
+   "category": "housing",
+   "id": "txn_0001"
+  },
+  {
+   "date": "2026-06-01",
+   "amount_cents": 30000,
+   "raw_name": "ZELLE FROM MOM",
+   "category": "income",
+   "id": "txn_0002"
+  },
+  {
+   "date": "2026-06-02",
+   "amount_cents": -1528,
+   "raw_name": "GIANT FOOD #6421",
+   "category": "groceries",
+   "id": "txn_0003"
+  },
+  {
+   "date": "2026-06-02",
+   "amount_cents": -715,
+   "raw_name": "TARGET T-2855",
+   "category": "shopping",
+   "id": "txn_0004"
+  },
+  {
+   "date": "2026-06-05",
+   "amount_cents": -1914,
+   "raw_name": "CHIPOTLE 2210",
+   "category": "dining",
+   "id": "txn_0005"
+  },
+  {
+   "date": "2026-06-05",
+   "amount_cents": 70000,
+   "raw_name": "PENN STATE PAYROLL",
+   "category": "income",
+   "id": "txn_0006"
+  },
+  {
+   "date": "2026-06-05",
+   "amount_cents": -2499,
+   "raw_name": "PLANET FITNESS",
+   "category": "subscriptions",
+   "id": "txn_0007"
+  },
+  {
+   "date": "2026-06-11",
+   "amount_cents": -2250,
+   "raw_name": "GIANT FOOD #6421",
+   "category": "groceries",
+   "id": "txn_0008"
+  },
+  {
+   "date": "2026-06-11",
+   "amount_cents": -1776,
+   "raw_name": "SHEETZ 0319",
+   "category": "gas",
+   "id": "txn_0009"
+  },
+  {
+   "date": "2026-06-11",
+   "amount_cents": -1669,
+   "raw_name": "TARGET T-2855",
+   "category": "shopping",
+   "id": "txn_0010"
+  },
+  {
+   "date": "2026-06-12",
+   "amount_cents": -4500,
+   "raw_name": "VERIZON WIRELESS",
+   "category": "utilities",
+   "id": "txn_0011"
+  },
+  {
+   "date": "2026-06-14",
+   "amount_cents": -1482,
+   "raw_name": "SHEETZ 0319",
+   "category": "gas",
+   "id": "txn_0012"
+  },
+  {
+   "date": "2026-06-15",
+   "amount_cents": -1891,
+   "raw_name": "UBER *TRIP",
+   "category": "transport",
+   "id": "txn_0013"
+  },
+  {
+   "date": "2026-06-17",
+   "amount_cents": -1043,
+   "raw_name": "GIANT FOOD #6421",
+   "category": "groceries",
+   "id": "txn_0014"
+  },
+  {
+   "date": "2026-06-18",
+   "amount_cents": -599,
+   "raw_name": "SPOTIFY",
+   "category": "subscriptions",
+   "id": "txn_0015"
+  },
+  {
+   "date": "2026-06-19",
+   "amount_cents": 70000,
+   "raw_name": "PENN STATE PAYROLL",
+   "category": "income",
+   "id": "txn_0016"
+  },
+  {
+   "date": "2026-06-21",
+   "amount_cents": -1396,
+   "raw_name": "MCLANAHANS DOWNTOWN",
+   "category": "groceries",
+   "id": "txn_0017"
+  },
+  {
+   "date": "2026-06-23",
+   "amount_cents": -340,
+   "raw_name": "SHEETZ 0319",
+   "category": "gas",
+   "id": "txn_0018"
+  },
+  {
+   "date": "2026-06-23",
+   "amount_cents": -2011,
+   "raw_name": "TARGET T-2855",
+   "category": "shopping",
+   "id": "txn_0019"
+  },
+  {
+   "date": "2026-06-27",
+   "amount_cents": -646,
+   "raw_name": "CHIPOTLE 2210",
+   "category": "dining",
+   "id": "txn_0020"
+  },
+  {
+   "date": "2026-06-30",
+   "amount_cents": -697,
+   "raw_name": "CHIPOTLE 2210",
+   "category": "dining",
+   "id": "txn_0021"
+  },
+  {
+   "date": "2026-06-30",
+   "amount_cents": -642,
+   "raw_name": "UBER *TRIP",
+   "category": "transport",
+   "id": "txn_0022"
+  },
+  {
+   "date": "2026-07-01",
+   "amount_cents": -1529,
+   "raw_name": "CHIPOTLE 2210",
+   "category": "dining",
+   "id": "txn_0023"
+  },
+  {
+   "date": "2026-07-01",
+   "amount_cents": -85000,
+   "raw_name": "RENT - THE META",
+   "category": "housing",
+   "id": "txn_0024"
+  },
+  {
+   "date": "2026-07-01",
+   "amount_cents": 30000,
+   "raw_name": "ZELLE FROM MOM",
+   "category": "income",
+   "id": "txn_0025"
+  },
+  {
+   "date": "2026-07-03",
+   "amount_cents": 70000,
+   "raw_name": "PENN STATE PAYROLL",
+   "category": "income",
+   "id": "txn_0026"
+  },
+  {
+   "date": "2026-07-03",
+   "amount_cents": -815,
+   "raw_name": "SHEETZ 0319",
+   "category": "gas",
+   "id": "txn_0027"
+  },
+  {
+   "date": "2026-07-05",
+   "amount_cents": -2499,
+   "raw_name": "PLANET FITNESS",
+   "category": "subscriptions",
+   "id": "txn_0028"
+  },
+  {
+   "date": "2026-07-05",
+   "amount_cents": -342,
+   "raw_name": "TARGET T-2855",
+   "category": "shopping",
+   "id": "txn_0029"
+  },
+  {
+   "date": "2026-07-07",
+   "amount_cents": -2876,
+   "raw_name": "SHEETZ 0319",
+   "category": "gas",
+   "id": "txn_0030"
+  },
+  {
+   "date": "2026-07-08",
+   "amount_cents": -514,
+   "raw_name": "AMAZON.COM*2K4PL",
+   "category": "shopping",
+   "id": "txn_0031"
+  },
+  {
+   "date": "2026-07-12",
+   "amount_cents": -4500,
+   "raw_name": "VERIZON WIRELESS",
+   "category": "utilities",
+   "id": "txn_0032"
+  },
+  {
+   "date": "2026-07-13",
+   "amount_cents": -1443,
+   "raw_name": "TARGET T-2855",
+   "category": "shopping",
+   "id": "txn_0033"
+  },
+  {
+   "date": "2026-07-15",
+   "amount_cents": -1452,
+   "raw_name": "SHEETZ 0319",
+   "category": "gas",
+   "id": "txn_0034"
+  },
+  {
+   "date": "2026-07-17",
+   "amount_cents": -2272,
+   "raw_name": "CHIPOTLE 2210",
+   "category": "dining",
+   "id": "txn_0035"
+  },
+  {
+   "date": "2026-07-17",
+   "amount_cents": 70000,
+   "raw_name": "PENN STATE PAYROLL",
+   "category": "income",
+   "id": "txn_0036"
+  },
+  {
+   "date": "2026-07-18",
+   "amount_cents": -599,
+   "raw_name": "SPOTIFY",
+   "category": "subscriptions",
+   "id": "txn_0037"
+  },
+  {
+   "date": "2026-07-19",
+   "amount_cents": -2768,
+   "raw_name": "SHEETZ 0319",
+   "category": "gas",
+   "id": "txn_0038"
+  },
+  {
+   "date": "2026-07-20",
+   "amount_cents": -2681,
+   "raw_name": "TARGET T-2855",
+   "category": "shopping",
+   "id": "txn_0039"
+  },
+  {
+   "date": "2026-07-22",
+   "amount_cents": -2790,
+   "raw_name": "AMAZON.COM*2K4PL",
+   "category": "shopping",
+   "id": "txn_0040"
+  },
+  {
+   "date": "2026-07-23",
+   "amount_cents": -1564,
+   "raw_name": "UBER *TRIP",
+   "category": "transport",
+   "id": "txn_0041"
+  },
+  {
+   "date": "2026-07-25",
+   "amount_cents": -2271,
+   "raw_name": "TARGET T-2855",
+   "category": "shopping",
+   "id": "txn_0042"
+  },
+  {
+   "date": "2026-07-27",
+   "amount_cents": -1140,
+   "raw_name": "UBER *TRIP",
+   "category": "transport",
+   "id": "txn_0043"
+  },
+  {
+   "date": "2026-07-28",
+   "amount_cents": -1543,
+   "raw_name": "SHEETZ 0319",
+   "category": "gas",
+   "id": "txn_0044"
+  },
+  {
+   "date": "2026-07-31",
+   "amount_cents": 70000,
+   "raw_name": "PENN STATE PAYROLL",
+   "category": "income",
+   "id": "txn_0045"
+  },
+  {
+   "date": "2026-08-01",
+   "amount_cents": -85000,
+   "raw_name": "RENT - THE META",
+   "category": "housing",
+   "id": "txn_0046"
+  },
+  {
+   "date": "2026-08-01",
+   "amount_cents": 30000,
+   "raw_name": "ZELLE FROM MOM",
+   "category": "income",
+   "id": "txn_0047"
+  },
+  {
+   "date": "2026-08-03",
+   "amount_cents": -3233,
+   "raw_name": "CHIPOTLE 2210",
+   "category": "dining",
+   "id": "txn_0048"
+  },
+  {
+   "date": "2026-08-04",
+   "amount_cents": -2766,
+   "raw_name": "CHIPOTLE 2210",
+   "category": "dining",
+   "id": "txn_0049"
+  },
+  {
+   "date": "2026-08-04",
+   "amount_cents": -3328,
+   "raw_name": "TARGET T-2855",
+   "category": "shopping",
+   "id": "txn_0050"
+  },
+  {
+   "date": "2026-08-05",
+   "amount_cents": -2499,
+   "raw_name": "PLANET FITNESS",
+   "category": "subscriptions",
+   "id": "txn_0051"
+  },
+  {
+   "date": "2026-08-07",
+   "amount_cents": -1753,
+   "raw_name": "CHIPOTLE 2210",
+   "category": "dining",
+   "id": "txn_0052"
+  },
+  {
+   "date": "2026-08-07",
+   "amount_cents": -3020,
+   "raw_name": "TARGET T-2855",
+   "category": "shopping",
+   "id": "txn_0053"
+  },
+  {
+   "date": "2026-08-10",
+   "amount_cents": -2636,
+   "raw_name": "GIANT FOOD #6421",
+   "category": "groceries",
+   "id": "txn_0054"
+  },
+  {
+   "date": "2026-08-10",
+   "amount_cents": -746,
+   "raw_name": "SHEETZ 0319",
+   "category": "gas",
+   "id": "txn_0055"
+  },
+  {
+   "date": "2026-08-12",
+   "amount_cents": -4500,
+   "raw_name": "VERIZON WIRELESS",
+   "category": "utilities",
+   "id": "txn_0056"
+  },
+  {
+   "date": "2026-08-14",
+   "amount_cents": -412,
+   "raw_name": "GIANT FOOD #6421",
+   "category": "groceries",
+   "id": "txn_0057"
+  },
+  {
+   "date": "2026-08-14",
+   "amount_cents": 70000,
+   "raw_name": "PENN STATE PAYROLL",
+   "category": "income",
+   "id": "txn_0058"
+  },
+  {
+   "date": "2026-08-15",
+   "amount_cents": -125000,
+   "raw_name": "PENN STATE BURSAR",
+   "category": "education",
+   "id": "txn_0059"
+  },
+  {
+   "date": "2026-08-17",
+   "amount_cents": -879,
+   "raw_name": "GIANT FOOD #6421",
+   "category": "groceries",
+   "id": "txn_0060"
+  },
+  {
+   "date": "2026-08-17",
+   "amount_cents": -563,
+   "raw_name": "SHEETZ 0319",
+   "category": "gas",
+   "id": "txn_0061"
+  },
+  {
+   "date": "2026-08-18",
+   "amount_cents": -599,
+   "raw_name": "SPOTIFY",
+   "category": "subscriptions",
+   "id": "txn_0062"
+  },
+  {
+   "date": "2026-08-20",
+   "amount_cents": -2171,
+   "raw_name": "AMAZON.COM*2K4PL",
+   "category": "shopping",
+   "id": "txn_0063"
+  },
+  {
+   "date": "2026-08-20",
+   "amount_cents": -3264,
+   "raw_name": "MCLANAHANS DOWNTOWN",
+   "category": "groceries",
+   "id": "txn_0064"
+  },
+  {
+   "date": "2026-08-21",
+   "amount_cents": -2319,
+   "raw_name": "AMAZON.COM*2K4PL",
+   "category": "shopping",
+   "id": "txn_0065"
+  },
+  {
+   "date": "2026-08-28",
+   "amount_cents": 70000,
+   "raw_name": "PENN STATE PAYROLL",
+   "category": "income",
+   "id": "txn_0066"
+  },
+  {
+   "date": "2026-08-30",
+   "amount_cents": -2568,
+   "raw_name": "UBER *TRIP",
+   "category": "transport",
+   "id": "txn_0067"
+  },
+  {
+   "date": "2026-08-31",
+   "amount_cents": -2342,
+   "raw_name": "CHIPOTLE 2210",
+   "category": "dining",
+   "id": "txn_0068"
+  },
+  {
+   "date": "2026-09-01",
+   "amount_cents": -4301,
+   "raw_name": "AMAZON.COM*2K4PL",
+   "category": "shopping",
+   "id": "txn_0069"
+  },
+  {
+   "date": "2026-09-01",
+   "amount_cents": -85000,
+   "raw_name": "RENT - THE META",
+   "category": "housing",
+   "id": "txn_0070"
+  },
+  {
+   "date": "2026-09-01",
+   "amount_cents": 30000,
+   "raw_name": "ZELLE FROM MOM",
+   "category": "income",
+   "id": "txn_0071"
+  },
+  {
+   "date": "2026-09-05",
+   "amount_cents": -2499,
+   "raw_name": "PLANET FITNESS",
+   "category": "subscriptions",
+   "id": "txn_0072"
+  },
+  {
+   "date": "2026-09-08",
+   "amount_cents": -4545,
+   "raw_name": "MCLANAHANS DOWNTOWN",
+   "category": "groceries",
+   "id": "txn_0073"
+  },
+  {
+   "date": "2026-09-10",
+   "amount_cents": -3160,
+   "raw_name": "UBER *TRIP",
+   "category": "transport",
+   "id": "txn_0074"
+  },
+  {
+   "date": "2026-09-11",
+   "amount_cents": -1406,
+   "raw_name": "AMAZON.COM*2K4PL",
+   "category": "shopping",
+   "id": "txn_0075"
+  },
+  {
+   "date": "2026-09-11",
+   "amount_cents": 70000,
+   "raw_name": "PENN STATE PAYROLL",
+   "category": "income",
+   "id": "txn_0076"
+  },
+  {
+   "date": "2026-09-12",
+   "amount_cents": -4500,
+   "raw_name": "VERIZON WIRELESS",
+   "category": "utilities",
+   "id": "txn_0077"
+  },
+  {
+   "date": "2026-09-14",
+   "amount_cents": -1025,
+   "raw_name": "UBER *TRIP",
+   "category": "transport",
+   "id": "txn_0078"
+  },
+  {
+   "date": "2026-09-14",
+   "amount_cents": -2618,
+   "raw_name": "UBER *TRIP",
+   "category": "transport",
+   "id": "txn_0079"
+  },
+  {
+   "date": "2026-09-16",
+   "amount_cents": -3698,
+   "raw_name": "TARGET T-2855",
+   "category": "shopping",
+   "id": "txn_0080"
+  },
+  {
+   "date": "2026-09-17",
+   "amount_cents": -1248,
+   "raw_name": "UBER *TRIP",
+   "category": "transport",
+   "id": "txn_0081"
+  },
+  {
+   "date": "2026-09-18",
+   "amount_cents": -599,
+   "raw_name": "SPOTIFY",
+   "category": "subscriptions",
+   "id": "txn_0082"
+  },
+  {
+   "date": "2026-09-19",
+   "amount_cents": -4629,
+   "raw_name": "CHIPOTLE 2210",
+   "category": "dining",
+   "id": "txn_0083"
+  },
+  {
+   "date": "2026-09-21",
+   "amount_cents": -3402,
+   "raw_name": "SHEETZ 0319",
+   "category": "gas",
+   "id": "txn_0084"
+  },
+  {
+   "date": "2026-09-22",
+   "amount_cents": -1496,
+   "raw_name": "CHIPOTLE 2210",
+   "category": "dining",
+   "id": "txn_0085"
+  },
+  {
+   "date": "2026-09-23",
+   "amount_cents": -2515,
+   "raw_name": "TARGET T-2855",
+   "category": "shopping",
+   "id": "txn_0086"
+  },
+  {
+   "date": "2026-09-25",
+   "amount_cents": 70000,
+   "raw_name": "PENN STATE PAYROLL",
+   "category": "income",
+   "id": "txn_0087"
+  },
+  {
+   "date": "2026-09-25",
+   "amount_cents": -2631,
+   "raw_name": "UBER *TRIP",
+   "category": "transport",
+   "id": "txn_0088"
+  },
+  {
+   "date": "2026-09-26",
+   "amount_cents": -677,
+   "raw_name": "MCLANAHANS DOWNTOWN",
+   "category": "groceries",
+   "id": "txn_0089"
+  },
+  {
+   "date": "2026-09-29",
+   "amount_cents": -649,
+   "raw_name": "TARGET T-2855",
+   "category": "shopping",
+   "id": "txn_0090"
+  },
+  {
+   "date": "2026-10-01",
+   "amount_cents": -3282,
+   "raw_name": "MCLANAHANS DOWNTOWN",
+   "category": "groceries",
+   "id": "txn_0091"
+  },
+  {
+   "date": "2026-10-01",
+   "amount_cents": -85000,
+   "raw_name": "RENT - THE META",
+   "category": "housing",
+   "id": "txn_0092"
+  },
+  {
+   "date": "2026-10-01",
+   "amount_cents": 30000,
+   "raw_name": "ZELLE FROM MOM",
+   "category": "income",
+   "id": "txn_0093"
+  },
+  {
+   "date": "2026-10-03",
+   "amount_cents": -773,
+   "raw_name": "GIANT FOOD #6421",
+   "category": "groceries",
+   "id": "txn_0094"
+  },
+  {
+   "date": "2026-10-03",
+   "amount_cents": -3135,
+   "raw_name": "MCLANAHANS DOWNTOWN",
+   "category": "groceries",
+   "id": "txn_0095"
+  },
+  {
+   "date": "2026-10-03",
+   "amount_cents": -1206,
+   "raw_name": "TARGET T-2855",
+   "category": "shopping",
+   "id": "txn_0096"
+  },
+  {
+   "date": "2026-10-03",
+   "amount_cents": -2128,
+   "raw_name": "TARGET T-2855",
+   "category": "shopping",
+   "id": "txn_0097"
+  },
+  {
+   "date": "2026-10-04",
+   "amount_cents": -650,
+   "raw_name": "UBER *TRIP",
+   "category": "transport",
+   "id": "txn_0098"
+  },
+  {
+   "date": "2026-10-05",
+   "amount_cents": -2499,
+   "raw_name": "PLANET FITNESS",
+   "category": "subscriptions",
+   "id": "txn_0099"
+  },
+  {
+   "date": "2026-10-09",
+   "amount_cents": 70000,
+   "raw_name": "PENN STATE PAYROLL",
+   "category": "income",
+   "id": "txn_0100"
+  },
+  {
+   "date": "2026-10-11",
+   "amount_cents": -3093,
+   "raw_name": "SHEETZ 0319",
+   "category": "gas",
+   "id": "txn_0101"
+  },
+  {
+   "date": "2026-10-12",
+   "amount_cents": -4500,
+   "raw_name": "VERIZON WIRELESS",
+   "category": "utilities",
+   "id": "txn_0102"
+  },
+  {
+   "date": "2026-10-16",
+   "amount_cents": -1843,
+   "raw_name": "CHIPOTLE 2210",
+   "category": "dining",
+   "id": "txn_0103"
+  },
+  {
+   "date": "2026-10-16",
+   "amount_cents": -1352,
+   "raw_name": "SHEETZ 0319",
+   "category": "gas",
+   "id": "txn_0104"
+  },
+  {
+   "date": "2026-10-17",
+   "amount_cents": -80000,
+   "raw_name": "CARMAX DOWN PAYMENT",
+   "category": "auto",
+   "id": "txn_0105"
+  },
+  {
+   "date": "2026-10-18",
+   "amount_cents": -599,
+   "raw_name": "SPOTIFY",
+   "category": "subscriptions",
+   "id": "txn_0106"
+  },
+  {
+   "date": "2026-10-19",
+   "amount_cents": -2500,
+   "raw_name": "AMAZON.COM*2K4PL",
+   "category": "shopping",
+   "id": "txn_0107"
+  },
+  {
+   "date": "2026-10-23",
+   "amount_cents": 70000,
+   "raw_name": "PENN STATE PAYROLL",
+   "category": "income",
+   "id": "txn_0108"
+  },
+  {
+   "date": "2026-10-24",
+   "amount_cents": -2489,
+   "raw_name": "MCLANAHANS DOWNTOWN",
+   "category": "groceries",
+   "id": "txn_0109"
+  }
+ ],
+ "future_one_offs": [
+  {
+   "id": "oo_registration",
+   "label": "Vehicle registration/title",
+   "amount_cents": -18000,
+   "date": "2026-11-05",
+   "source": "user"
+  },
+  {
+   "id": "oo_tuition",
+   "label": "Tuition installment",
+   "amount_cents": -125000,
+   "date": "2027-01-15",
+   "source": "user"
+  },
+  {
+   "id": "oo_textbooks",
+   "label": "Textbooks",
+   "amount_cents": -22000,
+   "date": "2027-01-20",
+   "source": "user"
+  }
+ ],
+ "declared_income": [
+  {
+   "raw_name": "PENN STATE PAYROLL",
+   "amount_cents": 70000,
+   "cadence": "biweekly"
+  },
+  {
+   "raw_name": "ZELLE FROM MOM",
+   "amount_cents": 30000,
+   "cadence": "monthly"
+  }
+ ],
+ "declared_recurring": [
+  {
+   "raw_name": "RENT - THE META",
+   "amount_cents": -85000,
+   "cadence": "monthly",
+   "day": 1,
+   "category": "housing"
+  },
+  {
+   "raw_name": "PLANET FITNESS",
+   "amount_cents": -2499,
+   "cadence": "monthly",
+   "day": 5,
+   "category": "subscriptions"
+  },
+  {
+   "raw_name": "VERIZON WIRELESS",
+   "amount_cents": -4500,
+   "cadence": "monthly",
+   "day": 12,
+   "category": "utilities"
+  },
+  {
+   "raw_name": "SPOTIFY",
+   "amount_cents": -599,
+   "cadence": "monthly",
+   "day": 18,
+   "category": "subscriptions"
+  }
+ ],
+ "moment": {
+  "auto_insurance": {
+   "state": "PA",
+   "vehicle_value_cents": 950000,
+   "financed": true,
+   "loan_payment_cents": 21200,
+   "loan_term_months": 48,
+   "driver_age": 21,
+   "deductible_comfort_cents": 60000,
+   "registration_deadline": "2026-11-23"
+  }
+ }
+}

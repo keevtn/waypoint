@@ -1,0 +1,781 @@
+{
+ "version": 2,
+ "override_accounts": [
+  {
+   "type": "depository",
+   "subtype": "checking",
+   "starting_balance": 1240.0,
+   "currency": "USD",
+   "meta": {
+    "name": "Checking",
+    "official_name": "Student Checking",
+    "mask": "4321"
+   },
+   "transactions": [
+    {
+     "date_transacted": "2026-06-01",
+     "date_posted": "2026-06-01",
+     "amount": 850.0,
+     "description": "RENT - THE META",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-01",
+     "date_posted": "2026-06-01",
+     "amount": -300.0,
+     "description": "ZELLE FROM MOM",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-02",
+     "date_posted": "2026-06-02",
+     "amount": 15.28,
+     "description": "GIANT FOOD #6421",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-02",
+     "date_posted": "2026-06-02",
+     "amount": 7.15,
+     "description": "TARGET T-2855",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-05",
+     "date_posted": "2026-06-05",
+     "amount": 19.14,
+     "description": "CHIPOTLE 2210",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-05",
+     "date_posted": "2026-06-05",
+     "amount": -700.0,
+     "description": "PENN STATE PAYROLL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-05",
+     "date_posted": "2026-06-05",
+     "amount": 24.99,
+     "description": "PLANET FITNESS",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-11",
+     "date_posted": "2026-06-11",
+     "amount": 22.5,
+     "description": "GIANT FOOD #6421",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-11",
+     "date_posted": "2026-06-11",
+     "amount": 17.76,
+     "description": "SHEETZ 0319",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-11",
+     "date_posted": "2026-06-11",
+     "amount": 16.69,
+     "description": "TARGET T-2855",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-12",
+     "date_posted": "2026-06-12",
+     "amount": 45.0,
+     "description": "VERIZON WIRELESS",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-14",
+     "date_posted": "2026-06-14",
+     "amount": 14.82,
+     "description": "SHEETZ 0319",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-15",
+     "date_posted": "2026-06-15",
+     "amount": 18.91,
+     "description": "UBER *TRIP",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-17",
+     "date_posted": "2026-06-17",
+     "amount": 10.43,
+     "description": "GIANT FOOD #6421",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-18",
+     "date_posted": "2026-06-18",
+     "amount": 5.99,
+     "description": "SPOTIFY",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-19",
+     "date_posted": "2026-06-19",
+     "amount": -700.0,
+     "description": "PENN STATE PAYROLL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-21",
+     "date_posted": "2026-06-21",
+     "amount": 13.96,
+     "description": "MCLANAHANS DOWNTOWN",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-23",
+     "date_posted": "2026-06-23",
+     "amount": 3.4,
+     "description": "SHEETZ 0319",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-23",
+     "date_posted": "2026-06-23",
+     "amount": 20.11,
+     "description": "TARGET T-2855",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-27",
+     "date_posted": "2026-06-27",
+     "amount": 6.46,
+     "description": "CHIPOTLE 2210",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-30",
+     "date_posted": "2026-06-30",
+     "amount": 6.97,
+     "description": "CHIPOTLE 2210",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-06-30",
+     "date_posted": "2026-06-30",
+     "amount": 6.42,
+     "description": "UBER *TRIP",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-01",
+     "date_posted": "2026-07-01",
+     "amount": 15.29,
+     "description": "CHIPOTLE 2210",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-01",
+     "date_posted": "2026-07-01",
+     "amount": 850.0,
+     "description": "RENT - THE META",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-01",
+     "date_posted": "2026-07-01",
+     "amount": -300.0,
+     "description": "ZELLE FROM MOM",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-03",
+     "date_posted": "2026-07-03",
+     "amount": -700.0,
+     "description": "PENN STATE PAYROLL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-03",
+     "date_posted": "2026-07-03",
+     "amount": 8.15,
+     "description": "SHEETZ 0319",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-05",
+     "date_posted": "2026-07-05",
+     "amount": 24.99,
+     "description": "PLANET FITNESS",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-05",
+     "date_posted": "2026-07-05",
+     "amount": 3.42,
+     "description": "TARGET T-2855",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-07",
+     "date_posted": "2026-07-07",
+     "amount": 28.76,
+     "description": "SHEETZ 0319",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-08",
+     "date_posted": "2026-07-08",
+     "amount": 5.14,
+     "description": "AMAZON.COM*2K4PL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-12",
+     "date_posted": "2026-07-12",
+     "amount": 45.0,
+     "description": "VERIZON WIRELESS",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-13",
+     "date_posted": "2026-07-13",
+     "amount": 14.43,
+     "description": "TARGET T-2855",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-15",
+     "date_posted": "2026-07-15",
+     "amount": 14.52,
+     "description": "SHEETZ 0319",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-17",
+     "date_posted": "2026-07-17",
+     "amount": 22.72,
+     "description": "CHIPOTLE 2210",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-17",
+     "date_posted": "2026-07-17",
+     "amount": -700.0,
+     "description": "PENN STATE PAYROLL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-18",
+     "date_posted": "2026-07-18",
+     "amount": 5.99,
+     "description": "SPOTIFY",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-19",
+     "date_posted": "2026-07-19",
+     "amount": 27.68,
+     "description": "SHEETZ 0319",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-20",
+     "date_posted": "2026-07-20",
+     "amount": 26.81,
+     "description": "TARGET T-2855",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-22",
+     "date_posted": "2026-07-22",
+     "amount": 27.9,
+     "description": "AMAZON.COM*2K4PL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-23",
+     "date_posted": "2026-07-23",
+     "amount": 15.64,
+     "description": "UBER *TRIP",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-25",
+     "date_posted": "2026-07-25",
+     "amount": 22.71,
+     "description": "TARGET T-2855",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-27",
+     "date_posted": "2026-07-27",
+     "amount": 11.4,
+     "description": "UBER *TRIP",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-28",
+     "date_posted": "2026-07-28",
+     "amount": 15.43,
+     "description": "SHEETZ 0319",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-07-31",
+     "date_posted": "2026-07-31",
+     "amount": -700.0,
+     "description": "PENN STATE PAYROLL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-01",
+     "date_posted": "2026-08-01",
+     "amount": 850.0,
+     "description": "RENT - THE META",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-01",
+     "date_posted": "2026-08-01",
+     "amount": -300.0,
+     "description": "ZELLE FROM MOM",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-03",
+     "date_posted": "2026-08-03",
+     "amount": 32.33,
+     "description": "CHIPOTLE 2210",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-04",
+     "date_posted": "2026-08-04",
+     "amount": 27.66,
+     "description": "CHIPOTLE 2210",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-04",
+     "date_posted": "2026-08-04",
+     "amount": 33.28,
+     "description": "TARGET T-2855",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-05",
+     "date_posted": "2026-08-05",
+     "amount": 24.99,
+     "description": "PLANET FITNESS",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-07",
+     "date_posted": "2026-08-07",
+     "amount": 17.53,
+     "description": "CHIPOTLE 2210",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-07",
+     "date_posted": "2026-08-07",
+     "amount": 30.2,
+     "description": "TARGET T-2855",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-10",
+     "date_posted": "2026-08-10",
+     "amount": 26.36,
+     "description": "GIANT FOOD #6421",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-10",
+     "date_posted": "2026-08-10",
+     "amount": 7.46,
+     "description": "SHEETZ 0319",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-12",
+     "date_posted": "2026-08-12",
+     "amount": 45.0,
+     "description": "VERIZON WIRELESS",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-14",
+     "date_posted": "2026-08-14",
+     "amount": 4.12,
+     "description": "GIANT FOOD #6421",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-14",
+     "date_posted": "2026-08-14",
+     "amount": -700.0,
+     "description": "PENN STATE PAYROLL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-15",
+     "date_posted": "2026-08-15",
+     "amount": 1250.0,
+     "description": "PENN STATE BURSAR",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-17",
+     "date_posted": "2026-08-17",
+     "amount": 8.79,
+     "description": "GIANT FOOD #6421",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-17",
+     "date_posted": "2026-08-17",
+     "amount": 5.63,
+     "description": "SHEETZ 0319",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-18",
+     "date_posted": "2026-08-18",
+     "amount": 5.99,
+     "description": "SPOTIFY",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-20",
+     "date_posted": "2026-08-20",
+     "amount": 21.71,
+     "description": "AMAZON.COM*2K4PL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-20",
+     "date_posted": "2026-08-20",
+     "amount": 32.64,
+     "description": "MCLANAHANS DOWNTOWN",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-21",
+     "date_posted": "2026-08-21",
+     "amount": 23.19,
+     "description": "AMAZON.COM*2K4PL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-28",
+     "date_posted": "2026-08-28",
+     "amount": -700.0,
+     "description": "PENN STATE PAYROLL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-30",
+     "date_posted": "2026-08-30",
+     "amount": 25.68,
+     "description": "UBER *TRIP",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-08-31",
+     "date_posted": "2026-08-31",
+     "amount": 23.42,
+     "description": "CHIPOTLE 2210",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-01",
+     "date_posted": "2026-09-01",
+     "amount": 43.01,
+     "description": "AMAZON.COM*2K4PL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-01",
+     "date_posted": "2026-09-01",
+     "amount": 850.0,
+     "description": "RENT - THE META",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-01",
+     "date_posted": "2026-09-01",
+     "amount": -300.0,
+     "description": "ZELLE FROM MOM",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-05",
+     "date_posted": "2026-09-05",
+     "amount": 24.99,
+     "description": "PLANET FITNESS",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-08",
+     "date_posted": "2026-09-08",
+     "amount": 45.45,
+     "description": "MCLANAHANS DOWNTOWN",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-10",
+     "date_posted": "2026-09-10",
+     "amount": 31.6,
+     "description": "UBER *TRIP",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-11",
+     "date_posted": "2026-09-11",
+     "amount": 14.06,
+     "description": "AMAZON.COM*2K4PL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-11",
+     "date_posted": "2026-09-11",
+     "amount": -700.0,
+     "description": "PENN STATE PAYROLL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-12",
+     "date_posted": "2026-09-12",
+     "amount": 45.0,
+     "description": "VERIZON WIRELESS",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-14",
+     "date_posted": "2026-09-14",
+     "amount": 10.25,
+     "description": "UBER *TRIP",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-14",
+     "date_posted": "2026-09-14",
+     "amount": 26.18,
+     "description": "UBER *TRIP",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-16",
+     "date_posted": "2026-09-16",
+     "amount": 36.98,
+     "description": "TARGET T-2855",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-17",
+     "date_posted": "2026-09-17",
+     "amount": 12.48,
+     "description": "UBER *TRIP",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-18",
+     "date_posted": "2026-09-18",
+     "amount": 5.99,
+     "description": "SPOTIFY",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-19",
+     "date_posted": "2026-09-19",
+     "amount": 46.29,
+     "description": "CHIPOTLE 2210",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-21",
+     "date_posted": "2026-09-21",
+     "amount": 34.02,
+     "description": "SHEETZ 0319",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-22",
+     "date_posted": "2026-09-22",
+     "amount": 14.96,
+     "description": "CHIPOTLE 2210",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-23",
+     "date_posted": "2026-09-23",
+     "amount": 25.15,
+     "description": "TARGET T-2855",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-25",
+     "date_posted": "2026-09-25",
+     "amount": -700.0,
+     "description": "PENN STATE PAYROLL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-25",
+     "date_posted": "2026-09-25",
+     "amount": 26.31,
+     "description": "UBER *TRIP",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-26",
+     "date_posted": "2026-09-26",
+     "amount": 6.77,
+     "description": "MCLANAHANS DOWNTOWN",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-09-29",
+     "date_posted": "2026-09-29",
+     "amount": 6.49,
+     "description": "TARGET T-2855",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-01",
+     "date_posted": "2026-10-01",
+     "amount": 32.82,
+     "description": "MCLANAHANS DOWNTOWN",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-01",
+     "date_posted": "2026-10-01",
+     "amount": 850.0,
+     "description": "RENT - THE META",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-01",
+     "date_posted": "2026-10-01",
+     "amount": -300.0,
+     "description": "ZELLE FROM MOM",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-03",
+     "date_posted": "2026-10-03",
+     "amount": 7.73,
+     "description": "GIANT FOOD #6421",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-03",
+     "date_posted": "2026-10-03",
+     "amount": 31.35,
+     "description": "MCLANAHANS DOWNTOWN",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-03",
+     "date_posted": "2026-10-03",
+     "amount": 12.06,
+     "description": "TARGET T-2855",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-03",
+     "date_posted": "2026-10-03",
+     "amount": 21.28,
+     "description": "TARGET T-2855",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-04",
+     "date_posted": "2026-10-04",
+     "amount": 6.5,
+     "description": "UBER *TRIP",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-05",
+     "date_posted": "2026-10-05",
+     "amount": 24.99,
+     "description": "PLANET FITNESS",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-09",
+     "date_posted": "2026-10-09",
+     "amount": -700.0,
+     "description": "PENN STATE PAYROLL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-11",
+     "date_posted": "2026-10-11",
+     "amount": 30.93,
+     "description": "SHEETZ 0319",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-12",
+     "date_posted": "2026-10-12",
+     "amount": 45.0,
+     "description": "VERIZON WIRELESS",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-16",
+     "date_posted": "2026-10-16",
+     "amount": 18.43,
+     "description": "CHIPOTLE 2210",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-16",
+     "date_posted": "2026-10-16",
+     "amount": 13.52,
+     "description": "SHEETZ 0319",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-17",
+     "date_posted": "2026-10-17",
+     "amount": 800.0,
+     "description": "CARMAX DOWN PAYMENT",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-18",
+     "date_posted": "2026-10-18",
+     "amount": 5.99,
+     "description": "SPOTIFY",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-19",
+     "date_posted": "2026-10-19",
+     "amount": 25.0,
+     "description": "AMAZON.COM*2K4PL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-23",
+     "date_posted": "2026-10-23",
+     "amount": -700.0,
+     "description": "PENN STATE PAYROLL",
+     "currency": "USD"
+    },
+    {
+     "date_transacted": "2026-10-24",
+     "date_posted": "2026-10-24",
+     "amount": 24.89,
+     "description": "MCLANAHANS DOWNTOWN",
+     "currency": "USD"
+    }
+   ]
+  }
+ ]
+}

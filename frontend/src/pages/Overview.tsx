@@ -6,6 +6,7 @@ import { useAppState } from "../state";
 import type { Profile, RecurringItem } from "../types";
 import { centsToDollarsText, dollarsToCents, fmtCadence, fmtCents, fmtDate, fmtDollars, fmtPct } from "../lib/format";
 import { errorMessage } from "../lib/hooks";
+import { markConnected } from "../lib/session";
 import ProjectionChart, { BASELINE_KEY } from "../components/ProjectionChart";
 import { Badge, Button, Card, Dot, ErrorNote, Skeleton, Stat, inputClass, type Tone } from "../components/ui";
 
@@ -24,6 +25,7 @@ export default function Overview() {
     try {
       const c = await api.connect();
       setInstitution(c.institution);
+      markConnected();
       const [p, b] = await Promise.all([api.profile(), api.baseline()]);
       setProfile(p);
       setBaseline(b);
@@ -77,6 +79,10 @@ export default function Overview() {
       </section>
     );
   }
+
+  const sortedOneOffs = [...profile.one_offs].sort((a, b) => a.date.localeCompare(b.date));
+  const upcoming = sortedOneOffs.filter((o) => o.date >= profile.as_of);
+  const past = sortedOneOffs.filter((o) => o.date < profile.as_of);
 
   return (
     <section className="space-y-4">
@@ -149,11 +155,11 @@ export default function Overview() {
         </Card>
 
         <Card title="Upcoming one-time costs" className="lg:col-span-1">
-          {profile.one_offs.length === 0 ? (
+          {upcoming.length === 0 ? (
             <p className="text-sm text-slate-500">None on file.</p>
           ) : (
             <ul className="divide-y divide-slate-100 dark:divide-slate-800">
-              {[...profile.one_offs].sort((a, b) => a.date.localeCompare(b.date)).map((o) => (
+              {upcoming.map((o) => (
                 <li key={o.id} className="flex items-start justify-between gap-3 py-2 text-sm">
                   <div>
                     <div className="font-medium">{o.label}</div>
@@ -168,6 +174,12 @@ export default function Overview() {
                 </li>
               ))}
             </ul>
+          )}
+          {past.length > 0 && (
+            <p className="mt-2 text-xs text-slate-500">
+              <span className="tabular">{past.length}</span> past one-time {past.length === 1 ? "cost" : "costs"} detected in your history (
+              {past.map((o) => o.label).join(", ")}); already reflected in your balance.
+            </p>
           )}
         </Card>
       </div>

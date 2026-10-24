@@ -154,3 +154,15 @@ def test_scenario_menu_and_action_template(profile, demo_inputs):
     assert "100/300/50" in tpl["configuration"] and "$500" in tpl["configuration"]
     no_deadline = AutoInsuranceInputs.model_validate({**demo_inputs, "registration_deadline": None})
     assert mod.action_template(no_deadline, option, AS_OF)["deadline"] == "2026-11-23"  # as_of + 30
+
+
+def test_constraint_citations_are_real_chunk_ids(profile, demo_inputs):
+    from app.rag import facts
+
+    ev = evaluate(registry.get("auto_insurance"), demo_inputs, profile)
+    cons = {c.id: c for c in ev.constraints}
+    for c in ev.constraints:
+        assert c.citation_ids and set(c.citation_ids) <= set(facts.EXPECTED_TEXT)
+    assert cons["c_pa_minimum"].citation_ids[0] == "pa-auto-insurance-guide#0"
+    assert cons["c_limited_tort"].citation_ids == ["pa-auto-insurance-guide#1"]
+    assert cons["c_lender_comp_coll"].citation_ids[0] == "cfpb-auto-loan-insurance#0"

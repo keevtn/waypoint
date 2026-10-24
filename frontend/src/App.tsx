@@ -1,4 +1,7 @@
-import { NavLink, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { NavLink, Route, Routes, useLocation } from "react-router-dom";
+import { api } from "./api";
+import { useAppState } from "./state";
 import Overview from "./pages/Overview";
 import Moment from "./pages/Moment";
 import Compare from "./pages/Compare";
@@ -6,33 +9,91 @@ import StressTest from "./pages/StressTest";
 import Action from "./pages/Action";
 
 // Top stepper echoes the track's chain: Understand → Compare → Stress test → Act.
-const STEPS = [
-  { to: "/", label: "Understand" },
-  { to: "/compare", label: "Compare" },
-  { to: "/stress", label: "Stress test" },
-  { to: "/action", label: "Act" },
+const STEPS: { to: string; label: string; match: string[] }[] = [
+  { to: "/", label: "Understand", match: ["/"] },
+  { to: "/compare", label: "Compare", match: ["/moment", "/compare"] },
+  { to: "/stress", label: "Stress test", match: ["/stress"] },
+  { to: "/action", label: "Act", match: ["/action"] },
 ];
 
 export default function App() {
+  const { pathname } = useLocation();
+  const { profile, evaluation, setProfile, setBaseline } = useAppState();
+
+  // Silently restore a profile after a refresh (live mode: succeeds only once a bank is connected).
+  useEffect(() => {
+    if (profile) return;
+    let alive = true;
+    api
+      .profile()
+      .then(async (p) => {
+        if (!alive) return;
+        setProfile(p);
+        try {
+          setBaseline(await api.baseline());
+        } catch {
+          /* chart stays in its loading state */
+        }
+      })
+      .catch(() => {
+        /* not connected yet: Overview shows the connect button */
+      });
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const stepIndex = STEPS.findIndex((s) => s.match.includes(pathname));
+  const reached = (i: number) => (i <= 1 ? true : !!evaluation);
+
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b border-slate-200 dark:border-slate-800">
-        <div className="mx-auto max-w-6xl px-4 py-3 flex items-center gap-6">
-          <span className="font-semibold text-accent dark:text-accent-light">Waypoint</span>
-          <nav className="flex gap-4 text-sm">
-            {STEPS.map((s) => (
-              <NavLink
-                key={s.to}
-                to={s.to}
-                end={s.to === "/"}
-                className={({ isActive }) =>
-                  isActive ? "text-accent dark:text-accent-light font-medium" : "text-slate-500"
-                }
-              >
-                {s.label}
-              </NavLink>
-            ))}
+      <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+        <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3">
+          <NavLink to="/" className="font-semibold tracking-tight text-accent dark:text-accent-light">
+            Waypoint
+          </NavLink>
+          <nav aria-label="Steps" className="flex items-center gap-1 text-sm">
+            {STEPS.map((s, i) => {
+              const active = i === stepIndex;
+              const done = i < stepIndex;
+              const enabled = reached(i);
+              return (
+                <NavLink
+                  key={s.to}
+                  to={enabled ? s.to : "#"}
+                  aria-current={active ? "step" : undefined}
+                  aria-disabled={!enabled}
+                  onClick={(e) => !enabled && e.preventDefault()}
+                  className={[
+                    "flex items-center gap-2 rounded-md px-2 py-1",
+                    active ? "font-medium text-accent dark:text-accent-light" : done ? "text-slate-700 dark:text-slate-200" : "text-slate-400",
+                    enabled ? "hover:bg-slate-100 dark:hover:bg-slate-800" : "cursor-default",
+                  ].join(" ")}
+                >
+                  <span
+                    className={`tabular flex h-5 w-5 items-center justify-center rounded-full border text-[11px] ${
+                      active
+                        ? "border-accent bg-accent text-white dark:border-accent-light dark:bg-accent-light"
+                        : done
+                          ? "border-accent text-accent dark:border-accent-light dark:text-accent-light"
+                          : "border-slate-300 dark:border-slate-700"
+                    }`}
+                  >
+                    {i + 1}
+                  </span>
+                  <span className="hidden sm:inline">{s.label}</span>
+                  {i < STEPS.length - 1 && <span aria-hidden className="ml-1 h-px w-4 bg-slate-300 dark:bg-slate-700" />}
+                </NavLink>
+              );
+            })}
           </nav>
+          {profile && (
+            <span className="ml-auto hidden text-xs text-slate-500 md:inline">
+              Demo bank · Plaid sandbox
+            </span>
+          )}
         </div>
       </header>
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
@@ -44,9 +105,9 @@ export default function App() {
           <Route path="/action" element={<Action />} />
         </Routes>
       </main>
-      <footer className="border-t border-slate-200 dark:border-slate-800 px-4 py-3 text-xs text-slate-500 text-center">
-        Estimates and educational information, not financial advice. Numbers are computed from your
-        transactions; facts are cited.
+      <footer className="border-t border-slate-200 px-4 py-3 text-center text-xs text-slate-500 dark:border-slate-800">
+        Estimates and educational information, not financial advice. Numbers are computed from your transactions; facts
+        are cited.
       </footer>
     </div>
   );

@@ -22,6 +22,9 @@ const fixtureFiles = import.meta.glob("../../backend/fixtures/*.json", { eager: 
   unknown
 >;
 
+// Fixture mode: LLM-backed calls take 5–15s live, so add a short delay to exercise loading states.
+const slow = <T,>(v: T, ms = 900): Promise<T> => new Promise((r) => setTimeout(() => r(v), ms));
+
 function fixture<T>(name: string): T {
   const key = `../../backend/fixtures/${name}.json`;
   const data = fixtureFiles[key];
@@ -96,12 +99,12 @@ export const api = {
 
   explain: (decisionId: string, evalId: string) =>
     USE_FIXTURES
-      ? Promise.resolve(fixture<ExplainResponse>(`explain_${shortId(decisionId)}`))
+      ? slow(fixture<ExplainResponse>(`explain_${shortId(decisionId)}`))
       : post<ExplainResponse>(`/decisions/${decisionId}/explain`, { eval_id: evalId }),
 
   stress: (decisionId: string, evalId: string, preferredOptionId: string) =>
     USE_FIXTURES
-      ? Promise.resolve(fixture<StressResponse>(`stress_${shortId(decisionId)}`))
+      ? slow(fixture<StressResponse>(`stress_${shortId(decisionId)}`))
       : post<StressResponse>(`/decisions/${decisionId}/stress`, {
           eval_id: evalId,
           preferred_option_id: preferredOptionId,
@@ -109,12 +112,12 @@ export const api = {
 
   action: (decisionId: string, evalId: string, optionId: string) =>
     USE_FIXTURES
-      ? Promise.resolve({ ...fixture<ActionCard>(`action_${shortId(decisionId)}`), option_id: optionId })
+      ? slow({ ...fixture<ActionCard>(`action_${shortId(decisionId)}`), option_id: optionId })
       : post<ActionCard>(`/decisions/${decisionId}/action`, { eval_id: evalId, option_id: optionId }),
 
   ask: (question: string, module: string | null) =>
     USE_FIXTURES
-      ? Promise.resolve(fixture<RagAskResponse>(/tort/i.test(question) ? "rag_ask_ok" : "rag_ask_refusal"))
+      ? slow(fixture<RagAskResponse>(/tort/i.test(question) ? "rag_ask_ok" : "rag_ask_refusal"), 700)
       : post<RagAskResponse>("/rag/ask", { question, module }),
 };
 

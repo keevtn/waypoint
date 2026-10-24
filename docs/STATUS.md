@@ -22,7 +22,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 | Session | Branch | Phase | Last merged to main | Blocked on | Updated |
 |---------|--------|-------|---------------------|------------|---------|
 | A llm | a/p6-p7 | P6 | — | A-P3, C | — |
-| B wire | b/p4-live | P4 live | — | A-P3 (evaluate), then A-P6/P7 | 2026-10-24 |
+| B wire | b/p4-live | P4 live | Stress + Action pages, live connect/profile/baseline verified @ 2026-10-24 | A-P3 (evaluate), then A-P6/P7 for real explain/stress/action | 2026-10-24 |
 | D plaid | d/p8-plaid | P8 | — | A-P1 | — |
 
 ## Wave 3 — from roughly hour 14
@@ -66,3 +66,11 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 - `ProjectionChart` takes `series: {id,label,result}[]`; pass `"baseline"` as the id for the dashed reference line. Fixture projections only carry 2 months; the chart unions whatever months it gets.
 - Prices without `source_url`/`source_title` render a red **Unsourced** badge (SPEC §3.6). Session A: populate `PriceEstimate.source_*` from `pricing.json` so the demo never shows it.
 - Explanation text renders `[s:chunk]` as citation chips and `[c:constraint]` as a "rule" tag with the constraint rule as tooltip; `tight_months.why` feeds the "why this month is tight" panel, falling back to `Flag.detail.contributors`.
+
+## Session B notes (Stress + Action merged; live swap partial)
+
+- All five pages render. Verified end to end in two modes: `VITE_USE_FIXTURES=1`, and live against `main` with `DATA_MODE=local LLM_FAKE=1` (connect, profile, baseline are real; evaluate/explain/stress/action still return fixtures on `main`).
+- The app only restores a profile on refresh after this tab has gone through Connect (sessionStorage flag), because the local backend serves `/api/profile` before any connect and the demo must start on the Connect button.
+- Overview lists one-offs dated on/after `as_of` as upcoming and summarizes earlier `detected` ones in a footnote.
+- Action page: printable card, "Copy as text", "Add reminder" (.ics with a 3-day alarm, only when `deadline` is set), "Talk to a human" hidden when `talk_to_human_url` is null.
+- Remaining for B: re-verify Compare once A-P3's real `/evaluate` lands (option ids and `PriceEstimate.source_*` drive badges), then Stress/Action once A-P6/P7 land. No frontend code change is expected for the swap.

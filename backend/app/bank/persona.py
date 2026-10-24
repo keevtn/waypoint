@@ -24,7 +24,7 @@ PERSONA_ID = "persona_student"
 SAFETY_FLOOR_CENTS = 20000
 
 # --- tuning knobs (amounts only; see SPEC.md §8 "tune the persona") -----------
-BALANCE_CENTS = 124000  # current balance as of today
+BALANCE_CENTS = 184000  # current balance as of today (tuned from §8's $1,240; see docs/STATUS.md)
 PAYROLL_CENTS = 70000  # biweekly, Fridays
 FAMILY_CENTS = 30000  # 1st of month
 RENT_CENTS = 85000  # 1st
@@ -32,12 +32,12 @@ PHONE_CENTS = 4500  # 12th
 GYM_CENTS = 2499  # 5th
 MUSIC_CENTS = 599  # 18th
 DOWN_PAYMENT_CENTS = 80000  # ~7 days ago
-PAST_TUITION_CENTS = 125000  # ~70 days ago
-TUITION_CENTS = 125000  # next Jan 15
+PAST_TUITION_CENTS = 150000  # ~70 days ago
+TUITION_CENTS = 150000  # next Jan 15 (tuned from §8's $1,250)
 TEXTBOOKS_CENTS = 22000  # next Jan 20
 REGISTRATION_CENTS = 18000  # as_of + 12 days
-# Variable spend per full history month, oldest -> newest. mean 290, pop. std ~67.
-VARIABLE_MONTH_TOTALS_CENTS = [20000, 26000, 32000, 38000]
+# Variable spend per full history month, oldest -> newest. mean 260 (tuned from §8's ~290), pop. std ~67.
+VARIABLE_MONTH_TOTALS_CENTS = [17000, 23000, 29000, 35000]
 VARIABLE_TXNS_PER_MONTH = 15
 HISTORY_FULL_MONTHS = 4
 

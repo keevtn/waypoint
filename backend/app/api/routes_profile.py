@@ -2,15 +2,15 @@
 
 Phase 1 (Session A): GET/PUT /profile and /profile/transactions come from
 profile/store.py (detect.py over the ingested transactions).
-Phase 2 wires /projection/baseline to projection/engine.py.
+Phase 2 (Session A): /projection/baseline = project(profile, []) from projection/engine.py.
 """
 from __future__ import annotations
 
 from fastapi import APIRouter, Query
 
-from .. import fixtures
 from ..models import Profile, ProjectionResult, Transaction
 from ..profile import store
+from ..projection import project
 
 router = APIRouter(prefix="/api", tags=["profile"])
 
@@ -32,4 +32,4 @@ def get_transactions(limit: int = Query(50, ge=1, le=500)) -> list[Transaction]:
 
 @router.get("/projection/baseline", response_model=ProjectionResult)
 def get_baseline() -> ProjectionResult:
-    return ProjectionResult.model_validate(fixtures.load("baseline"))
+    return project(store.get_profile(), [])

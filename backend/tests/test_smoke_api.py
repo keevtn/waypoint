@@ -33,7 +33,7 @@ def test_connect_then_profile(client):
     assert {i["cadence"] for i in p["income"]} == {"biweekly", "monthly"}
     assert all(x["confidence"] > 0.8 for x in p["income"] + p["recurring"])
     assert p["variable"]["months_observed"] >= 3
-    assert 50000 <= p["monthly_slack_cents"] <= 70000  # §8 outcome 1: ~$600
+    assert 55000 <= p["monthly_slack_cents"] <= 66000  # §8 outcome 1: ~$600
     assert {o["id"] for o in p["one_offs"] if o["source"] == "user"} == {"oo_registration", "oo_tuition", "oo_textbooks"}
 
     r = client.get("/api/profile/transactions?limit=5")
@@ -61,6 +61,13 @@ def test_baseline_no_negative_months(client):
     assert len(b["series"]) == 12
     assert b["months_negative"] == []
     assert all(pt["min_balance_cents"] >= 0 for pt in b["series"])
+    # Phase 2: computed, not a fixture
+    assert b["months_below_floor"] == []
+    assert all(pt["min_balance_date"][:7] == pt["month"] for pt in b["series"])
+    assert all(pt["inflow_cents"] > 0 and pt["outflow_cents"] > 0 for pt in b["series"])
+    assert b["series"][-1]["end_balance_cents"] > b["series"][0]["end_balance_cents"]
+    assert 55000 <= b["monthly_slack_cents"] <= 66000
+    assert not any(f["code"] in {"below_floor", "negative"} for f in b["flags"])
 
 
 def test_decisions_list(client):

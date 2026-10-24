@@ -12,7 +12,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 
 | Session | Branch | Phase | Last merged to main | Blocked on | Updated |
 |---------|--------|-------|---------------------|------------|---------|
-| A backend-core | a/p1-p3 | P1 | — | — | — |
+| A backend-core | a/p1-p3 | P3 | P1+P2 @ 2026-10-24 19:40 | — | 2026-10-24 19:40 |
 | B frontend | b/p4-core | P4 | P4 fixtures @ 2026-10-24 (6576e06, Actions green) | — | 2026-10-24 |
 | C rag | c/p5-rag | P5 | — | — | — |
 | E deploy | e/p9-deploy | P9 | — | — | — |
@@ -42,6 +42,14 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 3. Every §7 endpoint exists and returns its hand-written fixture; 11 fixtures validate against the models and encode §8 outcomes 2 and 5.
 4. `FakeLLM` and `FakeEmbedder` are wired behind `get_llm()` / `get_embedder()` under `LLM_FAKE=1`; no business logic exists yet, stubs only.
 5. Wave 1 (A, B, C, E) can start now from `origin/main`; `scripts/make_persona.py` and `scripts/build_index.py` are placeholders for A and C to replace.
+
+## Session A notes (P1+P2 merged)
+
+- `/bank/connect` (local), `GET/PUT /profile`, `/profile/transactions`, `/projection/baseline` are real. Single-user state lives in `app/profile/store.py`; Session D plugs Plaid in by filling the same `State` (see `store.connect()`).
+- Persona tuned per SPEC §8 "tune amounts, not logic" so all five outcomes hold with the spec's outflows-first rule: balance **$1,840** (was $1,240), tuition **$1,500** (was $1,250, both past and future), variable mean **$260** (was ~$290). Loan due on the 17th (first payment ~31 days after purchase), premium from as_of+10 days. Slack: baseline $630, after loan $419.
+- Deductible stress: claim on the 1st of plan month 3 counting the current month as month 1 (Dec 1 from late October); unaffordable = stressed balance in that month below the safety floor. Options flag Jan (+Feb/Mar as the tuition hole recovers); nothing goes negative.
+- `backend/data/persona_student.json` + `plaid_custom_user.json` are committed for reference; the loader regenerates in memory when the file's `as_of` is not today, so nothing goes stale. `python scripts/make_persona.py` refreshes them.
+- Flag `detail` shapes: below_floor/negative carry `contributors[]` (`id,label,amount_cents,date,kind`, plus a `variable` drip entry); deductible flags carry `deductible_cents, claim_date, min_balance_cents, unstressed_min_balance_cents`.
 
 ## Phase 0 notes for Wave 1
 

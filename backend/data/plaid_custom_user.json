@@ -4,7 +4,7 @@
   {
    "type": "depository",
    "subtype": "checking",
-   "starting_balance": 1240.0,
+   "starting_balance": 1840.0,
    "currency": "USD",
    "meta": {
     "name": "Checking",
@@ -29,21 +29,21 @@
     {
      "date_transacted": "2026-06-02",
      "date_posted": "2026-06-02",
-     "amount": 15.28,
+     "amount": 12.98,
      "description": "GIANT FOOD #6421",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-06-02",
      "date_posted": "2026-06-02",
-     "amount": 7.15,
+     "amount": 6.08,
      "description": "TARGET T-2855",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-06-05",
      "date_posted": "2026-06-05",
-     "amount": 19.14,
+     "amount": 16.27,
      "description": "CHIPOTLE 2210",
      "currency": "USD"
     },
@@ -64,21 +64,21 @@
     {
      "date_transacted": "2026-06-11",
      "date_posted": "2026-06-11",
-     "amount": 22.5,
+     "amount": 19.12,
      "description": "GIANT FOOD #6421",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-06-11",
      "date_posted": "2026-06-11",
-     "amount": 17.76,
+     "amount": 15.09,
      "description": "SHEETZ 0319",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-06-11",
      "date_posted": "2026-06-11",
-     "amount": 16.69,
+     "amount": 14.19,
      "description": "TARGET T-2855",
      "currency": "USD"
     },
@@ -92,21 +92,21 @@
     {
      "date_transacted": "2026-06-14",
      "date_posted": "2026-06-14",
-     "amount": 14.82,
+     "amount": 12.5,
      "description": "SHEETZ 0319",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-06-15",
      "date_posted": "2026-06-15",
-     "amount": 18.91,
+     "amount": 16.07,
      "description": "UBER *TRIP",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-06-17",
      "date_posted": "2026-06-17",
-     "amount": 10.43,
+     "amount": 8.86,
      "description": "GIANT FOOD #6421",
      "currency": "USD"
     },
@@ -127,49 +127,49 @@
     {
      "date_transacted": "2026-06-21",
      "date_posted": "2026-06-21",
-     "amount": 13.96,
+     "amount": 11.87,
      "description": "MCLANAHANS DOWNTOWN",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-06-23",
      "date_posted": "2026-06-23",
-     "amount": 3.4,
+     "amount": 3.0,
      "description": "SHEETZ 0319",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-06-23",
      "date_posted": "2026-06-23",
-     "amount": 20.11,
+     "amount": 17.1,
      "description": "TARGET T-2855",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-06-27",
      "date_posted": "2026-06-27",
-     "amount": 6.46,
+     "amount": 5.49,
      "description": "CHIPOTLE 2210",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-06-30",
      "date_posted": "2026-06-30",
-     "amount": 6.97,
+     "amount": 5.92,
      "description": "CHIPOTLE 2210",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-06-30",
      "date_posted": "2026-06-30",
-     "amount": 6.42,
+     "amount": 5.46,
      "description": "UBER *TRIP",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-07-01",
      "date_posted": "2026-07-01",
-     "amount": 15.29,
+     "amount": 13.52,
      "description": "CHIPOTLE 2210",
      "currency": "USD"
     },
@@ -197,7 +197,7 @@
     {
      "date_transacted": "2026-07-03",
      "date_posted": "2026-07-03",
-     "amount": 8.15,
+     "amount": 7.21,
      "description": "SHEETZ 0319",
      "currency": "USD"
     },
@@ -211,21 +211,21 @@
     {
      "date_transacted": "2026-07-05",
      "date_posted": "2026-07-05",
-     "amount": 3.42,
+     "amount": 3.02,
      "description": "TARGET T-2855",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-07-07",
      "date_posted": "2026-07-07",
-     "amount": 28.76,
+     "amount": 25.44,
      "description": "SHEETZ 0319",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-07-08",
      "date_posted": "2026-07-08",
-     "amount": 5.14,
+     "amount": 4.55,
      "description": "AMAZON.COM*2K4PL",
      "currency": "USD"
     },
@@ -239,21 +239,21 @@
     {
      "date_transacted": "2026-07-13",
      "date_posted": "2026-07-13",
-     "amount": 14.43,
+     "amount": 12.76,
      "description": "TARGET T-2855",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-07-15",
      "date_posted": "2026-07-15",
-     "amount": 14.52,
+     "amount": 12.86,
      "description": "SHEETZ 0319",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-07-17",
      "date_posted": "2026-07-17",
-     "amount": 22.72,
+     "amount": 20.1,
      "description": "CHIPOTLE 2210",
      "currency": "USD"
     },
@@ -274,49 +274,49 @@
     {
      "date_transacted": "2026-07-19",
      "date_posted": "2026-07-19",
-     "amount": 27.68,
+     "amount": 24.48,
      "description": "SHEETZ 0319",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-07-20",
      "date_posted": "2026-07-20",
-     "amount": 26.81,
+     "amount": 23.72,
      "description": "TARGET T-2855",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-07-22",
      "date_posted": "2026-07-22",
-     "amount": 27.9,
+     "amount": 24.68,
      "description": "AMAZON.COM*2K4PL",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-07-23",
      "date_posted": "2026-07-23",
-     "amount": 15.64,
+     "amount": 13.83,
      "description": "UBER *TRIP",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-07-25",
      "date_posted": "2026-07-25",
-     "amount": 22.71,
+     "amount": 20.09,
      "description": "TARGET T-2855",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-07-27",
      "date_posted": "2026-07-27",
-     "amount": 11.4,
+     "amount": 10.09,
      "description": "UBER *TRIP",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-07-28",
      "date_posted": "2026-07-28",
-     "amount": 15.43,
+     "amount": 13.65,
      "description": "SHEETZ 0319",
      "currency": "USD"
     },
@@ -344,21 +344,21 @@
     {
      "date_transacted": "2026-08-03",
      "date_posted": "2026-08-03",
-     "amount": 32.33,
+     "amount": 29.3,
      "description": "CHIPOTLE 2210",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-08-04",
      "date_posted": "2026-08-04",
-     "amount": 27.66,
+     "amount": 25.06,
      "description": "CHIPOTLE 2210",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-08-04",
      "date_posted": "2026-08-04",
-     "amount": 33.28,
+     "amount": 30.16,
      "description": "TARGET T-2855",
      "currency": "USD"
     },
@@ -372,28 +372,28 @@
     {
      "date_transacted": "2026-08-07",
      "date_posted": "2026-08-07",
-     "amount": 17.53,
+     "amount": 15.89,
      "description": "CHIPOTLE 2210",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-08-07",
      "date_posted": "2026-08-07",
-     "amount": 30.2,
+     "amount": 27.37,
      "description": "TARGET T-2855",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-08-10",
      "date_posted": "2026-08-10",
-     "amount": 26.36,
+     "amount": 23.89,
      "description": "GIANT FOOD #6421",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-08-10",
      "date_posted": "2026-08-10",
-     "amount": 7.46,
+     "amount": 6.76,
      "description": "SHEETZ 0319",
      "currency": "USD"
     },
@@ -407,7 +407,7 @@
     {
      "date_transacted": "2026-08-14",
      "date_posted": "2026-08-14",
-     "amount": 4.12,
+     "amount": 3.73,
      "description": "GIANT FOOD #6421",
      "currency": "USD"
     },
@@ -421,21 +421,21 @@
     {
      "date_transacted": "2026-08-15",
      "date_posted": "2026-08-15",
-     "amount": 1250.0,
+     "amount": 1500.0,
      "description": "PENN STATE BURSAR",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-08-17",
      "date_posted": "2026-08-17",
-     "amount": 8.79,
+     "amount": 7.97,
      "description": "GIANT FOOD #6421",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-08-17",
      "date_posted": "2026-08-17",
-     "amount": 5.63,
+     "amount": 5.1,
      "description": "SHEETZ 0319",
      "currency": "USD"
     },
@@ -449,21 +449,21 @@
     {
      "date_transacted": "2026-08-20",
      "date_posted": "2026-08-20",
-     "amount": 21.71,
+     "amount": 19.67,
      "description": "AMAZON.COM*2K4PL",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-08-20",
      "date_posted": "2026-08-20",
-     "amount": 32.64,
+     "amount": 29.58,
      "description": "MCLANAHANS DOWNTOWN",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-08-21",
      "date_posted": "2026-08-21",
-     "amount": 23.19,
+     "amount": 21.01,
      "description": "AMAZON.COM*2K4PL",
      "currency": "USD"
     },
@@ -477,21 +477,21 @@
     {
      "date_transacted": "2026-08-30",
      "date_posted": "2026-08-30",
-     "amount": 25.68,
+     "amount": 23.29,
      "description": "UBER *TRIP",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-08-31",
      "date_posted": "2026-08-31",
-     "amount": 23.42,
+     "amount": 21.22,
      "description": "CHIPOTLE 2210",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-09-01",
      "date_posted": "2026-09-01",
-     "amount": 43.01,
+     "amount": 39.62,
      "description": "AMAZON.COM*2K4PL",
      "currency": "USD"
     },
@@ -519,21 +519,21 @@
     {
      "date_transacted": "2026-09-08",
      "date_posted": "2026-09-08",
-     "amount": 45.45,
+     "amount": 41.86,
      "description": "MCLANAHANS DOWNTOWN",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-09-10",
      "date_posted": "2026-09-10",
-     "amount": 31.6,
+     "amount": 29.11,
      "description": "UBER *TRIP",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-09-11",
      "date_posted": "2026-09-11",
-     "amount": 14.06,
+     "amount": 12.95,
      "description": "AMAZON.COM*2K4PL",
      "currency": "USD"
     },
@@ -554,28 +554,28 @@
     {
      "date_transacted": "2026-09-14",
      "date_posted": "2026-09-14",
-     "amount": 10.25,
+     "amount": 9.44,
      "description": "UBER *TRIP",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-09-14",
      "date_posted": "2026-09-14",
-     "amount": 26.18,
+     "amount": 24.12,
      "description": "UBER *TRIP",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-09-16",
      "date_posted": "2026-09-16",
-     "amount": 36.98,
+     "amount": 34.06,
      "description": "TARGET T-2855",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-09-17",
      "date_posted": "2026-09-17",
-     "amount": 12.48,
+     "amount": 11.49,
      "description": "UBER *TRIP",
      "currency": "USD"
     },
@@ -589,28 +589,28 @@
     {
      "date_transacted": "2026-09-19",
      "date_posted": "2026-09-19",
-     "amount": 46.29,
+     "amount": 42.63,
      "description": "CHIPOTLE 2210",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-09-21",
      "date_posted": "2026-09-21",
-     "amount": 34.02,
+     "amount": 31.34,
      "description": "SHEETZ 0319",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-09-22",
      "date_posted": "2026-09-22",
-     "amount": 14.96,
+     "amount": 13.78,
      "description": "CHIPOTLE 2210",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-09-23",
      "date_posted": "2026-09-23",
-     "amount": 25.15,
+     "amount": 23.16,
      "description": "TARGET T-2855",
      "currency": "USD"
     },
@@ -624,28 +624,28 @@
     {
      "date_transacted": "2026-09-25",
      "date_posted": "2026-09-25",
-     "amount": 26.31,
+     "amount": 24.23,
      "description": "UBER *TRIP",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-09-26",
      "date_posted": "2026-09-26",
-     "amount": 6.77,
+     "amount": 6.24,
      "description": "MCLANAHANS DOWNTOWN",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-09-29",
      "date_posted": "2026-09-29",
-     "amount": 6.49,
+     "amount": 5.97,
      "description": "TARGET T-2855",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-10-01",
      "date_posted": "2026-10-01",
-     "amount": 32.82,
+     "amount": 29.42,
      "description": "MCLANAHANS DOWNTOWN",
      "currency": "USD"
     },
@@ -666,35 +666,35 @@
     {
      "date_transacted": "2026-10-03",
      "date_posted": "2026-10-03",
-     "amount": 7.73,
+     "amount": 6.95,
      "description": "GIANT FOOD #6421",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-10-03",
      "date_posted": "2026-10-03",
-     "amount": 31.35,
+     "amount": 28.11,
      "description": "MCLANAHANS DOWNTOWN",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-10-03",
      "date_posted": "2026-10-03",
-     "amount": 12.06,
+     "amount": 10.81,
      "description": "TARGET T-2855",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-10-03",
      "date_posted": "2026-10-03",
-     "amount": 21.28,
+     "amount": 19.08,
      "description": "TARGET T-2855",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-10-04",
      "date_posted": "2026-10-04",
-     "amount": 6.5,
+     "amount": 5.83,
      "description": "UBER *TRIP",
      "currency": "USD"
     },
@@ -715,7 +715,7 @@
     {
      "date_transacted": "2026-10-11",
      "date_posted": "2026-10-11",
-     "amount": 30.93,
+     "amount": 27.73,
      "description": "SHEETZ 0319",
      "currency": "USD"
     },
@@ -729,14 +729,14 @@
     {
      "date_transacted": "2026-10-16",
      "date_posted": "2026-10-16",
-     "amount": 18.43,
+     "amount": 16.52,
      "description": "CHIPOTLE 2210",
      "currency": "USD"
     },
     {
      "date_transacted": "2026-10-16",
      "date_posted": "2026-10-16",
-     "amount": 13.52,
+     "amount": 12.12,
      "description": "SHEETZ 0319",
      "currency": "USD"
     },
@@ -757,7 +757,7 @@
     {
      "date_transacted": "2026-10-19",
      "date_posted": "2026-10-19",
-     "amount": 25.0,
+     "amount": 22.41,
      "description": "AMAZON.COM*2K4PL",
      "currency": "USD"
     },
@@ -771,7 +771,7 @@
     {
      "date_transacted": "2026-10-24",
      "date_posted": "2026-10-24",
-     "amount": 24.89,
+     "amount": 22.31,
      "description": "MCLANAHANS DOWNTOWN",
      "currency": "USD"
     }

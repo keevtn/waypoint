@@ -1,7 +1,7 @@
 {
  "persona_id": "persona_student",
  "as_of": "2026-10-24",
- "balance_cents": 124000,
+ "balance_cents": 184000,
  "safety_floor_cents": 20000,
  "account": {
   "name": "Student Checking",
@@ -25,21 +25,21 @@
   },
   {
    "date": "2026-06-02",
-   "amount_cents": -1528,
+   "amount_cents": -1298,
    "raw_name": "GIANT FOOD #6421",
    "category": "groceries",
    "id": "txn_0003"
   },
   {
    "date": "2026-06-02",
-   "amount_cents": -715,
+   "amount_cents": -608,
    "raw_name": "TARGET T-2855",
    "category": "shopping",
    "id": "txn_0004"
   },
   {
    "date": "2026-06-05",
-   "amount_cents": -1914,
+   "amount_cents": -1627,
    "raw_name": "CHIPOTLE 2210",
    "category": "dining",
    "id": "txn_0005"
@@ -60,21 +60,21 @@
   },
   {
    "date": "2026-06-11",
-   "amount_cents": -2250,
+   "amount_cents": -1912,
    "raw_name": "GIANT FOOD #6421",
    "category": "groceries",
    "id": "txn_0008"
   },
   {
    "date": "2026-06-11",
-   "amount_cents": -1776,
+   "amount_cents": -1509,
    "raw_name": "SHEETZ 0319",
    "category": "gas",
    "id": "txn_0009"
   },
   {
    "date": "2026-06-11",
-   "amount_cents": -1669,
+   "amount_cents": -1419,
    "raw_name": "TARGET T-2855",
    "category": "shopping",
    "id": "txn_0010"
@@ -88,21 +88,21 @@
   },
   {
    "date": "2026-06-14",
-   "amount_cents": -1482,
+   "amount_cents": -1250,
    "raw_name": "SHEETZ 0319",
    "category": "gas",
    "id": "txn_0012"
   },
   {
    "date": "2026-06-15",
-   "amount_cents": -1891,
+   "amount_cents": -1607,
    "raw_name": "UBER *TRIP",
    "category": "transport",
    "id": "txn_0013"
   },
   {
    "date": "2026-06-17",
-   "amount_cents": -1043,
+   "amount_cents": -886,
    "raw_name": "GIANT FOOD #6421",
    "category": "groceries",
    "id": "txn_0014"
@@ -123,49 +123,49 @@
   },
   {
    "date": "2026-06-21",
-   "amount_cents": -1396,
+   "amount_cents": -1187,
    "raw_name": "MCLANAHANS DOWNTOWN",
    "category": "groceries",
    "id": "txn_0017"
   },
   {
    "date": "2026-06-23",
-   "amount_cents": -340,
+   "amount_cents": -300,
    "raw_name": "SHEETZ 0319",
    "category": "gas",
    "id": "txn_0018"
   },
   {
    "date": "2026-06-23",
-   "amount_cents": -2011,
+   "amount_cents": -1710,
    "raw_name": "TARGET T-2855",
    "category": "shopping",
    "id": "txn_0019"
   },
   {
    "date": "2026-06-27",
-   "amount_cents": -646,
+   "amount_cents": -549,
    "raw_name": "CHIPOTLE 2210",
    "category": "dining",
    "id": "txn_0020"
   },
   {
    "date": "2026-06-30",
-   "amount_cents": -697,
+   "amount_cents": -592,
    "raw_name": "CHIPOTLE 2210",
    "category": "dining",
    "id": "txn_0021"
   },
   {
    "date": "2026-06-30",
-   "amount_cents": -642,
+   "amount_cents": -546,
    "raw_name": "UBER *TRIP",
    "category": "transport",
    "id": "txn_0022"
   },
   {
    "date": "2026-07-01",
-   "amount_cents": -1529,
+   "amount_cents": -1352,
    "raw_name": "CHIPOTLE 2210",
    "category": "dining",
    "id": "txn_0023"
@@ -193,7 +193,7 @@
   },
   {
    "date": "2026-07-03",
-   "amount_cents": -815,
+   "amount_cents": -721,
    "raw_name": "SHEETZ 0319",
    "category": "gas",
    "id": "txn_0027"
@@ -207,21 +207,21 @@
   },
   {
    "date": "2026-07-05",
-   "amount_cents": -342,
+   "amount_cents": -302,
    "raw_name": "TARGET T-2855",
    "category": "shopping",
    "id": "txn_0029"
   },
   {
    "date": "2026-07-07",
-   "amount_cents": -2876,
+   "amount_cents": -2544,
    "raw_name": "SHEETZ 0319",
    "category": "gas",
    "id": "txn_0030"
   },
   {
    "date": "2026-07-08",
-   "amount_cents": -514,
+   "amount_cents": -455,
    "raw_name": "AMAZON.COM*2K4PL",
    "category": "shopping",
    "id": "txn_0031"
@@ -235,21 +235,21 @@
   },
   {
    "date": "2026-07-13",
-   "amount_cents": -1443,
+   "amount_cents": -1276,
    "raw_name": "TARGET T-2855",
    "category": "shopping",
    "id": "txn_0033"
   },
   {
    "date": "2026-07-15",
-   "amount_cents": -1452,
+   "amount_cents": -1286,
    "raw_name": "SHEETZ 0319",
    "category": "gas",
    "id": "txn_0034"
   },
   {
    "date": "2026-07-17",
-   "amount_cents": -2272,
+   "amount_cents": -2010,
    "raw_name": "CHIPOTLE 2210",
    "category": "dining",
    "id": "txn_0035"
@@ -270,49 +270,49 @@
   },
   {
    "date": "2026-07-19",
-   "amount_cents": -2768,
+   "amount_cents": -2448,
    "raw_name": "SHEETZ 0319",
    "category": "gas",
    "id": "txn_0038"
   },
   {
    "date": "2026-07-20",
-   "amount_cents": -2681,
+   "amount_cents": -2372,
    "raw_name": "TARGET T-2855",
    "category": "shopping",
    "id": "txn_0039"
   },
   {
    "date": "2026-07-22",
-   "amount_cents": -2790,
+   "amount_cents": -2468,
    "raw_name": "AMAZON.COM*2K4PL",
    "category": "shopping",
    "id": "txn_0040"
   },
   {
    "date": "2026-07-23",
-   "amount_cents": -1564,
+   "amount_cents": -1383,
    "raw_name": "UBER *TRIP",
    "category": "transport",
    "id": "txn_0041"
   },
   {
    "date": "2026-07-25",
-   "amount_cents": -2271,
+   "amount_cents": -2009,
    "raw_name": "TARGET T-2855",
    "category": "shopping",
    "id": "txn_0042"
   },
   {
    "date": "2026-07-27",
-   "amount_cents": -1140,
+   "amount_cents": -1009,
    "raw_name": "UBER *TRIP",
    "category": "transport",
    "id": "txn_0043"
   },
   {
    "date": "2026-07-28",
-   "amount_cents": -1543,
+   "amount_cents": -1365,
    "raw_name": "SHEETZ 0319",
    "category": "gas",
    "id": "txn_0044"
@@ -340,21 +340,21 @@
   },
   {
    "date": "2026-08-03",
-   "amount_cents": -3233,
+   "amount_cents": -2930,
    "raw_name": "CHIPOTLE 2210",
    "category": "dining",
    "id": "txn_0048"
   },
   {
    "date": "2026-08-04",
-   "amount_cents": -2766,
+   "amount_cents": -2506,
    "raw_name": "CHIPOTLE 2210",
    "category": "dining",
    "id": "txn_0049"
   },
   {
    "date": "2026-08-04",
-   "amount_cents": -3328,
+   "amount_cents": -3016,
    "raw_name": "TARGET T-2855",
    "category": "shopping",
    "id": "txn_0050"
@@ -368,28 +368,28 @@
   },
   {
    "date": "2026-08-07",
-   "amount_cents": -1753,
+   "amount_cents": -1589,
    "raw_name": "CHIPOTLE 2210",
    "category": "dining",
    "id": "txn_0052"
   },
   {
    "date": "2026-08-07",
-   "amount_cents": -3020,
+   "amount_cents": -2737,
    "raw_name": "TARGET T-2855",
    "category": "shopping",
    "id": "txn_0053"
   },
   {
    "date": "2026-08-10",
-   "amount_cents": -2636,
+   "amount_cents": -2389,
    "raw_name": "GIANT FOOD #6421",
    "category": "groceries",
    "id": "txn_0054"
   },
   {
    "date": "2026-08-10",
-   "amount_cents": -746,
+   "amount_cents": -676,
    "raw_name": "SHEETZ 0319",
    "category": "gas",
    "id": "txn_0055"
@@ -403,7 +403,7 @@
   },
   {
    "date": "2026-08-14",
-   "amount_cents": -412,
+   "amount_cents": -373,
    "raw_name": "GIANT FOOD #6421",
    "category": "groceries",
    "id": "txn_0057"
@@ -417,21 +417,21 @@
   },
   {
    "date": "2026-08-15",
-   "amount_cents": -125000,
+   "amount_cents": -150000,
    "raw_name": "PENN STATE BURSAR",
    "category": "education",
    "id": "txn_0059"
   },
   {
    "date": "2026-08-17",
-   "amount_cents": -879,
+   "amount_cents": -797,
    "raw_name": "GIANT FOOD #6421",
    "category": "groceries",
    "id": "txn_0060"
   },
   {
    "date": "2026-08-17",
-   "amount_cents": -563,
+   "amount_cents": -510,
    "raw_name": "SHEETZ 0319",
    "category": "gas",
    "id": "txn_0061"
@@ -445,21 +445,21 @@
   },
   {
    "date": "2026-08-20",
-   "amount_cents": -2171,
+   "amount_cents": -1967,
    "raw_name": "AMAZON.COM*2K4PL",
    "category": "shopping",
    "id": "txn_0063"
   },
   {
    "date": "2026-08-20",
-   "amount_cents": -3264,
+   "amount_cents": -2958,
    "raw_name": "MCLANAHANS DOWNTOWN",
    "category": "groceries",
    "id": "txn_0064"
   },
   {
    "date": "2026-08-21",
-   "amount_cents": -2319,
+   "amount_cents": -2101,
    "raw_name": "AMAZON.COM*2K4PL",
    "category": "shopping",
    "id": "txn_0065"
@@ -473,21 +473,21 @@
   },
   {
    "date": "2026-08-30",
-   "amount_cents": -2568,
+   "amount_cents": -2329,
    "raw_name": "UBER *TRIP",
    "category": "transport",
    "id": "txn_0067"
   },
   {
    "date": "2026-08-31",
-   "amount_cents": -2342,
+   "amount_cents": -2122,
    "raw_name": "CHIPOTLE 2210",
    "category": "dining",
    "id": "txn_0068"
   },
   {
    "date": "2026-09-01",
-   "amount_cents": -4301,
+   "amount_cents": -3962,
    "raw_name": "AMAZON.COM*2K4PL",
    "category": "shopping",
    "id": "txn_0069"
@@ -515,21 +515,21 @@
   },
   {
    "date": "2026-09-08",
-   "amount_cents": -4545,
+   "amount_cents": -4186,
    "raw_name": "MCLANAHANS DOWNTOWN",
    "category": "groceries",
    "id": "txn_0073"
   },
   {
    "date": "2026-09-10",
-   "amount_cents": -3160,
+   "amount_cents": -2911,
    "raw_name": "UBER *TRIP",
    "category": "transport",
    "id": "txn_0074"
   },
   {
    "date": "2026-09-11",
-   "amount_cents": -1406,
+   "amount_cents": -1295,
    "raw_name": "AMAZON.COM*2K4PL",
    "category": "shopping",
    "id": "txn_0075"
@@ -550,28 +550,28 @@
   },
   {
    "date": "2026-09-14",
-   "amount_cents": -1025,
+   "amount_cents": -944,
    "raw_name": "UBER *TRIP",
    "category": "transport",
    "id": "txn_0078"
   },
   {
    "date": "2026-09-14",
-   "amount_cents": -2618,
+   "amount_cents": -2412,
    "raw_name": "UBER *TRIP",
    "category": "transport",
    "id": "txn_0079"
   },
   {
    "date": "2026-09-16",
-   "amount_cents": -3698,
+   "amount_cents": -3406,
    "raw_name": "TARGET T-2855",
    "category": "shopping",
    "id": "txn_0080"
   },
   {
    "date": "2026-09-17",
-   "amount_cents": -1248,
+   "amount_cents": -1149,
    "raw_name": "UBER *TRIP",
    "category": "transport",
    "id": "txn_0081"
@@ -585,28 +585,28 @@
   },
   {
    "date": "2026-09-19",
-   "amount_cents": -4629,
+   "amount_cents": -4263,
    "raw_name": "CHIPOTLE 2210",
    "category": "dining",
    "id": "txn_0083"
   },
   {
    "date": "2026-09-21",
-   "amount_cents": -3402,
+   "amount_cents": -3134,
    "raw_name": "SHEETZ 0319",
    "category": "gas",
    "id": "txn_0084"
   },
   {
    "date": "2026-09-22",
-   "amount_cents": -1496,
+   "amount_cents": -1378,
    "raw_name": "CHIPOTLE 2210",
    "category": "dining",
    "id": "txn_0085"
   },
   {
    "date": "2026-09-23",
-   "amount_cents": -2515,
+   "amount_cents": -2316,
    "raw_name": "TARGET T-2855",
    "category": "shopping",
    "id": "txn_0086"
@@ -620,28 +620,28 @@
   },
   {
    "date": "2026-09-25",
-   "amount_cents": -2631,
+   "amount_cents": -2423,
    "raw_name": "UBER *TRIP",
    "category": "transport",
    "id": "txn_0088"
   },
   {
    "date": "2026-09-26",
-   "amount_cents": -677,
+   "amount_cents": -624,
    "raw_name": "MCLANAHANS DOWNTOWN",
    "category": "groceries",
    "id": "txn_0089"
   },
   {
    "date": "2026-09-29",
-   "amount_cents": -649,
+   "amount_cents": -597,
    "raw_name": "TARGET T-2855",
    "category": "shopping",
    "id": "txn_0090"
   },
   {
    "date": "2026-10-01",
-   "amount_cents": -3282,
+   "amount_cents": -2942,
    "raw_name": "MCLANAHANS DOWNTOWN",
    "category": "groceries",
    "id": "txn_0091"
@@ -662,35 +662,35 @@
   },
   {
    "date": "2026-10-03",
-   "amount_cents": -773,
+   "amount_cents": -695,
    "raw_name": "GIANT FOOD #6421",
    "category": "groceries",
    "id": "txn_0094"
   },
   {
    "date": "2026-10-03",
-   "amount_cents": -3135,
+   "amount_cents": -2811,
    "raw_name": "MCLANAHANS DOWNTOWN",
    "category": "groceries",
    "id": "txn_0095"
   },
   {
    "date": "2026-10-03",
-   "amount_cents": -1206,
+   "amount_cents": -1081,
    "raw_name": "TARGET T-2855",
    "category": "shopping",
    "id": "txn_0096"
   },
   {
    "date": "2026-10-03",
-   "amount_cents": -2128,
+   "amount_cents": -1908,
    "raw_name": "TARGET T-2855",
    "category": "shopping",
    "id": "txn_0097"
   },
   {
    "date": "2026-10-04",
-   "amount_cents": -650,
+   "amount_cents": -583,
    "raw_name": "UBER *TRIP",
    "category": "transport",
    "id": "txn_0098"
@@ -711,7 +711,7 @@
   },
   {
    "date": "2026-10-11",
-   "amount_cents": -3093,
+   "amount_cents": -2773,
    "raw_name": "SHEETZ 0319",
    "category": "gas",
    "id": "txn_0101"
@@ -725,14 +725,14 @@
   },
   {
    "date": "2026-10-16",
-   "amount_cents": -1843,
+   "amount_cents": -1652,
    "raw_name": "CHIPOTLE 2210",
    "category": "dining",
    "id": "txn_0103"
   },
   {
    "date": "2026-10-16",
-   "amount_cents": -1352,
+   "amount_cents": -1212,
    "raw_name": "SHEETZ 0319",
    "category": "gas",
    "id": "txn_0104"
@@ -753,7 +753,7 @@
   },
   {
    "date": "2026-10-19",
-   "amount_cents": -2500,
+   "amount_cents": -2241,
    "raw_name": "AMAZON.COM*2K4PL",
    "category": "shopping",
    "id": "txn_0107"
@@ -767,7 +767,7 @@
   },
   {
    "date": "2026-10-24",
-   "amount_cents": -2489,
+   "amount_cents": -2231,
    "raw_name": "MCLANAHANS DOWNTOWN",
    "category": "groceries",
    "id": "txn_0109"
@@ -784,7 +784,7 @@
   {
    "id": "oo_tuition",
    "label": "Tuition installment",
-   "amount_cents": -125000,
+   "amount_cents": -150000,
    "date": "2027-01-15",
    "source": "user"
   },

@@ -14,7 +14,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 |---------|--------|-------|---------------------|------------|---------|
 | A backend-core | a/p1-p3 | P3 | P1+P2 @ 2026-10-24 19:40 | — | 2026-10-24 19:40 |
 | B frontend | b/p4-core | P4 | P4 fixtures @ 2026-10-24 (6576e06, Actions green) | — | 2026-10-24 |
-| C rag | c/p5-rag | P5 | — | — | — |
+| C rag | c/p5-rag | P5 done | — (ready: CI green locally, rebased on 1d0b65c) | GitHub push access (403) | 2026-10-24 19:30 |
 | E deploy | e/p9-deploy | P9 | — | — | — |
 
 ## Wave 2 — start when A-P3 and C are on main
@@ -74,3 +74,32 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 - Overview lists one-offs dated on/after `as_of` as upcoming and summarizes earlier `detected` ones in a footnote.
 - Action page: printable card, "Copy as text", "Add reminder" (.ics with a 3-day alarm, only when `deadline` is set), "Talk to a human" hidden when `talk_to_human_url` is null.
 - Remaining for B: re-verify Compare once A-P3's real `/evaluate` lands (option ids and `PriceEstimate.source_*` drive badges), then Stress/Action once A-P6/P7 land. No frontend code change is expected for the swap.
+
+## Session C notes (P5 RAG)
+
+**Chunk ids for constraints (Session A): import them, don't hard-code.** `from app.rag import facts`. Each id is test-checked (`tests/test_rag.py`) to exist and still hold its fact, so a corpus edit can't silently break a citation.
+
+| Fact | Constant | Chunk id |
+|---|---|---|
+| PA minimum coverage (15/30/5 + $5,000 medical) | `facts.PA_MIN_COVERAGE` | `pa-auto-insurance-guide#0` (PennDOT copy: `penndot-insurance-law#0`) |
+| Limited vs full tort | `facts.PA_TORT` | `pa-auto-insurance-guide#1` |
+| Lender requires collision + comprehensive on a financed car | `facts.LENDER_REQUIRES_PHYSICAL_DAMAGE` | `cfpb-auto-loan-insurance#0` (NAIC "lenders may require": `naic-consumer-auto-guide#1`) |
+| Deductible you can afford | `facts.DEDUCTIBLE_AFFORDABLE` | `naic-deductibles#2` (tradeoff: `#1`) |
+| At least 3 quotes / independent agent | `facts.GET_THREE_QUOTES`, `facts.INDEPENDENT_AGENT` | `naic-shopping-agents#0`, `#2` |
+| Lapse → 3-month registration suspension | `facts.PA_LAPSE_SUSPENSION` | `penndot-insurance-law#2` |
+| Force-placed insurance | `facts.FORCE_PLACED` | `cfpb-auto-loan-insurance#2` |
+| Emergency fund / rent 30% rule | `facts.EMERGENCY_FUND`, `facts.RENT_30_PERCENT` | `cfpb-emergency-fund#1`, `hud-housing-affordability#0` |
+
+Fixtures were remapped to these ids in contract commit 1d0b65c.
+
+**RAG API for the explainer/stress/action (A, Wave 2):** `retrieve.retrieve(query, k=6, module="auto_insurance") -> list[Hit]` (`hit.chunk.id/.text/.title`, `hit.score`); `retrieve.citation_for(chunk_id) -> Citation | None` to turn `citation_ids` into `Citation` objects. Chunk ids are `<slug>#<n>`: one `##` section = one chunk, n from 0.
+
+**`/rag/ask` and the LLM (A, P6):** under a real client, `rag/answer.py` calls `get_llm().call("rag", {"question", "chunks": [{id, title, publisher, text}]}, RagAskResponse)`. Please add `llm/prompts/rag.txt` (I don't own `llm/`): *"Answer only from the provided chunks. End every sentence with [s:<chunk id>]. If the chunks don't answer the question, return answer=null and refusal="I don't have a trusted source for that, so I won't guess." No numbers that aren't in the chunks."* Whatever the LLM returns, `answer.py` keeps only `[s:]` markers for retrieved chunks and rebuilds `citations` itself; an uncited answer, an error, or `LLM_FAKE=1` falls back to an extractive answer (verbatim source sentences + markers). So `/rag/ask` works today with no LLM.
+
+**Refusals:** investing (regex, before retrieval, never calls the LLM; "emergency fund" is not investing) → `Investing is outside what this tool covers.` No source → cosine threshold, then an idf-weighted check that the question's key terms appear in the top chunks (this is what refuses "insurance on a bicycle"; similarity alone doesn't).
+
+**Index:** `python scripts/build_index.py` writes `backend/rag/index.npz` + `index_meta.json` (gitignored). The app loads it if corpus hash + embedder match, else rebuilds at startup in a background thread (`/api/health` shows `index_chunks: 0` until ready). If fastembed can't load its model (offline laptop, no cache), it logs and falls back to `FakeEmbedder`, so `/rag/ask` still works. **E:** run `build_index.py` in the image build with `FASTEMBED_CACHE_PATH` set so the model is baked in.
+
+**Caveats (open):**
+1. The corpus was written in a cloud session whose network allows only package registries: pa.gov, consumerfinance.gov, naic.org pages could not be fetched. Each file is condensed from web-search excerpts of the named official page (marked `provenance:` in the frontmatter). Someone with network should spot-check each file against its `url` before the demo; facts in `facts.py` were all confirmed by at least one official-domain excerpt.
+2. `FastEmbedEmbedder.min_score = 0.45` (SPEC default) is untuned: huggingface.co was blocked, so the real model never ran here. Model name `BAAI/bge-small-en-v1.5` verified against fastembed 0.9.1's supported list. Tune with real queries; the lexical coverage check (`answer.MIN_COVERAGE = 0.6`) is embedder-independent and does the off-corpus refusals either way.

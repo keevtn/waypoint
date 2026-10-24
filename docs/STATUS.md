@@ -14,7 +14,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 |---------|--------|-------|---------------------|------------|---------|
 | A backend-core | a/p1-p3 | P3 | P1+P2 @ 2026-10-24 19:40 | — | 2026-10-24 19:40 |
 | B frontend | b/p4-core | P4 | P4 fixtures @ 2026-10-24 (6576e06, Actions green) | — | 2026-10-24 |
-| C rag | c/p5-rag | P5 done | — (ready: CI green locally, rebased on 1d0b65c) | GitHub push access (403) | 2026-10-24 19:30 |
+| C rag | c/p5-rag | P5 done | P5 @ 2026-10-24 19:22 (contract 1d0b65c + RAG; CI green) | — | 2026-10-24 19:22 |
 | E deploy | e/p9-deploy | P9 | — | — | — |
 
 ## Wave 2 — start when A-P3 and C are on main

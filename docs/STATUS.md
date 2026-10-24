@@ -15,7 +15,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 | A backend-core | a/p1-p3 | done | P3 @ 2026-10-24 20:30 (P1+P2 @ 19:40) | — | 2026-10-24 20:30 |
 | B frontend | b/p4-core | P4 | P4 fixtures @ 2026-10-24 (6576e06, Actions green) | — | 2026-10-24 |
 | C rag | c/p5-rag | P5 done | P5 @ 2026-10-24 19:22 (contract 1d0b65c + RAG; CI green) | — | 2026-10-24 19:22 |
-| E deploy | e/p9-deploy | P9 | — | — | — |
+| E deploy | e/p9-deploy | P9 | P9 @ 2026-10-24 (Docker image + render.yaml) | — | 2026-10-24 |
 
 ## Wave 2 — start when A-P3 and C are on main
 
@@ -111,3 +111,23 @@ Fixtures were remapped to these ids in contract commit 1d0b65c.
 **Caveats (open):**
 1. The corpus was written in a cloud session whose network allows only package registries: pa.gov, consumerfinance.gov, naic.org pages could not be fetched. Each file is condensed from web-search excerpts of the named official page (marked `provenance:` in the frontmatter). Someone with network should spot-check each file against its `url` before the demo; facts in `facts.py` were all confirmed by at least one official-domain excerpt.
 2. `FastEmbedEmbedder.min_score = 0.45` (SPEC default) is untuned: huggingface.co was blocked, so the real model never ran here. Model name `BAAI/bge-small-en-v1.5` verified against fastembed 0.9.1's supported list. Tune with real queries; the lexical coverage check (`answer.MIN_COVERAGE = 0.6`) is embedder-independent and does the off-corpus refusals either way.
+
+## Session E — deploy (P9 config done)
+
+1. `Dockerfile` (node:20-slim → python:3.12-slim), `.dockerignore`, `render.yaml` are on `main`. Image builds and serves `/api/health`, the SPA, and `/api/*` with `DATA_MODE=local LLM_FAKE=1`; pytest passes inside the image.
+2. Build runs `scripts/build_index.py` only when `backend/corpus/**/*.md` exists; a failing index build fails the image build (Render keeps the previous deploy). With C's corpus on `main` this step now runs on every deploy.
+3. `FASTEMBED_CACHE_PATH=/app/.cache/fastembed` is set in the image, so the model downloads at build time and is baked in. `FastEmbedEmbedder` should honour that env var (or pass `cache_dir`).
+4. Container runs as uid 10001 with `/app` writable (sqlite under `backend/`). Image is ~650 MB.
+5. **Integration/B:** a refresh on a client route (`/compare`) returns 404, because `StaticFiles(html=True)` has no SPA fallback and the app uses `BrowserRouter`. Fix in `main.py` (catch-all that returns `index.html` for non-`/api` paths) or switch to `HashRouter`. Not E's files.
+
+### Render-side settings the owner must set
+
+- New → Blueprint → pick this repo; Render reads `render.yaml` (Docker runtime, branch `main`, health check `/api/health`).
+- Env vars (prompted once on blueprint creation, all `sync: false`):
+  - `DATA_MODE=local` until Phase 8 is live, then `plaid`. `LLM_FAKE=0` for the real demo (`1` = canned answers, no key needed).
+  - `DEV_MODE=0` in prod (guardrail strips instead of raising; dev CORS off).
+  - `ANTHROPIC_API_KEY`, `PLAID_CLIENT_ID`, `PLAID_SECRET`, `PLAID_ENV=sandbox`. `TALK_TO_HUMAN_URL` blank or a neutral URL (no sponsor URLs).
+  - Do **not** set `PORT`; Render injects it and the image honours it.
+- Plan: free tier spins down after idle (cold start ~1 min). Use a paid instance on demo day (SPEC §13).
+- `[VERIFY]` blueprint keys couldn't be checked against render.com from the build sandbox. `autoDeployTrigger: commit` is the current key (it replaces the older `autoDeploy: true`). If Render rejects it, use `autoDeploy: true`. `checksPass` would wait for GitHub Actions before deploying; this is worth switching to.
+- Optional: set the deployed URL as repo variable for the §15.5 `deploy-smoke` job.

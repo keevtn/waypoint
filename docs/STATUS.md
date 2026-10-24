@@ -6,7 +6,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 
 | Session | Branch | Phase | Last merged to main | Blocked on | Updated |
 |---------|--------|-------|---------------------|------------|---------|
-| 0 scaffold | main | P0 | P0 (in progress) | — | 2026-10-24 |
+| 0 scaffold | main | P0 | P0 @ 2026-10-24 (5642438, Actions green) | — | 2026-10-24 |
 
 ## Wave 1 — start all four once Wave 0 is pushed
 
@@ -34,6 +34,14 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 ## Contract commits
 
 (none yet — format: `HH:MM models.py — what changed (session)`)
+
+## Wave 0 summary (Phase 0 done)
+
+1. Scaffold is on `main` and GitHub Actions is green; `./scripts/ci.sh` passes locally in ~7s (12 pytest + typecheck + build).
+2. `backend/app/models.py` is the complete §5 contract plus §7 request/response envelopes; `frontend/src/types.ts` mirrors it field for field.
+3. Every §7 endpoint exists and returns its hand-written fixture; 11 fixtures validate against the models and encode §8 outcomes 2 and 5.
+4. `FakeLLM` and `FakeEmbedder` are wired behind `get_llm()` / `get_embedder()` under `LLM_FAKE=1`; no business logic exists yet, stubs only.
+5. Wave 1 (A, B, C, E) can start now from `origin/main`; `scripts/make_persona.py` and `scripts/build_index.py` are placeholders for A and C to replace.
 
 ## Phase 0 notes for Wave 1
 

@@ -31,11 +31,14 @@ COPY scripts/ scripts/
 COPY --from=frontend /src/frontend/dist/ frontend/dist/
 
 # Build the RAG index (and download the embedding model into FASTEMBED_CACHE_PATH)
-# only once a corpus exists. A failure here fails the build, so Render keeps the
-# last good deploy instead of shipping an app without its index.
+# only once a corpus exists. With INDEX_REQUIRED=1 (default) a failure fails the
+# build, so Render keeps the last good deploy. INDEX_REQUIRED=0 is for offline
+# builds: the app then rebuilds the index at startup (FakeEmbedder if no model).
+ARG INDEX_REQUIRED=1
 RUN mkdir -p "$FASTEMBED_CACHE_PATH" \
  && if find backend/corpus -name '*.md' -type f | grep -q .; then \
-        cd backend && python ../scripts/build_index.py; \
+        (cd backend && python ../scripts/build_index.py) \
+        || { [ "$INDEX_REQUIRED" = "0" ] && echo "WARNING: build_index.py failed; index builds at startup"; }; \
     else \
         echo "no corpus yet; skipping build_index.py"; \
     fi

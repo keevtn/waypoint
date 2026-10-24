@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
-import { api } from "./api";
+import { USE_FIXTURES, api } from "./api";
 import { useAppState } from "./state";
 import Overview from "./pages/Overview";
 import Moment from "./pages/Moment";
@@ -21,8 +21,9 @@ export default function App() {
   const { profile, evaluation, setProfile, setBaseline } = useAppState();
 
   // Silently restore a profile after a refresh (live mode: succeeds only once a bank is connected).
+  // In fixture mode the demo must start at the Connect step, so skip it.
   useEffect(() => {
-    if (profile) return;
+    if (profile || USE_FIXTURES) return;
     let alive = true;
     api
       .profile()

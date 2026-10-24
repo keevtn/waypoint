@@ -1,6 +1,6 @@
 // Overview: connect → balance, income, recurring (confidence dots), variable spend, slack, baseline chart.
 import { useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useAppState } from "../state";
 import type { Profile, RecurringItem } from "../types";
@@ -12,6 +12,7 @@ import { Badge, Button, Card, Dot, ErrorNote, Skeleton, Stat, inputClass, type T
 const confidenceTone = (c: number): Tone => (c >= 0.9 ? "ok" : c >= 0.7 ? "warn" : "neutral");
 
 export default function Overview() {
+  const navigate = useNavigate();
   const { profile, baseline, setProfile, setBaseline } = useAppState();
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,7 +87,7 @@ export default function Overview() {
             {institution ?? "Demo bank · Plaid sandbox"} · as of {fmtDate(profile.as_of)}
           </p>
         </div>
-        <Button onClick={() => (window.location.href = "/moment")} variant="primary">
+        <Button onClick={() => navigate("/moment")} variant="primary">
           Pick a decision
         </Button>
       </header>

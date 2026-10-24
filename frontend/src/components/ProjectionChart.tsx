@@ -34,6 +34,7 @@ export interface ChartSeries {
 }
 
 interface Row {
+  idx: number;
   month: string;
   [seriesId: string]: number | string | null;
 }
@@ -58,8 +59,8 @@ export default function ProjectionChart({
     const months = new Set<string>();
     for (const s of series) for (const p of s.result.series) months.add(p.month);
     const sorted = [...months].sort();
-    return sorted.map((month) => {
-      const row: Row = { month };
+    return sorted.map((month, idx) => {
+      const row: Row = { idx, month };
       for (const s of series) {
         const p = s.result.series.find((x) => x.month === month);
         row[s.id] = p ? p.end_balance_cents : null;
@@ -69,7 +70,9 @@ export default function ProjectionChart({
   }, [series]);
 
   const selected = series.find((s) => s.id === selectedId) ?? null;
-  const tinted = selected ? selected.result.months_below_floor.filter((m) => rows.some((r) => r.month === m)) : [];
+  const idxOf = (month: string) => rows.findIndex((r) => r.month === month);
+  const tinted = selected ? selected.result.months_below_floor.filter((m) => idxOf(m) >= 0) : [];
+  const monthAt = (v: unknown) => rows[Number(v)]?.month ?? "";
 
   const grid = dark ? "#1f2937" : "#e2e8f0";
   const axis = dark ? "#94a3b8" : "#64748b";
@@ -102,12 +105,22 @@ export default function ProjectionChart({
             data={rows}
             margin={{ top: 8, right: 12, bottom: 4, left: 4 }}
             onClick={(e) => {
-              const m = (e as { activeLabel?: string } | null)?.activeLabel;
+              const m = monthAt((e as { activeLabel?: string | number } | null)?.activeLabel);
               if (m && onMonthClick) onMonthClick(m);
             }}
           >
             <CartesianGrid stroke={grid} vertical={false} />
-            <XAxis dataKey="month" tickFormatter={fmtMonthShort} stroke={axis} tick={{ fontSize: 11, fill: axis }} tickLine={false} axisLine={{ stroke: grid }} />
+            <XAxis
+              dataKey="idx"
+              type="number"
+              domain={[-0.5, rows.length - 0.5]}
+              ticks={rows.map((r) => r.idx)}
+              tickFormatter={(v: number) => fmtMonthShort(monthAt(v))}
+              stroke={axis}
+              tick={{ fontSize: 11, fill: axis }}
+              tickLine={false}
+              axisLine={{ stroke: grid }}
+            />
             <YAxis
               tickFormatter={(v: number) => fmtDollars(v)}
               stroke={axis}
@@ -118,22 +131,18 @@ export default function ProjectionChart({
             />
             {tinted.map((m) => {
               const neg = selected?.result.months_negative.includes(m);
-              return <ReferenceArea key={m} x1={m} x2={m} fill={neg ? negTint : tint} stroke="none" ifOverflow="extendDomain" />;
+              const i = idxOf(m);
+              return <ReferenceArea key={m} x1={i - 0.5} x2={i + 0.5} fill={neg ? negTint : tint} stroke="none" />;
             })}
             <ReferenceLine y={0} stroke={axis} strokeOpacity={0.6} />
-            <ReferenceLine
-              y={floorCents}
-              stroke={floorColor}
-              strokeDasharray="2 4"
-              label={{ value: `Floor ${fmtDollars(floorCents)}`, position: "insideTopRight", fontSize: 11, fill: floorColor }}
-            />
+            <ReferenceLine y={floorCents} stroke={floorColor} strokeDasharray="2 4" />
             <Tooltip
               cursor={{ stroke: axis, strokeWidth: 1 }}
               content={({ active, payload, label }) => {
                 if (!active || !payload?.length) return null;
                 return (
                   <div className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                    <div className="mb-1 font-medium">{fmtMonth(String(label))}</div>
+                    <div className="mb-1 font-medium">{fmtMonth(monthAt(label))}</div>
                     {payload
                       .filter((p) => p.value !== null && p.value !== undefined)
                       .map((p) => (
@@ -200,6 +209,10 @@ export default function ProjectionChart({
           );
         })}
         <span className="ml-auto flex items-center gap-1.5 text-slate-500">
+          <span aria-hidden className="inline-block w-4" style={{ borderTop: `2px dotted ${floorColor}` }} />
+          Floor {fmtDollars(floorCents)}
+        </span>
+        <span className="flex items-center gap-1.5 text-slate-500">
           <span aria-hidden className="inline-block h-3 w-3 rounded-sm" style={{ background: tint, border: `1px solid ${floorColor}` }} />
           Below floor
         </span>

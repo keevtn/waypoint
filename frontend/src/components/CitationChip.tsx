@@ -53,10 +53,13 @@ export function CitedText({
     const start = m.index ?? 0;
     if (start > last) parts.push(text.slice(last, start));
     const [, kind, id] = m;
+    // No trailing gap when punctuation follows the marker.
+    const after = text[start + m[0].length] ?? "";
+    const gap = /[.,;:)]/.test(after) ? "ml-0.5" : "mx-0.5";
     if (kind === "s") {
       const c = citations.find((x) => x.chunk_id === id);
       parts.push(
-        <span key={key++} className="mx-0.5">
+        <span key={key++} className={gap}>
           {c ? <CitationChip citation={c} index={citations.indexOf(c) + 1} /> : <UnsourcedChip id={id} />}
         </span>,
       );
@@ -66,7 +69,7 @@ export function CitedText({
         <span
           key={key++}
           title={rule ?? id}
-          className="mx-0.5 inline-flex items-center rounded border border-slate-300 bg-slate-50 px-1 py-0.5 align-baseline text-[11px] leading-4 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+          className={`${gap} inline-flex items-center rounded border border-slate-300 bg-slate-50 px-1 py-0.5 align-baseline text-[11px] leading-4 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300`}
         >
           rule
         </span>,

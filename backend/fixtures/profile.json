@@ -1,0 +1,22 @@
+{
+  "as_of": "2026-10-24",
+  "balance_cents": 124000,
+  "income": [
+    {"id": "inc_payroll", "label": "Payroll", "amount_cents": 70000, "cadence": "biweekly", "next_date": "2026-11-06", "confidence": 0.95},
+    {"id": "inc_family", "label": "Family transfer", "amount_cents": 30000, "cadence": "monthly", "next_date": "2026-11-01", "confidence": 0.9}
+  ],
+  "recurring": [
+    {"id": "rec_rent", "label": "Rent", "amount_cents": -85000, "cadence": "monthly", "next_date": "2026-11-01", "confidence": 1.0, "category": "housing"},
+    {"id": "rec_phone", "label": "Phone", "amount_cents": -4500, "cadence": "monthly", "next_date": "2026-11-12", "confidence": 1.0, "category": "utilities"},
+    {"id": "rec_gym", "label": "Gym", "amount_cents": -2499, "cadence": "monthly", "next_date": "2026-11-05", "confidence": 1.0, "category": "subscriptions"},
+    {"id": "rec_music", "label": "Music streaming", "amount_cents": -599, "cadence": "monthly", "next_date": "2026-11-18", "confidence": 1.0, "category": "subscriptions"}
+  ],
+  "one_offs": [
+    {"id": "oo_registration", "label": "Vehicle registration/title", "amount_cents": -18000, "date": "2026-11-05", "source": "user"},
+    {"id": "oo_tuition", "label": "Tuition installment", "amount_cents": -125000, "date": "2027-01-15", "source": "user"},
+    {"id": "oo_textbooks", "label": "Textbooks", "amount_cents": -22000, "date": "2027-01-20", "source": "user"}
+  ],
+  "variable": {"mean_monthly_cents": 29000, "std_monthly_cents": 7000, "months_observed": 4},
+  "safety_floor_cents": 20000,
+  "monthly_slack_cents": 59735
+}

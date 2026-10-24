@@ -1,4 +1,3 @@
-# Place at .github/workflows/ci.yml
 # Mirrors scripts/ci.sh. No secrets: tests run with LLM_FAKE=1 and DATA_MODE=local.
 name: ci
 

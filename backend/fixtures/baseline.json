@@ -1,0 +1,26 @@
+{
+  "option_id": null,
+  "series": [
+    {"month": "2026-11", "end_balance_cents": 148000, "min_balance_cents": 51000, "min_balance_date": "2026-11-05", "inflow_cents": 170000, "outflow_cents": 146000},
+    {"month": "2026-12", "end_balance_cents": 207700, "min_balance_cents": 92000, "min_balance_date": "2026-12-01", "inflow_cents": 170000, "outflow_cents": 110300},
+    {"month": "2027-01", "end_balance_cents": 190400, "min_balance_cents": 38000, "min_balance_date": "2027-01-20", "inflow_cents": 240000, "outflow_cents": 257300},
+    {"month": "2027-02", "end_balance_cents": 250100, "min_balance_cents": 120000, "min_balance_date": "2027-02-01", "inflow_cents": 170000, "outflow_cents": 110300},
+    {"month": "2027-03", "end_balance_cents": 309800, "min_balance_cents": 180000, "min_balance_date": "2027-03-01", "inflow_cents": 170000, "outflow_cents": 110300},
+    {"month": "2027-04", "end_balance_cents": 369500, "min_balance_cents": 239000, "min_balance_date": "2027-04-01", "inflow_cents": 170000, "outflow_cents": 110300},
+    {"month": "2027-05", "end_balance_cents": 429200, "min_balance_cents": 299000, "min_balance_date": "2027-05-01", "inflow_cents": 170000, "outflow_cents": 110300},
+    {"month": "2027-06", "end_balance_cents": 488900, "min_balance_cents": 358000, "min_balance_date": "2027-06-01", "inflow_cents": 170000, "outflow_cents": 110300},
+    {"month": "2027-07", "end_balance_cents": 618600, "min_balance_cents": 418000, "min_balance_date": "2027-07-01", "inflow_cents": 240000, "outflow_cents": 110300},
+    {"month": "2027-08", "end_balance_cents": 678300, "min_balance_cents": 548000, "min_balance_date": "2027-08-01", "inflow_cents": 170000, "outflow_cents": 110300},
+    {"month": "2027-09", "end_balance_cents": 738000, "min_balance_cents": 608000, "min_balance_date": "2027-09-01", "inflow_cents": 170000, "outflow_cents": 110300},
+    {"month": "2027-10", "end_balance_cents": 797700, "min_balance_cents": 668000, "min_balance_date": "2027-10-01", "inflow_cents": 170000, "outflow_cents": 110300}
+  ],
+  "min_balance_cents": 38000,
+  "min_balance_date": "2027-01-20",
+  "monthly_slack_cents": 59735,
+  "months_below_floor": [],
+  "months_negative": [],
+  "flags": [
+    {"id": "flag_target_2026-11", "severity": "info", "month": "2026-11", "code": "target_reached", "detail": {"end_balance_cents": 148000, "floor_cents": 20000}}
+  ],
+  "band": null
+}

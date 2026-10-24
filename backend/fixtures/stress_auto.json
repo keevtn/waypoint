@@ -1,0 +1,78 @@
+{
+  "scenarios": [
+    {
+      "scenario": {
+        "template_id": "deductible_claim",
+        "params": {"month": 3},
+        "rationale": "You have a single biweekly income stream and said $600 is the most you could pay on short notice, so a claim in month 3 tests whether each deductible is actually affordable."
+      },
+      "results": {
+        "baseline": {
+          "option_id": null,
+          "series": [{"month": "2027-01", "end_balance_cents": 105600, "min_balance_cents": 3200, "min_balance_date": "2027-01-20", "inflow_cents": 240000, "outflow_cents": 278500}],
+          "min_balance_cents": 3200, "min_balance_date": "2027-01-20", "monthly_slack_cents": 38535,
+          "months_below_floor": ["2027-01"], "months_negative": [], "flags": [], "band": null
+        },
+        "std_limited_1000": {
+          "option_id": "std_limited_1000",
+          "series": [{"month": "2027-01", "end_balance_cents": -39400, "min_balance_cents": -141800, "min_balance_date": "2027-01-20", "inflow_cents": 240000, "outflow_cents": 393500}],
+          "min_balance_cents": -141800, "min_balance_date": "2027-01-20", "monthly_slack_cents": 23535,
+          "months_below_floor": ["2027-01"], "months_negative": ["2027-01"],
+          "flags": [{"id": "flag_negative_2027-01", "severity": "danger", "month": "2027-01", "code": "negative", "detail": {"min_balance_cents": -141800}}], "band": null
+        },
+        "std_full_500": {
+          "option_id": "std_full_500",
+          "series": [{"month": "2027-01", "end_balance_cents": 100, "min_balance_cents": -2300, "min_balance_date": "2027-01-20", "inflow_cents": 240000, "outflow_cents": 347000}],
+          "min_balance_cents": -2300, "min_balance_date": "2027-01-20", "monthly_slack_cents": 20035,
+          "months_below_floor": ["2027-01"], "months_negative": ["2027-01"],
+          "flags": [{"id": "flag_negative_2027-01", "severity": "danger", "month": "2027-01", "code": "negative", "detail": {"min_balance_cents": -2300}}], "band": null
+        }
+      }
+    },
+    {
+      "scenario": {
+        "template_id": "shock_expense",
+        "params": {"amount_cents": 60000, "month": 2},
+        "rationale": "Your variable spend already swings by about $70 a month and December has no buffer beyond the usual family transfer."
+      },
+      "results": {
+        "baseline": {
+          "option_id": null,
+          "series": [{"month": "2026-12", "end_balance_cents": 125300, "min_balance_cents": 32000, "min_balance_date": "2026-12-01", "inflow_cents": 170000, "outflow_cents": 191500}],
+          "min_balance_cents": 32000, "min_balance_date": "2026-12-01", "monthly_slack_cents": 38535,
+          "months_below_floor": [], "months_negative": [], "flags": [], "band": null
+        }
+      }
+    },
+    {
+      "scenario": {
+        "template_id": "income_gap",
+        "params": {"months": 1, "start_month": 4},
+        "rationale": "Payroll is your only earned income; a one-month gap in February shows how much of January's dip carries forward."
+      },
+      "results": {
+        "baseline": {
+          "option_id": null,
+          "series": [{"month": "2027-02", "end_balance_cents": 3200, "min_balance_cents": -12000, "min_balance_date": "2027-02-18", "inflow_cents": 30000, "outflow_cents": 110300}],
+          "min_balance_cents": -12000, "min_balance_date": "2027-02-18", "monthly_slack_cents": 38535,
+          "months_below_floor": ["2027-02"], "months_negative": ["2027-02"],
+          "flags": [{"id": "flag_negative_2027-02", "severity": "danger", "month": "2027-02", "code": "negative", "detail": {"min_balance_cents": -12000}}], "band": null
+        }
+      }
+    }
+  ],
+  "critique": {
+    "preferred_option_id": "std_limited_1000",
+    "case_against": [
+      "In the deductible_claim scenario the $1,000 deductible drives January negative, and you said $600 was your short-notice limit.",
+      "The $1,000-deductible option is below your floor in two months even before any claim."
+    ],
+    "case_for": [
+      "It is the cheaper monthly premium among the options your lender allows, which widens slack in every month without a claim."
+    ],
+    "recommendation_shift": "reconsider",
+    "citations": [
+      {"chunk_id": "naic-deductibles#1", "title": "Choosing a Deductible", "url": "https://content.naic.org/consumer/auto-insurance.htm", "publisher": "National Association of Insurance Commissioners", "year": 2024, "excerpt": "A higher deductible lowers your premium but means you pay more out of pocket when you file a claim. Choose an amount you could pay today."}
+    ]
+  }
+}

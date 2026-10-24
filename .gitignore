@@ -1,10 +1,14 @@
-.env
+# python
 __pycache__/
 *.pyc
 .pytest_cache/
+.venv/
+backend/.env
+backend/*.db
 backend/rag/index.npz
 backend/rag/index_meta.json
-backend/*.db
+# node
 node_modules/
 frontend/dist/
-.cache/
+# misc
+.DS_Store

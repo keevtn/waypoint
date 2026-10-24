@@ -1,0 +1,106 @@
+{
+  "eval_id": "eval_fixture_auto_0001",
+  "options": [
+    {
+      "id": "pa_min_limited",
+      "label": "State minimum, limited tort",
+      "attributes": {"bi_per_person": 15000, "bi_per_accident": 30000, "pd": 5000, "medical": 5000, "tort": "limited", "collision": false, "comprehensive": false, "deductible": 0},
+      "commitment": {"id": "cmt_pa_min_limited", "label": "Auto insurance premium (state minimum)", "upfront_cents": 0, "recurring_cents": -6000, "cadence": "monthly", "start_date": "2026-11-01", "term_months": null, "risk_exposure_cents": 0},
+      "price": {"cents": 6000, "kind": "estimate", "source_url": null, "source_title": null, "retrieved": null},
+      "status": "disallowed",
+      "constraint_ids": ["c_lender_comp_coll", "c_pa_minimum", "c_limited_tort"]
+    },
+    {
+      "id": "std_limited_1000",
+      "label": "Standard, $1,000 deductible, limited tort",
+      "attributes": {"bi_per_person": 50000, "bi_per_accident": 100000, "pd": 25000, "medical": 5000, "tort": "limited", "collision": true, "comprehensive": true, "deductible": 1000},
+      "commitment": {"id": "cmt_std_limited_1000", "label": "Auto insurance premium (standard, $1,000 deductible)", "upfront_cents": 0, "recurring_cents": -15000, "cadence": "monthly", "start_date": "2026-11-01", "term_months": null, "risk_exposure_cents": 100000},
+      "price": {"cents": 15000, "kind": "estimate", "source_url": null, "source_title": null, "retrieved": null},
+      "status": "flagged",
+      "constraint_ids": ["c_pa_minimum", "c_deductible_comfort", "c_limited_tort"]
+    },
+    {
+      "id": "std_full_500",
+      "label": "Standard, $500 deductible, full tort",
+      "attributes": {"bi_per_person": 100000, "bi_per_accident": 300000, "pd": 50000, "medical": 5000, "tort": "full", "collision": true, "comprehensive": true, "deductible": 500},
+      "commitment": {"id": "cmt_std_full_500", "label": "Auto insurance premium (standard, $500 deductible)", "upfront_cents": 0, "recurring_cents": -18500, "cadence": "monthly", "start_date": "2026-11-01", "term_months": null, "risk_exposure_cents": 50000},
+      "price": {"cents": 18500, "kind": "estimate", "source_url": null, "source_title": null, "retrieved": null},
+      "status": "allowed",
+      "constraint_ids": ["c_pa_minimum"]
+    }
+  ],
+  "constraints": [
+    {"id": "c_lender_comp_coll", "kind": "required", "applies_to": ["pa_min_limited"], "rule": "Lenders generally require collision and comprehensive coverage on a financed vehicle.", "citation_ids": ["cfpb-auto-loans#2"]},
+    {"id": "c_pa_minimum", "kind": "required", "applies_to": ["pa_min_limited", "std_limited_1000", "std_full_500"], "rule": "Pennsylvania requires 15/30/5 liability plus $5,000 first-party medical benefits; a lapse can suspend registration.", "citation_ids": ["pa-auto-insurance-guide#1"]},
+    {"id": "c_deductible_comfort", "kind": "flag", "applies_to": ["std_limited_1000"], "rule": "Deductible exceeds what you said you could pay on short notice.", "citation_ids": ["naic-deductibles#1"]},
+    {"id": "c_limited_tort", "kind": "flag", "applies_to": ["pa_min_limited", "std_limited_1000"], "rule": "Limited tort lowers the premium but waives most pain-and-suffering claims unless an exception applies.", "citation_ids": ["pa-auto-insurance-guide#3"]}
+  ],
+  "projections": {
+    "baseline": {
+      "option_id": null,
+      "series": [
+        {"month": "2026-11", "end_balance_cents": 126800, "min_balance_cents": 29800, "min_balance_date": "2026-11-05", "inflow_cents": 170000, "outflow_cents": 167200},
+        {"month": "2027-01", "end_balance_cents": 105600, "min_balance_cents": 3200, "min_balance_date": "2027-01-20", "inflow_cents": 240000, "outflow_cents": 278500}
+      ],
+      "min_balance_cents": 3200,
+      "min_balance_date": "2027-01-20",
+      "monthly_slack_cents": 38535,
+      "months_below_floor": ["2027-01"],
+      "months_negative": [],
+      "flags": [
+        {"id": "flag_below_floor_2027-01", "severity": "warn", "month": "2027-01", "code": "below_floor", "detail": {"min_balance_cents": 3200, "floor_cents": 20000, "contributors": [{"id": "oo_tuition", "label": "Tuition installment", "amount_cents": -125000, "date": "2027-01-15"}, {"id": "oo_textbooks", "label": "Textbooks", "amount_cents": -22000, "date": "2027-01-20"}]}}
+      ],
+      "band": null
+    },
+    "pa_min_limited": {
+      "option_id": "pa_min_limited",
+      "series": [
+        {"month": "2026-11", "end_balance_cents": 120800, "min_balance_cents": 23800, "min_balance_date": "2026-11-05", "inflow_cents": 170000, "outflow_cents": 173200},
+        {"month": "2027-01", "end_balance_cents": 87600, "min_balance_cents": -14800, "min_balance_date": "2027-01-20", "inflow_cents": 240000, "outflow_cents": 284500}
+      ],
+      "min_balance_cents": -14800,
+      "min_balance_date": "2027-01-20",
+      "monthly_slack_cents": 32535,
+      "months_below_floor": ["2027-01"],
+      "months_negative": ["2027-01"],
+      "flags": [
+        {"id": "flag_negative_2027-01", "severity": "danger", "month": "2027-01", "code": "negative", "detail": {"min_balance_cents": -14800}}
+      ],
+      "band": null
+    },
+    "std_limited_1000": {
+      "option_id": "std_limited_1000",
+      "series": [
+        {"month": "2026-11", "end_balance_cents": 111800, "min_balance_cents": 14800, "min_balance_date": "2026-11-05", "inflow_cents": 170000, "outflow_cents": 182200},
+        {"month": "2027-01", "end_balance_cents": 60600, "min_balance_cents": -41800, "min_balance_date": "2027-01-20", "inflow_cents": 240000, "outflow_cents": 293500}
+      ],
+      "min_balance_cents": -41800,
+      "min_balance_date": "2027-01-20",
+      "monthly_slack_cents": 23535,
+      "months_below_floor": ["2026-11", "2027-01"],
+      "months_negative": ["2027-01"],
+      "flags": [
+        {"id": "flag_below_floor_2027-01", "severity": "warn", "month": "2027-01", "code": "below_floor", "detail": {"min_balance_cents": -41800, "floor_cents": 20000, "contributors": [{"id": "oo_tuition", "label": "Tuition installment", "amount_cents": -125000, "date": "2027-01-15"}, {"id": "oo_textbooks", "label": "Textbooks", "amount_cents": -22000, "date": "2027-01-20"}]}},
+        {"id": "flag_deductible_std_limited_1000", "severity": "danger", "month": "2027-01", "code": "deductible_unaffordable", "detail": {"deductible_cents": 100000, "claim_month": "2027-01", "resulting_min_balance_cents": -141800, "floor_cents": 20000}}
+      ],
+      "band": null
+    },
+    "std_full_500": {
+      "option_id": "std_full_500",
+      "series": [
+        {"month": "2026-11", "end_balance_cents": 108300, "min_balance_cents": 11300, "min_balance_date": "2026-11-05", "inflow_cents": 170000, "outflow_cents": 185700},
+        {"month": "2027-01", "end_balance_cents": 50100, "min_balance_cents": -52300, "min_balance_date": "2027-01-20", "inflow_cents": 240000, "outflow_cents": 297000}
+      ],
+      "min_balance_cents": -52300,
+      "min_balance_date": "2027-01-20",
+      "monthly_slack_cents": 20035,
+      "months_below_floor": ["2026-11", "2027-01"],
+      "months_negative": ["2027-01"],
+      "flags": [
+        {"id": "flag_below_floor_2027-01", "severity": "warn", "month": "2027-01", "code": "below_floor", "detail": {"min_balance_cents": -52300, "floor_cents": 20000, "contributors": [{"id": "oo_tuition", "label": "Tuition installment", "amount_cents": -125000, "date": "2027-01-15"}, {"id": "oo_textbooks", "label": "Textbooks", "amount_cents": -22000, "date": "2027-01-20"}]}},
+        {"id": "flag_deductible_std_full_500", "severity": "info", "month": "2027-01", "code": "deductible_ok", "detail": {"deductible_cents": 50000, "claim_month": "2027-01", "resulting_min_balance_cents": 21500, "floor_cents": 20000}}
+      ],
+      "band": null
+    }
+  }
+}

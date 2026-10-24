@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Place at scripts/ci.sh and `chmod +x` it.
 # Same checks as .github/workflows/ci.yml. Run before every push.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -14,8 +13,13 @@ export PLAID_ENV="${PLAID_ENV:-sandbox}"
 
 start=$(date +%s)
 
-echo "== backend: pytest"
-( cd backend && python -m pytest -q )
+# Prefer the project venv (Python 3.12, matches CI) when it exists.
+PY=python
+[ -x backend/.venv/Scripts/python.exe ] && PY=.venv/Scripts/python.exe
+[ -x backend/.venv/bin/python ] && PY=.venv/bin/python
+
+echo "== backend: pytest ($PY)"
+( cd backend && "$PY" -m pytest -q )
 
 echo "== frontend: typecheck + build"
 ( cd frontend && npm run typecheck --silent && npm run build --silent )

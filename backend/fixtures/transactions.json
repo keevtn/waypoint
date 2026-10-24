@@ -1,0 +1,10 @@
+[
+  {"id": "txn_0001", "date": "2026-10-23", "amount_cents": 70000, "raw_name": "PENN STATE PAYROLL", "merchant": "Payroll", "category": "income"},
+  {"id": "txn_0002", "date": "2026-10-17", "amount_cents": -80000, "raw_name": "CARMAX DOWN PAYMENT", "merchant": "Carmax", "category": "auto"},
+  {"id": "txn_0003", "date": "2026-10-18", "amount_cents": -599, "raw_name": "SPOTIFY", "merchant": "Spotify", "category": "subscriptions"},
+  {"id": "txn_0004", "date": "2026-10-12", "amount_cents": -4500, "raw_name": "VERIZON WIRELESS", "merchant": "Verizon", "category": "utilities"},
+  {"id": "txn_0005", "date": "2026-10-05", "amount_cents": -2499, "raw_name": "PLANET FITNESS", "merchant": "Planet Fitness", "category": "subscriptions"},
+  {"id": "txn_0006", "date": "2026-10-01", "amount_cents": -85000, "raw_name": "RENT - THE META", "merchant": "Rent", "category": "housing"},
+  {"id": "txn_0007", "date": "2026-10-01", "amount_cents": 30000, "raw_name": "ZELLE FROM MOM", "merchant": "Family transfer", "category": "income"},
+  {"id": "txn_0008", "date": "2026-10-03", "amount_cents": -2340, "raw_name": "SHEETZ #412", "merchant": "Sheetz", "category": "variable"}
+]

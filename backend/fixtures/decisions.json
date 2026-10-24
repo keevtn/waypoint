@@ -1,0 +1,28 @@
+[
+  {
+    "id": "auto_insurance",
+    "title": "Auto insurance",
+    "description": "Choose a coverage configuration for a car you just bought or financed.",
+    "input_schema": {
+      "type": "object",
+      "required": ["vehicle_value_cents", "financed", "driver_age", "deductible_comfort_cents"],
+      "properties": {
+        "state": {"type": "string", "enum": ["PA"], "default": "PA"},
+        "vehicle_value_cents": {"type": "integer", "minimum": 0},
+        "financed": {"type": "boolean"},
+        "loan_payment_cents": {"type": ["integer", "null"], "minimum": 0},
+        "loan_term_months": {"type": ["integer", "null"], "minimum": 1},
+        "driver_age": {"type": "integer", "minimum": 16},
+        "deductible_comfort_cents": {"type": "integer", "minimum": 0},
+        "registration_deadline": {"type": ["string", "null"], "format": "date"},
+        "user_quotes": {"type": "array", "items": {"type": "object"}, "default": []}
+      }
+    }
+  },
+  {
+    "id": "rent",
+    "title": "Rent",
+    "description": "Compare apartments against your actual cash flow. Coming soon.",
+    "input_schema": {"type": "object", "properties": {"units": {"type": "array", "items": {"type": "object"}}}}
+  }
+]

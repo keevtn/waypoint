@@ -1,0 +1,24 @@
+{
+  "option_id": "std_full_500",
+  "headline": "Get three quotes for a 100/300/50, full tort, $500-deductible policy before your registration deadline.",
+  "steps": [
+    "Request quotes for this exact configuration from at least three sources, including one independent agency.",
+    "Ask your lender for its coverage requirements in writing and confirm each quote meets them.",
+    "Confirm the full tort election in writing on the policy you choose.",
+    "Set up autopay from checking on a date after your biweekly payday.",
+    "Move $150 to savings before January 15, because that month dips below your floor.",
+    "Keep proof of insurance with you for the registration appointment."
+  ],
+  "questions_to_ask": [
+    "Is the quoted premium six-month or annual?",
+    "What is the surcharge if I change tort election later?",
+    "Is there a student or good-grade discount?",
+    "Does this policy satisfy my lender's requirements?"
+  ],
+  "deadline": "2026-11-23",
+  "deadline_reason": "Vehicle registration deadline you entered.",
+  "talk_to_human_url": null,
+  "citations": [
+    {"chunk_id": "pa-auto-insurance-guide#1", "title": "Automobile Insurance Guide", "url": "https://insurance.pa.gov/Coverage/Auto/Pages/Auto-Insurance-Guide.aspx", "publisher": "Pennsylvania Insurance Department", "year": 2025, "excerpt": "Pennsylvania law requires all registered vehicles to carry liability coverage of at least 15/30/5 and $5,000 in first-party medical benefits."}
+  ]
+}

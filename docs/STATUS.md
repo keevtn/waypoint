@@ -13,7 +13,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 | Session | Branch | Phase | Last merged to main | Blocked on | Updated |
 |---------|--------|-------|---------------------|------------|---------|
 | A backend-core | a/p1-p3 | P1 | — | — | — |
-| B frontend | b/p4-core | P4 | — | — | — |
+| B frontend | b/p4-core | P4 | P4 fixtures @ 2026-10-24 (6576e06, Actions green) | — | 2026-10-24 |
 | C rag | c/p5-rag | P5 | — | — | — |
 | E deploy | e/p9-deploy | P9 | — | — | — |
 
@@ -22,7 +22,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 | Session | Branch | Phase | Last merged to main | Blocked on | Updated |
 |---------|--------|-------|---------------------|------------|---------|
 | A llm | a/p6-p7 | P6 | — | A-P3, C | — |
-| B wire | b/p4-live | P4 live | — | A-P3 | — |
+| B wire | b/p4-live | P4 live | — | A-P3 (evaluate), then A-P6/P7 | 2026-10-24 |
 | D plaid | d/p8-plaid | P8 | — | A-P1 | — |
 
 ## Wave 3 — from roughly hour 14
@@ -50,3 +50,11 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 - Seams: `app.llm.client.get_llm()` returns `FakeLLM` under `LLM_FAKE=1`; `app.rag.index.get_embedder()` returns `FakeEmbedder`. `index_chunk_count()` is the `/api/health` `index_chunks` source (Session C replaces it).
 - Local Python is 3.14 by default; CI is 3.12. Use `backend/.venv` (3.12): `backend/.venv/Scripts/python -m pytest -q`. `scripts/ci.sh` uses it automatically when present.
 - Frontend: `npm run typecheck` and `npm run build` pass on stubs. `VITE_USE_FIXTURES=1` makes `api.ts` import `backend/fixtures/*.json` directly via Vite glob.
+
+## Session B notes (P4 on fixtures merged)
+
+- Overview, Moment (hand-built auto form), and Compare render end to end with `VITE_USE_FIXTURES=1`; Stress and Action are still stubs (b/p4-live).
+- `api.ts` adds a ~0.9s delay to explain/stress/action/ask in fixture mode only, so loading skeletons are visible; live mode is unchanged.
+- `ProjectionChart` takes `series: {id,label,result}[]`; pass `"baseline"` as the id for the dashed reference line. Fixture projections only carry 2 months; the chart unions whatever months it gets.
+- Prices without `source_url`/`source_title` render a red **Unsourced** badge (SPEC §3.6). Session A: populate `PriceEstimate.source_*` from `pricing.json` so the demo never shows it.
+- Explanation text renders `[s:chunk]` as citation chips and `[c:constraint]` as a "rule" tag with the constraint rule as tooltip; `tight_months.why` feeds the "why this month is tight" panel, falling back to `Flag.detail.contributors`.

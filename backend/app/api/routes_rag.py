@@ -1,29 +1,25 @@
-"""RAG routes (SPEC.md §7). Phase 0: fixture-backed stub. Phase 5 (Session C) makes it real.
-
-The investing refusal is kept here even in the stub because it is a hard rule (CLAUDE.md #4).
-"""
+"""RAG routes (SPEC.md §6.5, §7). Logic lives in app/rag/answer.py."""
 from __future__ import annotations
 
 from fastapi import APIRouter
 
-from .. import fixtures
+from .. import config
 from ..models import RagAskRequest, RagAskResponse
+from ..rag import answer
+from ..rag.index import warm_in_background
 
 router = APIRouter(prefix="/api/rag", tags=["rag"])
 
-INVESTING_KEYWORDS = ("invest", "stock", "crypto", "fund", "etf", "portfolio", "bitcoin")
-INVESTING_REFUSAL = "Investing is outside what this tool covers."
+# Kept as module attributes for anything that imported them from the Phase 0 stub.
+INVESTING_REFUSAL = answer.INVESTING_REFUSAL
+NO_SOURCE_REFUSAL = answer.NO_SOURCE_REFUSAL
+is_investing_question = answer.is_investing_question
 
-
-def is_investing_question(question: str) -> bool:
-    q = question.lower()
-    return any(k in q for k in INVESTING_KEYWORDS)
+# Load the real embedding model + index off the request path at startup.
+if not config.LLM_FAKE:
+    warm_in_background()
 
 
 @router.post("/ask", response_model=RagAskResponse)
 def ask(body: RagAskRequest) -> RagAskResponse:
-    if is_investing_question(body.question):
-        return RagAskResponse(answer=None, refusal=INVESTING_REFUSAL, citations=[])
-    if "tort" in body.question.lower():
-        return RagAskResponse.model_validate(fixtures.load("rag_ask_ok"))
-    return RagAskResponse.model_validate(fixtures.load("rag_ask_refusal"))
+    return answer.ask(body.question, body.module)

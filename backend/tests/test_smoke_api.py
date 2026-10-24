@@ -13,6 +13,7 @@ def test_health(client):
     assert body["ok"] is True
     assert body["data_mode"] == "local"
     assert isinstance(body["index_chunks"], int)
+    assert body["index_chunks"] > 0  # corpus indexed (FakeEmbedder under LLM_FAKE=1)
 
 
 def test_connect_then_profile(client):
@@ -145,3 +146,25 @@ def test_rag_ask_cites(client):
     body = r.json()
     assert body["answer"]
     assert body["citations"]
+
+
+def test_rag_ask_cites_tort_chunk(client):
+    """§11: limited tort -> cited answer from the PA Insurance Department chunk."""
+    from app.rag.facts import PA_TORT
+
+    r = client.post("/api/rag/ask", json={"question": "What does limited tort mean in Pennsylvania?", "module": "auto_insurance"})
+    body = r.json()
+    assert body["refusal"] is None
+    assert PA_TORT in {c["chunk_id"] for c in body["citations"]}
+    assert f"[s:{PA_TORT}]" in body["answer"]
+    assert all(c["publisher"] and c["url"] for c in body["citations"])
+
+
+def test_rag_ask_no_source_refusal(client):
+    """§11: off-corpus question -> no-source refusal, no citations."""
+    r = client.post("/api/rag/ask", json={"question": "Does PA require insurance on a bicycle?", "module": "auto_insurance"})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["answer"] is None
+    assert body["refusal"] == "I don't have a trusted source for that, so I won't guess."
+    assert body["citations"] == []

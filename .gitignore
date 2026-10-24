@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+backend/rag/index.npz
+backend/rag/index_meta.json
+backend/*.db
+node_modules/
+frontend/dist/
+.cache/

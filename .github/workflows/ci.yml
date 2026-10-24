@@ -1,0 +1,54 @@
+# Place at .github/workflows/ci.yml
+# Mirrors scripts/ci.sh. No secrets: tests run with LLM_FAKE=1 and DATA_MODE=local.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    env:
+      DATA_MODE: local
+      LLM_FAKE: "1"
+      DEV_MODE: "1"
+      ANTHROPIC_API_KEY: test
+      PLAID_CLIENT_ID: test
+      PLAID_SECRET: test
+      PLAID_ENV: sandbox
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install
+        run: pip install -r backend/requirements.txt
+      - name: Unit + smoke tests
+        working-directory: backend
+        run: python -m pytest -q
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install
+        working-directory: frontend
+        run: npm ci
+      - name: Typecheck
+        working-directory: frontend
+        run: npm run typecheck
+      - name: Build
+        working-directory: frontend
+        run: npm run build

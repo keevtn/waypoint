@@ -33,7 +33,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 
 ## Contract commits
 
-(none yet — format: `HH:MM models.py — what changed (session)`)
+19:12 fixtures — citation chunk ids remapped to the real corpus (pa-auto-insurance-guide#0 minimums, #1 tort; cfpb-auto-loan-insurance#0 lender; naic-deductibles#2 deductible); values only, no field changes; models.py/types.ts untouched (C)
 
 ## Wave 0 summary (Phase 0 done)
 

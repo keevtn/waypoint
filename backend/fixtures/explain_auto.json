@@ -5,18 +5,18 @@
       "verdict": "This configuration satisfies your lender [c:c_lender_comp_coll] and is the cheaper monthly choice, but its deductible is above what you said you could cover on short notice [c:c_deductible_comfort].",
       "pros": [
         "Lowest monthly premium of the options your lender allows.",
-        "Meets Pennsylvania's minimum liability and medical requirements [s:pa-auto-insurance-guide#1]."
+        "Meets Pennsylvania's minimum liability and medical requirements [s:pa-auto-insurance-guide#0]."
       ],
       "cons": [
         "A single claim would require a $1,000 payment, above your $600 comfort level [c:c_deductible_comfort].",
-        "Limited tort waives most pain-and-suffering claims unless an exception applies [s:pa-auto-insurance-guide#3]."
+        "Limited tort waives most pain-and-suffering claims unless an exception applies [s:pa-auto-insurance-guide#1]."
       ],
       "tight_months": [
         {"month": "2027-01", "why": "Tuition installment and Textbooks land in the same week as the premium and loan payment, pushing the balance below your floor."}
       ],
       "citations": [
-        {"chunk_id": "pa-auto-insurance-guide#1", "title": "Automobile Insurance Guide", "url": "https://insurance.pa.gov/Coverage/Auto/Pages/Auto-Insurance-Guide.aspx", "publisher": "Pennsylvania Insurance Department", "year": 2025, "excerpt": "Pennsylvania law requires all registered vehicles to carry liability coverage of at least 15/30/5 and $5,000 in first-party medical benefits."},
-        {"chunk_id": "pa-auto-insurance-guide#3", "title": "Automobile Insurance Guide", "url": "https://insurance.pa.gov/Coverage/Auto/Pages/Auto-Insurance-Guide.aspx", "publisher": "Pennsylvania Insurance Department", "year": 2025, "excerpt": "Under limited tort you may seek recovery for medical and out-of-pocket expenses, but not for pain and suffering unless the injuries meet the serious-injury threshold."}
+        {"chunk_id": "pa-auto-insurance-guide#0", "title": "Automobile Insurance Guide", "url": "https://www.pa.gov/content/dam/copapwp-pagov/en/insurance/documents/consumer-help-center/learn-about-insurance/auto-insurance-guide.pdf", "publisher": "Pennsylvania Insurance Department", "year": 2025, "excerpt": "Every vehicle registered in Pennsylvania must carry three coverages. Medical benefits coverage pays the medical bills for you and others who are covered by your policy; the minimum limit is $5,000, and higher limits are available. Bodily…"},
+        {"chunk_id": "pa-auto-insurance-guide#1", "title": "Automobile Insurance Guide", "url": "https://www.pa.gov/content/dam/copapwp-pagov/en/insurance/documents/consumer-help-center/learn-about-insurance/auto-insurance-guide.pdf", "publisher": "Pennsylvania Insurance Department", "year": 2025, "excerpt": "Pennsylvania drivers choose a tort option, which controls your right to sue another driver after an accident. Limited tort offers you significant savings on your premium, but you are not able to recover certain damages, such as payments…"}
       ]
     },
     {
@@ -24,7 +24,7 @@
       "verdict": "This configuration satisfies your lender [c:c_lender_comp_coll], keeps the deductible inside your comfort level, and passes the deductible stress test at the cost of a higher premium.",
       "pros": [
         "Deductible of $500 is below your $600 comfort level.",
-        "Full tort preserves the right to claim pain and suffering [s:pa-auto-insurance-guide#3]."
+        "Full tort preserves the right to claim pain and suffering [s:pa-auto-insurance-guide#1]."
       ],
       "cons": [
         "Highest monthly premium, so January dips lower than with the $1,000-deductible option."
@@ -33,7 +33,7 @@
         {"month": "2027-01", "why": "Tuition installment and Textbooks land in the same week as the premium and loan payment, pushing the balance below your floor."}
       ],
       "citations": [
-        {"chunk_id": "pa-auto-insurance-guide#3", "title": "Automobile Insurance Guide", "url": "https://insurance.pa.gov/Coverage/Auto/Pages/Auto-Insurance-Guide.aspx", "publisher": "Pennsylvania Insurance Department", "year": 2025, "excerpt": "Under limited tort you may seek recovery for medical and out-of-pocket expenses, but not for pain and suffering unless the injuries meet the serious-injury threshold."}
+        {"chunk_id": "pa-auto-insurance-guide#1", "title": "Automobile Insurance Guide", "url": "https://www.pa.gov/content/dam/copapwp-pagov/en/insurance/documents/consumer-help-center/learn-about-insurance/auto-insurance-guide.pdf", "publisher": "Pennsylvania Insurance Department", "year": 2025, "excerpt": "Pennsylvania drivers choose a tort option, which controls your right to sue another driver after an accident. Limited tort offers you significant savings on your premium, but you are not able to recover certain damages, such as payments…"}
       ]
     }
   ]

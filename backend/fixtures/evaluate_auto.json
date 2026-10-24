@@ -30,10 +30,10 @@
     }
   ],
   "constraints": [
-    {"id": "c_lender_comp_coll", "kind": "required", "applies_to": ["pa_min_limited"], "rule": "Lenders generally require collision and comprehensive coverage on a financed vehicle.", "citation_ids": ["cfpb-auto-loans#2"]},
-    {"id": "c_pa_minimum", "kind": "required", "applies_to": ["pa_min_limited", "std_limited_1000", "std_full_500"], "rule": "Pennsylvania requires 15/30/5 liability plus $5,000 first-party medical benefits; a lapse can suspend registration.", "citation_ids": ["pa-auto-insurance-guide#1"]},
-    {"id": "c_deductible_comfort", "kind": "flag", "applies_to": ["std_limited_1000"], "rule": "Deductible exceeds what you said you could pay on short notice.", "citation_ids": ["naic-deductibles#1"]},
-    {"id": "c_limited_tort", "kind": "flag", "applies_to": ["pa_min_limited", "std_limited_1000"], "rule": "Limited tort lowers the premium but waives most pain-and-suffering claims unless an exception applies.", "citation_ids": ["pa-auto-insurance-guide#3"]}
+    {"id": "c_lender_comp_coll", "kind": "required", "applies_to": ["pa_min_limited"], "rule": "Lenders generally require collision and comprehensive coverage on a financed vehicle.", "citation_ids": ["cfpb-auto-loan-insurance#0"]},
+    {"id": "c_pa_minimum", "kind": "required", "applies_to": ["pa_min_limited", "std_limited_1000", "std_full_500"], "rule": "Pennsylvania requires 15/30/5 liability plus $5,000 first-party medical benefits; a lapse can suspend registration.", "citation_ids": ["pa-auto-insurance-guide#0"]},
+    {"id": "c_deductible_comfort", "kind": "flag", "applies_to": ["std_limited_1000"], "rule": "Deductible exceeds what you said you could pay on short notice.", "citation_ids": ["naic-deductibles#2"]},
+    {"id": "c_limited_tort", "kind": "flag", "applies_to": ["pa_min_limited", "std_limited_1000"], "rule": "Limited tort lowers the premium but waives most pain-and-suffering claims unless an exception applies.", "citation_ids": ["pa-auto-insurance-guide#1"]}
   ],
   "projections": {
     "baseline": {

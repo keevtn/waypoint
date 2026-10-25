@@ -25,9 +25,9 @@ const fixtureFiles = import.meta.glob("../../backend/fixtures/*.json", { eager: 
 // Fixture mode: LLM-backed calls take 5–15s live, so add a short delay to exercise loading states.
 const slow = <T,>(v: T, ms = 900): Promise<T> => new Promise((r) => setTimeout(() => r(v), ms));
 
-function fixture<T>(name: string): T {
+function fixture<T>(name: string, fallback?: string): T {
   const key = `../../backend/fixtures/${name}.json`;
-  const data = fixtureFiles[key];
+  const data = fixtureFiles[key] ?? (fallback ? fixtureFiles[`../../backend/fixtures/${fallback}.json`] : undefined);
   if (data === undefined) throw new Error(`Missing fixture ${name}`);
   return data as T;
 }
@@ -99,12 +99,12 @@ export const api = {
 
   explain: (decisionId: string, evalId: string) =>
     USE_FIXTURES
-      ? slow(fixture<ExplainResponse>(`explain_${shortId(decisionId)}`))
+      ? slow(fixture<ExplainResponse>(`explain_${shortId(decisionId)}`, "explain_auto"))
       : post<ExplainResponse>(`/decisions/${decisionId}/explain`, { eval_id: evalId }),
 
   stress: (decisionId: string, evalId: string, preferredOptionId: string) =>
     USE_FIXTURES
-      ? slow(fixture<StressResponse>(`stress_${shortId(decisionId)}`))
+      ? slow(fixture<StressResponse>(`stress_${shortId(decisionId)}`, "stress_auto"))
       : post<StressResponse>(`/decisions/${decisionId}/stress`, {
           eval_id: evalId,
           preferred_option_id: preferredOptionId,
@@ -112,7 +112,7 @@ export const api = {
 
   action: (decisionId: string, evalId: string, optionId: string) =>
     USE_FIXTURES
-      ? slow({ ...fixture<ActionCard>(`action_${shortId(decisionId)}`), option_id: optionId })
+      ? slow({ ...fixture<ActionCard>(`action_${shortId(decisionId)}`, "action_auto"), option_id: optionId })
       : post<ActionCard>(`/decisions/${decisionId}/action`, { eval_id: evalId, option_id: optionId }),
 
   ask: (question: string, module: string | null) =>
@@ -121,7 +121,8 @@ export const api = {
       : post<RagAskResponse>("/rag/ask", { question, module }),
 };
 
-// "auto_insurance" → "auto" so fixture names stay short (evaluate_auto.json etc.).
+// "auto_insurance" → "auto" so fixture names stay short (evaluate_auto.json etc.); other modules use
+// their full id (evaluate_big_purchase.json). Explain/stress/action fall back to the auto fixtures.
 function shortId(decisionId: string): string {
-  return decisionId.split("_")[0];
+  return decisionId === "auto_insurance" ? "auto" : decisionId;
 }

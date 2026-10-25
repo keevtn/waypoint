@@ -3,8 +3,8 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useAppState } from "../state";
-import type { AutoInsuranceInputs, DecisionSummary, UserQuote } from "../types";
-import { isAutoInputs, isRentInputs, type DecisionInputs, type RentInputs, type RentUnit } from "../lib/decisionInputs";
+import type { AutoInsuranceInputs, BigPurchaseInputs, DecisionSummary, UserQuote } from "../types";
+import { isAutoInputs, isBigPurchaseInputs, isRentInputs, type DecisionInputs, type RentInputs, type RentUnit } from "../lib/decisionInputs";
 import { addDays, centsToDollarsText, dollarsToCents, fmtCents, todayIso } from "../lib/format";
 import { errorMessage, useAsync } from "../lib/hooks";
 import { Badge, Button, Card, ErrorNote, Field, Skeleton, inputClass } from "../components/ui";
@@ -97,6 +97,47 @@ const rentFromInputs = (i: RentInputs): RentFormState => ({
   })),
 });
 
+
+// ---------- Big purchase module (mirrors backend/app/decisions/big_purchase/inputs.py) ----------
+
+interface PurchaseFormState {
+  name: string;
+  amount: string;
+  date: string;
+  hasOffer: boolean;
+  aprPct: string; // "24.99"
+  termMonths: string;
+  downPayment: string;
+}
+
+// Demo default: the $1,800 laptop next week, no lender offer (so the financed plans use the assumed APR).
+const purchaseDefaultsFor = (asOf: string): PurchaseFormState => ({
+  name: "Laptop",
+  amount: "1800",
+  date: addDays(asOf, 7),
+  hasOffer: false,
+  aprPct: "",
+  termMonths: "12",
+  downPayment: "",
+});
+
+const purchaseFromInputs = (i: BigPurchaseInputs): PurchaseFormState => ({
+  name: i.name,
+  amount: centsToDollarsText(i.amount_cents),
+  date: i.date,
+  hasOffer: i.financing !== null,
+  aprPct: i.financing ? String(i.financing.apr_bps / 100) : "",
+  termMonths: i.financing ? String(i.financing.term_months) : "12",
+  downPayment: i.financing ? centsToDollarsText(i.financing.down_payment_cents) : "",
+});
+
+/** "24.99" -> 2499 basis points; null when not a number. */
+const pctToBps = (s: string): number | null => {
+  const t = s.trim();
+  if (!/^\d+(\.\d{1,2})?$/.test(t)) return null;
+  return Math.round(Number(t) * 100);
+};
+
 export default function Moment() {
   const navigate = useNavigate();
   const { profile, inputs, decisionId, setInputs, setEvaluation } = useAppState();
@@ -105,6 +146,7 @@ export default function Moment() {
   const asOf = profile?.as_of ?? todayIso();
   const [form, setForm] = useState<FormState>(() => (isAutoInputs(inputs) ? fromInputs(inputs.inputs) : defaultsFor(asOf)));
   const [rentForm, setRentForm] = useState<RentFormState>(() => (isRentInputs(inputs) ? rentFromInputs(inputs.inputs) : rentDefaultsFor(asOf)));
+  const [purchase, setPurchase] = useState<PurchaseFormState>(() => (isBigPurchaseInputs(inputs) ? purchaseFromInputs(inputs.inputs) : purchaseDefaultsFor(asOf)));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -115,6 +157,7 @@ export default function Moment() {
       setForm((f) => ({ ...f, registrationDeadline: addDays(profile.as_of, 30) }));
       const start = nextLeaseStart(profile.as_of);
       setRentForm((f) => ({ ...f, units: f.units.map((u) => ({ ...u, startDate: start })) }));
+      setPurchase((f) => ({ ...f, date: addDays(profile.as_of, 7) }));
     }
   }, [profile, inputs]);
 
@@ -199,12 +242,42 @@ export default function Moment() {
     return { units, current_rent_cents: current };
   };
 
+
+  const setP = <K extends keyof PurchaseFormState>(k: K, v: PurchaseFormState[K]) => setPurchase((f) => ({ ...f, [k]: v }));
+
+  const validatePurchase = (): BigPurchaseInputs | null => {
+    const e: Record<string, string> = {};
+    const amount = dollarsToCents(purchase.amount);
+    const name = purchase.name.trim();
+    if (!name) e.pName = "Say what you're buying.";
+    if (name.length > 60) e.pName = "Keep the name under 60 characters.";
+    if (amount === null || amount <= 0) e.pAmount = "Enter the full price.";
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(purchase.date)) e.pDate = "Pick a date.";
+    let financing: BigPurchaseInputs["financing"] = null;
+    if (purchase.hasOffer) {
+      const bps = pctToBps(purchase.aprPct);
+      const term = Number(purchase.termMonths);
+      const down = purchase.downPayment.trim() === "" ? 0 : dollarsToCents(purchase.downPayment);
+      if (bps === null || bps > 10000) e.pApr = "Enter the APR as a percentage, e.g. 24.99.";
+      if (!Number.isInteger(term) || term < 1 || term > 84) e.pTerm = "1 to 84 monthly payments.";
+      if (down === null || down < 0) e.pDown = "Enter an amount or leave blank.";
+      if (down !== null && amount !== null && down >= amount) e.pDown = "A down payment that large means you're paying cash.";
+      if (bps !== null && down !== null) financing = { apr_bps: bps, term_months: term, down_payment_cents: down };
+    }
+    setErrors(e);
+    if (Object.keys(e).length > 0) return null;
+    return { name, amount_cents: amount as number, date: purchase.date, financing };
+  };
+
   const onSubmit = async (ev: FormEvent) => {
     ev.preventDefault();
     let tagged: DecisionInputs | null = null;
     if (moduleId === "rent") {
       const parsed = validateRent();
       if (parsed) tagged = { decisionId: "rent", inputs: parsed };
+    } else if (moduleId === "big_purchase") {
+      const parsed = validatePurchase();
+      if (parsed) tagged = { decisionId: "big_purchase", inputs: parsed };
     } else {
       const parsed = validate();
       if (parsed) tagged = { decisionId: "auto_insurance", inputs: parsed };
@@ -438,11 +511,77 @@ export default function Moment() {
           </form>
         </Card>
       )}
+
+      {moduleId === "big_purchase" && (
+        <Card title="Big purchase · what, how much, and when">
+          <form onSubmit={onSubmit} className="space-y-5" noValidate>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              We test paying cash on that date against financing it, and if neither keeps your floor we look for a date or a plan that does.
+            </p>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <Field label="What are you buying?">
+                <input className={inputClass} placeholder="e.g. Laptop" value={purchase.name} onChange={(e) => setP("name", e.target.value)} />
+                <FieldError msg={errors.pName} />
+              </Field>
+              <Field label="Full price">
+                <DollarInput value={purchase.amount} onChange={(v) => setP("amount", v)} error={errors.pAmount} />
+              </Field>
+              <Field label="When" hint="Purchase date, or when payments would start.">
+                <input type="date" className={inputClass} value={purchase.date} onChange={(e) => setP("date", e.target.value)} />
+                <FieldError msg={errors.pDate} />
+              </Field>
+            </div>
+
+            <fieldset>
+              <legend className="mb-1 text-sm font-medium text-slate-700 dark:text-slate-200">Do you have a financing offer?</legend>
+              <div className="flex gap-2">
+                <Choice active={!purchase.hasOffer} onClick={() => setP("hasOffer", false)}>
+                  Not yet
+                </Choice>
+                <Choice active={purchase.hasOffer} onClick={() => setP("hasOffer", true)}>
+                  Yes, I know the terms
+                </Choice>
+              </div>
+              <p className="mt-1 text-xs text-slate-500">
+                {purchase.hasOffer
+                  ? "We use your lender's numbers for the financed plans."
+                  : "Without an offer, financed plans use an assumed APR and are marked Estimate."}
+              </p>
+            </fieldset>
+
+            {purchase.hasOffer && (
+              <div className="grid gap-4 sm:grid-cols-3">
+                <Field label="APR (%)" hint="As printed on the offer, e.g. 24.99. Zero is fine.">
+                  <input className={inputClass} inputMode="decimal" value={purchase.aprPct} onChange={(e) => setP("aprPct", e.target.value)} />
+                  <FieldError msg={errors.pApr} />
+                </Field>
+                <Field label="Number of monthly payments">
+                  <input className={inputClass} inputMode="numeric" value={purchase.termMonths} onChange={(e) => setP("termMonths", e.target.value)} />
+                  <FieldError msg={errors.pTerm} />
+                </Field>
+                <Field label="Down payment" hint="Paid on the purchase date. Blank = none.">
+                  <DollarInput value={purchase.downPayment} onChange={(v) => setP("downPayment", v)} error={errors.pDown} />
+                </Field>
+              </div>
+            )}
+
+            {submitError && <ErrorNote message={submitError} />}
+
+            <div className="flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
+              <span className="text-xs text-slate-500">Cash vs. financing, against your own projection. {profile && <>Floor {fmtCents(profile.safety_floor_cents)}.</>}</span>
+              <Button type="submit" disabled={submitting || !profile}>
+                {submitting ? "Running projections…" : "Compare ways to pay"}
+              </Button>
+            </div>
+          </form>
+        </Card>
+      )}
     </section>
   );
 }
 
-const SUPPORTED = new Set(["auto_insurance", "rent"]);
+const SUPPORTED = new Set(["auto_insurance", "rent", "big_purchase"]);
 
 function ModuleCard({ decision, selected, onSelect }: { decision: DecisionSummary; selected: boolean; onSelect: () => void }) {
   const soon = !SUPPORTED.has(decision.id);

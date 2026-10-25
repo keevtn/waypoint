@@ -9,6 +9,7 @@ import { fmtCents, fmtMonth } from "../lib/format";
 import { friendlyError } from "../lib/hooks";
 import CitationChip, { CitedText } from "../components/CitationChip";
 import FlagList, { dedupeFlags } from "../components/FlagList";
+import { priceCadence } from "../components/OptionCard";
 import ProjectionChart, { BASELINE_KEY, type ChartSeries } from "../components/ProjectionChart";
 import { Badge, Button, Card, Empty, ErrorNote, Skeleton, SkeletonLines, type Tone } from "../components/ui";
 
@@ -129,7 +130,10 @@ export default function StressTest() {
               }`}
             >
               {o.label}
-              <span className="tabular ml-2 text-xs text-slate-500">{fmtCents(o.price.cents)}/mo</span>
+              <span className="tabular ml-2 text-xs text-slate-500">
+                {fmtCents(o.price.cents)}
+                {priceCadence(o) === "per month" ? "/mo" : ""}
+              </span>
             </button>
           ))}
           <div className="ml-auto">

@@ -2,10 +2,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppState } from "../state";
-import { baselineLabel, isAutoInputs, isRentInputs, priceFootnote, type DecisionInputs } from "../lib/decisionInputs";
+import { applySuggestionPatch, baselineLabel, fmtApr, isAutoInputs, isBigPurchaseInputs, isRentInputs, priceFootnote, type DecisionInputs } from "../lib/decisionInputs";
+import SuggestionsPanel from "../components/SuggestionsPanel";
+import type { Suggestion } from "../types";
+import { api } from "../api";
 import type { Flag } from "../types";
-import { fmtCents, fmtDollars } from "../lib/format";
-import { useDarkMode } from "../lib/hooks";
+import { fmtCents, fmtDate, fmtDollars } from "../lib/format";
+import { friendlyError, useDarkMode } from "../lib/hooks";
 import AskWithSources from "../components/AskWithSources";
 import ExplanationPanel, { ExplanationSkeleton, TightMonthPanel } from "../components/ExplanationPanel";
 import FlagList from "../components/FlagList";
@@ -16,6 +19,30 @@ import { Button, Card, Empty, ErrorNote } from "../components/ui";
 export default function Compare() {
   const { profile, evaluation, explanations, explainStatus, explainError, selectedOptionId, decisionId, inputs, selectOption, prefetchExplanations } =
     useAppState();
+  const [applyingId, setApplyingId] = useState<string | null>(null);
+  const [applyError, setApplyError] = useState<string | null>(null);
+
+  /** Merge a suggestion's patch into the inputs and re-run /evaluate; the new options replace the current ones. */
+  const applySuggestion = async (s: Suggestion) => {
+    if (!inputs || applyingId) return;
+    const next = applySuggestionPatch(inputs, s);
+    setApplyingId(s.id);
+    setApplyError(null);
+    try {
+      const result = await api.evaluate(next.decisionId, next.inputs);
+      const st = useAppState.getState();
+      st.setInputs(next);
+      st.setEvaluation(result);
+      // Land on the option the suggestion was computed for, when it exists in the new evaluation.
+      if (result.options.some((o) => o.id === s.projected.option_id)) st.selectOption(s.projected.option_id);
+      st.prefetchExplanations();
+      setActiveMonth(null);
+    } catch (e) {
+      setApplyError(friendlyError(e));
+    } finally {
+      setApplyingId(null);
+    }
+  };
   const dark = useDarkMode();
   const [activeMonth, setActiveMonth] = useState<string | null>(null);
 
@@ -126,6 +153,9 @@ export default function Compare() {
         </div>
       </div>
 
+      {applyError && <ErrorNote message={applyError} />}
+      <SuggestionsPanel suggestions={evaluation.suggestions ?? []} options={options} floorCents={floor} applyingId={applyingId} onApply={applySuggestion} />
+
       {selected &&
         (explainLoading && explanations === null ? (
           <ExplanationSkeleton />
@@ -157,6 +187,13 @@ function inputsSummary(d: DecisionInputs): string {
     const i = d.inputs;
     const current = i.current_rent_cents === null ? "current rent from your transactions" : i.current_rent_cents === 0 ? "no rent today" : `paying ${fmtCents(i.current_rent_cents)}/mo now`;
     return `${i.units.length} units · ${current} · each option is "move to this unit", the baseline is staying put`;
+  }
+  if (isBigPurchaseInputs(d)) {
+    const i = d.inputs;
+    const fin = i.financing
+      ? `your offer: ${fmtApr(i.financing.apr_bps)} APR over ${i.financing.term_months} months${i.financing.down_payment_cents > 0 ? `, ${fmtCents(i.financing.down_payment_cents)} down` : ""}`
+      : "no lender offer yet, so financed plans use an assumed APR";
+    return `${i.name} · ${fmtCents(i.amount_cents)} on ${fmtDate(i.date)} · ${fin}`;
   }
   return "";
 }

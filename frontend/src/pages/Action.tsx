@@ -7,7 +7,7 @@ import type { ActionCard } from "../types";
 import { fmtCents, fmtDate } from "../lib/format";
 import { friendlyError } from "../lib/hooks";
 import CitationChip, { CitedText } from "../components/CitationChip";
-import { describeAttributes, PriceBadge } from "../components/OptionCard";
+import { describeAttributes, PriceBadge, priceCadence } from "../components/OptionCard";
 import { Button, Empty, ErrorNote, Skeleton, SkeletonLines } from "../components/ui";
 
 const inflight = new Map<string, Promise<ActionCard>>();
@@ -78,7 +78,11 @@ export default function Action() {
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Your next action</h1>
           <p className="text-sm text-slate-500">
-            {decisionId === "rent" ? "A unit and a plan, not a landlord's pitch. Get everything in writing before you pay." : "A coverage configuration, not a carrier. Take this to real people and get real quotes."}
+            {decisionId === "rent"
+              ? "A unit and a plan, not a landlord's pitch. Get everything in writing before you pay."
+              : decisionId === "big_purchase"
+                ? "A date and a way to pay, not a sales pitch. Get the real terms in writing before you commit."
+                : "A coverage configuration, not a carrier. Take this to real people and get real quotes."}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -126,7 +130,7 @@ export default function Action() {
           </div>
           <div className="text-right">
             <div className="tabular text-xl font-semibold">{fmtCents(option.price.cents)}</div>
-            <div className="text-xs text-slate-500">per month</div>
+            <div className="text-xs text-slate-500">{priceCadence(option)}</div>
             <div className="mt-1 flex justify-end">
               <PriceBadge price={option.price} />
             </div>
@@ -205,7 +209,9 @@ export default function Action() {
                 <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
                   {decisionId === "rent"
                     ? "A campus housing office or tenant resource center can read the lease with you before you sign."
-                    : "An independent agent or your own bank can check this configuration against your lender's letter before you buy."}
+                    : decisionId === "big_purchase"
+                      ? "A non-profit credit counselor or your own bank can check the financing terms against this plan before you sign."
+                      : "An independent agent or your own bank can check this configuration against your lender's letter before you buy."}
                 </p>
                 <a
                   href={card.talk_to_human_url}
@@ -237,7 +243,12 @@ export default function Action() {
           </>
         )}
         <p className="mt-6 text-[11px] text-slate-400">
-          Estimates and educational information, not financial advice. Premiums shown are estimates until you enter a quote.
+          Estimates and educational information, not financial advice.{" "}
+          {decisionId === "auto_insurance"
+            ? "Premiums shown are estimates until you enter a quote."
+            : decisionId === "big_purchase"
+              ? "Financing figures use an assumed APR until you enter your lender's terms."
+              : "Figures are the ones you entered; confirm them with the landlord."}
         </p>
       </article>
 

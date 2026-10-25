@@ -2,10 +2,17 @@
 // constraint badges, and status styling (disallowed = greyed with reason).
 import type { Constraint, Option, ProjectionResult } from "../types";
 import { fmtCents, fmtDate, fmtDollars } from "../lib/format";
+import { fmtApr } from "../lib/decisionInputs";
 import { Badge, Dot, type Tone } from "./ui";
 import { StatusBadge, constraintShortLabel } from "./ConstraintBadge";
 
 const KIND_TONE: Record<Constraint["kind"], Tone> = { required: "accent", disallowed: "danger", flag: "warn" };
+
+/** "per month" for recurring prices; "one time" for a lump sum (big-purchase cash option: term_months 0). */
+export function priceCadence(option: Option): string {
+  const a = option.attributes;
+  return "total_cost_cents" in a && Number(a.term_months ?? 0) === 0 ? "one time" : "per month";
+}
 
 export function PriceBadge({ price }: { price: Option["price"] }) {
   if (price.kind === "user_quote") return <Badge tone="accent">Your quote</Badge>;
@@ -18,7 +25,7 @@ export function PriceBadge({ price }: { price: Option["price"] }) {
       </a>
     ) : (
       <Badge tone="neutral" title={tip}>
-        Estimate · source
+        Estimate
       </Badge>
     );
   }
@@ -50,6 +57,18 @@ export function describeAttributes(a: Option["attributes"]): { label: string; va
       const delta = Number(a.monthly_housing_cents) - Number(a.current_rent_cents);
       out.push({ label: "vs. today", value: delta === 0 ? "same monthly cost" : `${fmtCents(Math.abs(delta))}/mo ${delta > 0 ? "more" : "less"}` });
     }
+  }
+  // Big purchase module (backend/app/decisions/big_purchase attributes).
+  if ("monthly_payment_cents" in a && "total_cost_cents" in a) {
+    const term = Number(a.term_months);
+    if (term > 0) {
+      out.push({ label: "Payment", value: `${fmtCents(Number(a.monthly_payment_cents))}/mo × ${term}` });
+      out.push({ label: "APR", value: `${fmtApr(Number(a.apr_bps))}${a.apr_assumed ? " (assumed)" : ""}` });
+      if (Number(a.down_payment_cents) > 0) out.push({ label: "Down payment", value: fmtCents(Number(a.down_payment_cents)) });
+      out.push({ label: "Interest", value: fmtCents(Number(a.interest_cents)) });
+    }
+    out.push({ label: "Total cost", value: fmtCents(Number(a.total_cost_cents)) });
+    if (a.date) out.push({ label: term > 0 ? "First payment" : "Paid on", value: fmtDate(String(a.date)) });
   }
   if (out.length === 0) {
     for (const [key, v] of Object.entries(a)) out.push({ label: key.replace(/_/g, " "), value: String(v) });
@@ -122,7 +141,7 @@ export default function OptionCard({
         </div>
         <div className="shrink-0 text-right">
           <div className={`tabular text-lg font-semibold ${disallowed ? "text-slate-500" : ""}`}>{fmtCents(option.price.cents)}</div>
-          <div className="text-xs text-slate-500">per month</div>
+          <div className="text-xs text-slate-500">{priceCadence(option)}</div>
           <div className="mt-1 flex justify-end">
             <PriceBadge price={option.price} />
           </div>

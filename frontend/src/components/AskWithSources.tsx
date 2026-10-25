@@ -8,6 +8,7 @@ import { Button, Card, ErrorNote, SkeletonLines, inputClass } from "./ui";
 
 const SUGGESTIONS_BY_MODULE: Record<string, string[]> = {
   rent: ["What share of income is considered affordable for housing?", "Should I invest my emergency fund in index funds?"],
+  big_purchase: ["What is an emergency fund and how much should be in it?", "Should I invest my emergency fund in index funds?"],
 };
 const SUGGESTIONS = ["What does limited tort mean in Pennsylvania?", "Should I invest my emergency fund in index funds?"];
 
@@ -44,7 +45,13 @@ export default function AskWithSources({ module }: { module: string | null }) {
       <form onSubmit={onSubmit} className="flex gap-2">
         <input
           className={inputClass}
-          placeholder={module === "rent" ? "Ask about leases, deposits, or what counts as affordable rent" : "Ask about coverage terms, state requirements, or lender rules"}
+          placeholder={
+            module === "rent"
+              ? "Ask about leases, deposits, or what counts as affordable rent"
+              : module === "big_purchase"
+                ? "Ask about emergency funds, borrowing costs, or lender rules"
+                : "Ask about coverage terms, state requirements, or lender rules"
+          }
           value={q}
           onChange={(e) => setQ(e.target.value)}
           aria-label="Question"

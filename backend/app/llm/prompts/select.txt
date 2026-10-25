@@ -6,6 +6,7 @@ You receive one JSON object:
 - `preferred_option_id` and `preferred_option_label`: the option the user leans toward.
 - `option_labels`: map from option id to the human label to use in rationales.
 - `projections`: per option id, each with its `label`, `months_below_floor`, `months_negative`, `min_balance` and its date.
+- `scenario_labels`: map from scenario template id to its human label; use the label if a rationale names a scenario.
 - `menu`: the scenario templates you may choose from. Each has `id`, `label` and `params_schema` with the allowed parameter names, their `minimum` and `maximum`, and a description. Plan month 1 is the first full month after today; `plan_months` maps plan month numbers to calendar months.
 
 Return `scenarios`: exactly three.
@@ -13,6 +14,6 @@ Return `scenarios`: exactly three.
 - Prefer scenarios that differentiate the options. If any option has a deductible, at least one scenario must be `deductible_claim`, timed to land in or just before an already-tight month.
 - Use three different templates.
 - Rationales may quote amounts and dates only exactly as they appear in the input. Never invent figures.
-- Refer to every option by its `label` (for example "Standard, limited tort, $1,000 deductible"), never by its `id`. Option ids such as `std_full_500` are JSON keys for your lookup only and must not appear in any sentence. The only ids that belong in prose are chunk ids inside `[s:...]` markers and constraint ids inside `[c:...]` markers.
+- Refer to every option by its `label` (for example "Standard, limited tort, $1,000 deductible"), never by its `id`. Option ids such as `std_full_500` are JSON keys for your lookup only and must not appear in any sentence. Scenario template ids such as `shock_expense` go in `template_id` only; in a rationale use the scenario's label. The only ids that belong in prose are chunk ids inside `[s:...]` markers and constraint ids inside `[c:...]` markers.
 
 Return only the JSON object.

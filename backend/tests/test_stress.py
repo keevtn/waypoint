@@ -7,7 +7,7 @@ import pytest
 from app import config
 from app.decisions import cache, registry
 from app.llm import client as llm_client
-from app.llm import stress
+from app.llm import payload, stress
 from app.models import Scenario
 
 INPUTS = {
@@ -168,6 +168,30 @@ def test_stress_route_runs_scenarios_and_critique(client, evaluation, stub):
     payload_ = s.calls[1][1]
     assert payload_["scenarios"][0]["results"]["std_limited_1000"]["months_negative"] is not None
     assert payload_["inputs"]["deductible_comfort_display"] == "$600"
+    # scenario labels travel with the payload (select and critique), like option_labels
+    assert payload_["scenario_labels"]["deductible_claim"] == "You have to pay the deductible after a claim"
+    assert payload_["scenarios"][0]["label"] == "You have to pay the deductible after a claim"
+    assert s.calls[0][1]["scenario_labels"] == payload_["scenario_labels"]
+
+
+def test_scenario_ids_in_prose_become_labels(client, evaluation, stub, menu):
+    labels = {t.id: t.label for t in menu}
+    out = payload.replace_scenario_ids("Under shock_expense and hours_cut it fails [c:c_deductible_comfort].", menu)
+    assert out == f"Under {labels['shock_expense']} and {labels['hours_cut']} it fails [c:c_deductible_comfort]."
+    assert payload.replace_scenario_ids("shock_expenses", menu) == "shock_expenses"  # partial match untouched
+    crit = {**CRITIQUE, "case_against": ["In the deductible_claim scenario std_limited_1000 goes negative. [s:naic-deductibles#2]"], "summary": "Reconsider: income_gap breaks it."}
+    stub({"select": {"scenarios": [{"template_id": "income_gap", "params": {"months": 1, "start_month": 2}, "rationale": "income_gap because payroll is the only income."}]}, "critique": crit})
+    r = client.post("/api/decisions/auto_insurance/stress", json={"eval_id": evaluation.eval_id, "preferred_option_id": "std_limited_1000"})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    prose = body["critique"]["case_against"] + body["critique"]["case_for"] + [s["scenario"]["rationale"] for s in body["scenarios"]]
+    for text in prose:
+        for tid in labels:
+            assert tid not in text.replace("[c:", "").split("[s:")[0] or f"[c:{tid}]" in text, text
+    assert any(labels["deductible_claim"] in x for x in body["critique"]["case_against"])
+    assert any(labels["income_gap"] in x for x in body["critique"]["case_against"])
+    gap = next(s for s in body["scenarios"] if s["scenario"]["template_id"] == "income_gap")
+    assert gap["scenario"]["rationale"].startswith(labels["income_gap"])
 
 
 def test_stress_route_guardrail_rejects_invented_number(client, evaluation, stub, monkeypatch):

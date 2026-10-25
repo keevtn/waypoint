@@ -21,7 +21,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 
 | Session | Branch | Phase | Last merged to main | Blocked on | Updated |
 |---------|--------|-------|---------------------|------------|---------|
-| A llm | a/big-purchase | done | P6 + P7 @ 2026-10-24; labels fix; S1 rent module; eval cache sqlite; S2 big_purchase module + suggestions @ 2026-10-25 ~03:30 | — | 2026-10-25 |
+| A llm | a/scenario-labels | done | P6 + P7 @ 2026-10-24; labels fix; S1 rent module; eval cache sqlite; S2 big_purchase module + suggestions @ 2026-10-25 ~03:30; scenario labels in stress prose @ 2026-10-25 | — | 2026-10-25 |
 | B wire | b/p4-live | P4 live | All pages verified on live explain/stress/action @ 2026-10-24 (528e997) | — | 2026-10-24 |
 | D plaid | d/p8-plaid | P8 | — | A-P1 | — |
 
@@ -65,6 +65,10 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 ## Session A note: evaluation cache persisted to sqlite (merged to main)
 
 `decisions/cache.py` now writes every evaluation through to a sqlite table (`evaluations` in `config.DB_PATH`, default `backend/waypoint.db`, already gitignored; override with `DB_PATH`) and reads it back on an in-memory miss, so a restart or redeploy between `/evaluate` and `/explain|/stress|/action` no longer yields 404 `unknown_eval`. TTL stays 1h in both layers (expired rows are evicted on every put/get). Rows are pydantic JSON dumps rehydrated through the module's `InputModel`; a row that no longer validates (contract change) or whose module is gone is treated as a miss. If the file cannot be created (read-only disk) the cache logs once and runs memory-only. Tests use a temp `DB_PATH` (`tests/conftest.py`). **Render: the disk is ephemeral per deploy, so this covers restarts within a deploy, not across deploys, unless a persistent disk is mounted and `DB_PATH` points at it.**
+
+## Session A note: scenario labels in stress prose (merged to main)
+
+Per B's report of raw scenario ids (`shock_expense`) in the critique: the select and critique payloads now carry `scenario_labels` (template id -> label, like `option_labels`) and each critique scenario entry carries its `label`; `select.txt` and `critique.txt` say labels in prose, template ids only in `template_id`. Safety net: `payload.replace_scenario_ids` (shared `replace_ids` with the option version) rewrites any leaked template id in rationales and critique prose, markers untouched. Verified with the real key on the persona for auto (`std_limited_1000`, 37s) and big_purchase (`financed_12`, 10s): zero scenario ids in prose, scenarios named "You have to pay the deductible after a claim", "An unexpected expense", etc. Tests: `test_stress.py` (+1, payload labels and the rewrite end to end), 155 total. Still cosmetic and open: the critique may quote a *flag code* in quotes (`'deductible_unaffordable'`) when it cites the unstressed flag.
 
 ## Session A summary (S2 big_purchase module + suggestions, backend only, merged to main)
 

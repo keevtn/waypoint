@@ -13,7 +13,7 @@ from datetime import date
 from typing import Any
 
 from ..decisions.cache import Evaluation
-from ..models import Citation, Constraint, Option, Profile, ProjectionResult
+from ..models import Citation, Constraint, Option, Profile, ProjectionResult, ScenarioTemplate
 
 MAX_CHUNKS = 8
 CHUNK_CHARS = 1600
@@ -134,17 +134,29 @@ def projections_view(projections: dict[str, ProjectionResult], options: list[Opt
 _ID_CHARS = r"[A-Za-z0-9_]"
 
 
-def replace_option_ids(text: str, options: list[Option]) -> str:
-    """Deterministic safety net: a raw option id that leaked into prose becomes its label.
-
-    Ids inside `[c:...]`/`[s:...]` markers are constraint and chunk ids, never option ids,
-    so the markers are left untouched."""
+def replace_ids(text: str, labels: dict[str, str]) -> str:
+    """Deterministic safety net: a raw id (option or scenario template) that leaked into prose
+    becomes its label. Ids inside `[c:...]`/`[s:...]` markers are constraint and chunk ids, so
+    the markers are left untouched."""
     if not text:
         return text
-    for o in sorted(options, key=lambda o: -len(o.id)):
-        pattern = re.compile(rf"(?<!{_ID_CHARS})(?<!\[c:)(?<!\[s:)`?{re.escape(o.id)}`?(?!{_ID_CHARS})")
-        text = pattern.sub(o.label, text)
+    for id_, label in sorted(labels.items(), key=lambda kv: -len(kv[0])):
+        pattern = re.compile(rf"(?<!{_ID_CHARS})(?<!\[c:)(?<!\[s:)`?{re.escape(id_)}`?(?!{_ID_CHARS})")
+        text = pattern.sub(label, text)
     return text
+
+
+def replace_option_ids(text: str, options: list[Option]) -> str:
+    return replace_ids(text, {o.id: o.label for o in options})
+
+
+def scenario_labels(menu: list[ScenarioTemplate]) -> dict[str, str]:
+    """template id -> human label; the model uses these in prose, ids only as JSON keys."""
+    return {t.id: t.label for t in menu}
+
+
+def replace_scenario_ids(text: str, menu: list[ScenarioTemplate]) -> str:
+    return replace_ids(text, scenario_labels(menu))
 
 
 def suggestions_view(ev: Evaluation) -> list[dict[str, Any]]:

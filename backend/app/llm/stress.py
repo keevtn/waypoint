@@ -120,6 +120,7 @@ def select_payload(ev: Evaluation, menu: list[ScenarioTemplate], preferred_optio
         "option_labels": payload.option_labels(ev.options),
         "projections": payload.projections_view(ev.projections, ev.options),
         "plan_months": {str(k): v for k, v in payload.plan_months(ev.profile).items()},
+        "scenario_labels": payload.scenario_labels(menu),
         "menu": [t.model_dump() for t in menu],
     }
 
@@ -138,7 +139,8 @@ def select_scenarios(ev: Evaluation, menu: list[ScenarioTemplate], preferred_opt
             t = by_id.get(s.template_id)
             if t is None or any(c.template_id == t.id for c in chosen):
                 continue
-            chosen.append(normalize_scenario(t, s.params.model_dump(), payload.replace_option_ids(s.rationale, ev.options)))
+            rationale = payload.replace_scenario_ids(payload.replace_option_ids(s.rationale, ev.options), menu)
+            chosen.append(normalize_scenario(t, s.params.model_dump(), rationale))
             if len(chosen) == N_SCENARIOS:
                 break
     except guardrail.GuardrailViolation:
@@ -236,7 +238,8 @@ def run_scenario(ev: Evaluation, scenario: Scenario) -> StressResult:
 # ---------------------------------------------------------------------------
 
 
-def critique_payload(ev: Evaluation, preferred: Option, stress: list[StressResult]) -> dict:
+def critique_payload(ev: Evaluation, preferred: Option, stress: list[StressResult], menu: list[ScenarioTemplate] | None = None) -> dict:
+    labels = payload.scenario_labels(menu or [])
     from ..rag import facts
 
     cited = [facts.DEDUCTIBLE_AFFORDABLE, facts.DEDUCTIBLE_TRADEOFF] + [cid for c in ev.constraints for cid in c.citation_ids]
@@ -251,9 +254,11 @@ def critique_payload(ev: Evaluation, preferred: Option, stress: list[StressResul
         "inputs": payload.inputs_view(ev.inputs),
         "floor_display": payload.dollars(ev.profile.safety_floor_cents),
         "evaluations": payload.projections_view(ev.projections, ev.options),
+        "scenario_labels": labels,
         "scenarios": [
             {
                 "template_id": s.scenario.template_id,
+                "label": labels.get(s.scenario.template_id, s.scenario.template_id),
                 "params": payload.with_displays(s.scenario.params),
                 "rationale": s.scenario.rationale,
                 "results": payload.projections_view(s.results, ev.options),
@@ -264,15 +269,16 @@ def critique_payload(ev: Evaluation, preferred: Option, stress: list[StressResul
     }
 
 
-def critique(ev: Evaluation, preferred: Option, stress: list[StressResult]) -> Critique:
-    data = critique_payload(ev, preferred, stress)
+def critique(ev: Evaluation, preferred: Option, stress: list[StressResult], menu: list[ScenarioTemplate] | None = None) -> Critique:
+    menu = menu or []
+    data = critique_payload(ev, preferred, stress, menu)
     out = get_llm().call("critique", data, CritiqueOut)
     out = guardrail.apply(out, guardrail.allowed_numbers(data), where="critique")
     chunk_ids = {c["id"] for c in data["chunks"]}
     constraint_ids = {c.id for c in ev.constraints}
 
     def clean(text: str) -> str:
-        return payload.replace_option_ids(scrub_markers(text, chunk_ids, constraint_ids), ev.options)
+        return payload.replace_scenario_ids(payload.replace_option_ids(scrub_markers(text, chunk_ids, constraint_ids), ev.options), menu)
 
     against = [x for x in (clean(s) for s in out.case_against) if x]
     for_ = [x for x in (clean(s) for s in out.case_for) if x]
@@ -298,7 +304,7 @@ def stress_test(ev: Evaluation, module, preferred: Option) -> tuple[list[StressR
     menu = module.scenario_menu(ev.inputs, ev.profile)
     scenarios = select_scenarios(ev, menu, preferred.id)
     results = [run_scenario(ev, s) for s in scenarios]
-    return results, critique(ev, preferred, results)
+    return results, critique(ev, preferred, results, menu)
 
 
 __all__ = ["CritiqueOut", "SelectOut", "critique", "default_scenarios", "normalize_scenario", "perturbation", "run_scenario", "select_scenarios", "stress_test"]

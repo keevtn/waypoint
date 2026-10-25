@@ -1,9 +1,10 @@
 // Moment: module picker + hand-built auto insurance form (no generic schema renderer).
 import { useEffect, useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useAppState } from "../state";
 import type { AutoInsuranceInputs, BigPurchaseInputs, DecisionSummary, UserQuote } from "../types";
+import { DEFAULT_MODULE, MODULE_COPY, isModuleId, orderModules } from "../lib/modules";
 import { isAutoInputs, isBigPurchaseInputs, isRentInputs, type DecisionInputs, type RentInputs, type RentUnit } from "../lib/decisionInputs";
 import { addDays, centsToDollarsText, dollarsToCents, fmtCents, todayIso } from "../lib/format";
 import { errorMessage, useAsync } from "../lib/hooks";
@@ -140,9 +141,12 @@ const pctToBps = (s: string): number | null => {
 
 export default function Moment() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { profile, inputs, decisionId, setInputs, setEvaluation } = useAppState();
   const decisions = useAsync(() => api.decisions(), []);
-  const [moduleId, setModuleId] = useState(decisionId);
+  // Preselection: a module handed over by the landing page, else the module behind the last evaluation, else the first in product order.
+  const requested = (location.state as { moduleId?: unknown } | null)?.moduleId;
+  const [moduleId, setModuleId] = useState<string>(isModuleId(requested) ? requested : inputs ? decisionId : DEFAULT_MODULE);
   const asOf = profile?.as_of ?? todayIso();
   const [form, setForm] = useState<FormState>(() => (isAutoInputs(inputs) ? fromInputs(inputs.inputs) : defaultsFor(asOf)));
   const [rentForm, setRentForm] = useState<RentFormState>(() => (isRentInputs(inputs) ? rentFromInputs(inputs.inputs) : rentDefaultsFor(asOf)));
@@ -309,7 +313,7 @@ export default function Moment() {
       {!profile && (
         <div className="rounded-md border border-warn/40 bg-amber-50 px-3 py-2 text-sm text-warn dark:bg-amber-950/40 dark:text-amber-300">
           Connect your bank first.{" "}
-          <Link to="/" className="font-medium underline">
+          <Link to="/overview" className="font-medium underline">
             Go to Overview
           </Link>
         </div>
@@ -323,7 +327,7 @@ export default function Moment() {
           </>
         )}
         {decisions.error && <ErrorNote message={decisions.error} />}
-        {decisions.data?.map((d) => (
+        {decisions.data && orderModules(decisions.data).map((d) => (
           <ModuleCard key={d.id} decision={d} selected={moduleId === d.id} onSelect={() => {
               setModuleId(d.id);
               setErrors({});
@@ -598,10 +602,12 @@ function ModuleCard({ decision, selected, onSelect }: { decision: DecisionSummar
       ].join(" ")}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="font-semibold">{decision.title}</span>
+        <span className="font-semibold">{isModuleId(decision.id) ? MODULE_COPY[decision.id].title : decision.title}</span>
         {soon && <Badge tone="neutral">Coming soon</Badge>}
       </div>
-      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{decision.description.replace(/\s*Coming soon\.?$/i, "")}</p>
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+        {isModuleId(decision.id) ? MODULE_COPY[decision.id].line : decision.description.replace(/\s*Coming soon\.?$/i, "")}
+      </p>
     </button>
   );
 }

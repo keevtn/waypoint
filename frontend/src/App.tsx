@@ -3,6 +3,7 @@ import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { USE_FIXTURES, api } from "./api";
 import { hasConnected } from "./lib/session";
 import { useAppState } from "./state";
+import Landing from "./pages/Landing";
 import Overview from "./pages/Overview";
 import Moment from "./pages/Moment";
 import Compare from "./pages/Compare";
@@ -11,7 +12,7 @@ import Action from "./pages/Action";
 
 // Top stepper echoes the track's chain: Understand → Compare → Stress test → Act.
 const STEPS: { to: string; label: string; match: string[] }[] = [
-  { to: "/", label: "Understand", match: ["/"] },
+  { to: "/overview", label: "Understand", match: ["/overview"] },
   { to: "/compare", label: "Compare", match: ["/moment", "/compare"] },
   { to: "/stress", label: "Stress test", match: ["/stress"] },
   { to: "/action", label: "Act", match: ["/action"] },
@@ -47,6 +48,8 @@ export default function App() {
   }, []);
 
   const stepIndex = STEPS.findIndex((s) => s.match.includes(pathname));
+  // The stepper belongs to the app routes; the landing page at "/" shows the brand only.
+  const isLanding = pathname === "/";
   const reached = (i: number) => (i <= 1 ? true : !!evaluation);
 
   return (
@@ -56,6 +59,7 @@ export default function App() {
           <NavLink to="/" className="font-semibold tracking-tight text-accent dark:text-accent-light">
             Waypoint
           </NavLink>
+          {!isLanding && (
           <nav aria-label="Steps" className="flex items-center gap-1 text-sm">
             {STEPS.map((s, i) => {
               const active = i === stepIndex;
@@ -81,7 +85,8 @@ export default function App() {
               );
             })}
           </nav>
-          {profile && (
+          )}
+          {profile && !isLanding && (
             <span className="ml-auto hidden text-xs text-slate-500 dark:text-slate-400 md:inline">
               Demo bank · Plaid sandbox
             </span>
@@ -90,7 +95,8 @@ export default function App() {
       </header>
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
         <Routes>
-          <Route path="/" element={<Overview />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/overview" element={<Overview />} />
           <Route path="/moment" element={<Moment />} />
           <Route path="/compare" element={<Compare />} />
           <Route path="/stress" element={<StressTest />} />

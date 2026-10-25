@@ -254,7 +254,7 @@ export default function Action() {
         <Link to="/stress" className="text-sm text-slate-500 dark:text-slate-400 hover:underline">
           Back to stress test
         </Link>
-        <Link to="/" className="text-sm text-slate-500 dark:text-slate-400 hover:underline">
+        <Link to="/overview" className="text-sm text-slate-500 dark:text-slate-400 hover:underline">
           Start over
         </Link>
       </div>

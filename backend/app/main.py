@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import config
@@ -45,5 +45,19 @@ app.include_router(routes_profile.router)
 app.include_router(routes_rag.router)
 
 # Static frontend last so /api/* wins. Absent in dev (vite serves it) and in CI.
+# Hashed bundles are served from /assets; every other GET falls back to index.html so client-side
+# routes (/compare, /stress, ...) survive a refresh on the deployed build.
 if config.FRONTEND_DIST.is_dir():
-    app.mount("/", StaticFiles(directory=str(config.FRONTEND_DIST), html=True), name="frontend")
+    _dist = config.FRONTEND_DIST.resolve()
+    _index = _dist / "index.html"
+    if (_dist / "assets").is_dir():
+        app.mount("/assets", StaticFiles(directory=str(_dist / "assets")), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def spa(full_path: str) -> FileResponse:
+        if full_path == "api" or full_path.startswith("api/"):
+            raise HTTPException(status_code=404, detail={"code": "not_found", "message": f"No route /{full_path}"})
+        candidate = (_dist / full_path).resolve() if full_path else _index
+        if candidate.is_file() and _dist in candidate.parents:
+            return FileResponse(candidate)
+        return FileResponse(_index)

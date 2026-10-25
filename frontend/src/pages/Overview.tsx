@@ -11,6 +11,7 @@ import ProjectionChart, { BASELINE_KEY } from "../components/ProjectionChart";
 import { Badge, Button, Card, Dot, ErrorNote, Skeleton, Stat, inputClass, type Tone } from "../components/ui";
 import { BalanceEditor, ListEditorCard, resetToDemo } from "../components/ProfileEditors";
 import HorizonSelect, { HorizonNote } from "../components/HorizonSelect";
+import CsvImport from "../components/CsvImport";
 
 const confidenceTone = (c: number): Tone => (c >= 0.9 ? "ok" : c >= 0.7 ? "warn" : "neutral");
 
@@ -65,6 +66,7 @@ export default function Overview() {
             {connecting ? "Connecting…" : "Connect your bank"}
           </Button>
           <span className="text-xs text-slate-500 dark:text-slate-400">Demo bank · Plaid sandbox</span>
+          <CsvImport onImported={(inst) => setInstitution(inst ?? "Imported CSV")} />
         </div>
         {connecting && (
           <div className="mt-6 space-y-3">

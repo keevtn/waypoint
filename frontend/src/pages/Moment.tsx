@@ -9,6 +9,7 @@ import { isAutoInputs, isBigPurchaseInputs, isRentInputs, type DecisionInputs, t
 import { addDays, centsToDollarsText, dollarsToCents, fmtCents, todayIso } from "../lib/format";
 import { errorMessage, useAsync } from "../lib/hooks";
 import { Badge, Button, Card, ErrorNote, Field, Skeleton, inputClass } from "../components/ui";
+import ProductLookup from "../components/ProductLookup";
 
 interface FormState {
   vehicleValue: string;
@@ -521,6 +522,16 @@ export default function Moment() {
             <p className="text-sm text-slate-600 dark:text-slate-300">
               Cash on that date is tested against financing. If neither keeps your floor, a date or a plan that does is suggested.
             </p>
+
+            <ProductLookup
+              onFound={(r) =>
+                setPurchase((f) => ({
+                  ...f,
+                  name: r.name ? r.name.slice(0, 60) : f.name,
+                  amount: r.price_cents !== null && r.price_cents > 0 ? centsToDollarsText(r.price_cents) : f.amount,
+                }))
+              }
+            />
 
             <div className="grid gap-4 sm:grid-cols-3">
               <Field label="What are you buying?">

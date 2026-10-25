@@ -24,5 +24,35 @@
     "title": "Rent",
     "description": "Compare apartments against your actual cash flow. Coming soon.",
     "input_schema": {"type": "object", "properties": {"units": {"type": "array", "items": {"type": "object"}}}}
+  },
+  {
+    "id": "big_purchase",
+    "title": "Big purchase",
+    "description": "Decide when to buy something large, and whether to pay cash or finance it, without dipping below your safety floor.",
+    "input_schema": {
+      "type": "object",
+      "required": ["name", "amount_cents", "date"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1, "maxLength": 60, "description": "What you are buying, e.g. 'Laptop'"},
+        "amount_cents": {"type": "integer", "exclusiveMinimum": 0, "description": "Full price in cents"},
+        "date": {"type": "string", "format": "date", "description": "When you would buy it (or when financing would start)"},
+        "financing": {
+          "anyOf": [{"$ref": "#/$defs/Financing"}, {"type": "null"}],
+          "default": null,
+          "description": "Your lender's terms, if you have an offer. Leave empty to see assumed-rate plans."
+        }
+      },
+      "$defs": {
+        "Financing": {
+          "type": "object",
+          "required": ["apr_bps", "term_months"],
+          "properties": {
+            "apr_bps": {"type": "integer", "minimum": 0, "maximum": 10000, "description": "Annual percentage rate in basis points (2499 = 24.99%). 0 allowed."},
+            "term_months": {"type": "integer", "minimum": 1, "maximum": 84, "description": "Number of monthly payments"},
+            "down_payment_cents": {"type": "integer", "minimum": 0, "default": 0, "description": "Paid upfront on the purchase date, in cents"}
+          }
+        }
+      }
+    }
   }
 ]

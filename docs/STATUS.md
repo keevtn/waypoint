@@ -33,6 +33,8 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 
 ## Contract commits
 
+2026-10-25 ~02:30 contract (A): `Suggestion` model + `EvaluateResponse.suggestions: list[Suggestion] = []` in models.py; mirrored in `types.ts` (plus `Financing`/`BigPurchaseInputs` input types); `suggestions: []` added to `evaluate_auto.json`; new `evaluate_big_purchase.json` (computed from the engine on the persona: $1,800 laptop on 2026-11-01, options `cash_now` + `financed_12`, suggestions `earliest_safe_date` + `safest_financing`); `big_purchase` entry appended to `decisions.json`. **B:** `api.ts` `shortId()` maps `big_purchase` -> `big`, so fixture mode will look for `evaluate_big.json`; either special-case it or rename when you wire the module. Module itself lands on `a/big-purchase`.
+
 19:12 fixtures — citation chunk ids remapped to the real corpus (pa-auto-insurance-guide#0 minimums, #1 tort; cfpb-auto-loan-insurance#0 lender; naic-deductibles#2 deductible); values only, no field changes; models.py/types.ts untouched (C)
 
 ## Wave 0 summary (Phase 0 done)

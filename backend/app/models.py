@@ -225,11 +225,24 @@ class EvaluateRequest(BaseModel):
     inputs: dict
 
 
+class Suggestion(BaseModel):
+    """A code-generated alternative the client can apply by merging `patch` into its inputs
+    and re-submitting /evaluate. `rationale` is templated by code, never by the LLM."""
+
+    id: str
+    type: Literal["earliest_safe_date", "safest_financing", "wait_beyond_horizon"]
+    label: str
+    rationale: str
+    patch: dict  # partial inputs; never changes `name` or raises `amount_cents`
+    projected: dict  # option_id, min_balance_cents, min_balance_date, months_below_floor, monthly_slack_cents, total_cost_cents (+ cash_gap_cents for wait_beyond_horizon)
+
+
 class EvaluateResponse(BaseModel):
     options: list[Option]
     constraints: list[Constraint]
     projections: dict[str, ProjectionResult]  # "baseline" + one per option id
     eval_id: str
+    suggestions: list[Suggestion] = []
 
 
 class ExplainRequest(BaseModel):

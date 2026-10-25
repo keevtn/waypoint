@@ -22,6 +22,7 @@ CASES = {
     "baseline": ProjectionResult,
     "decisions": list[DecisionSummary],
     "evaluate_auto": EvaluateResponse,
+    "evaluate_big_purchase": EvaluateResponse,
     "explain_auto": ExplainResponse,
     "stress_auto": StressResponse,
     "action_auto": ActionCard,

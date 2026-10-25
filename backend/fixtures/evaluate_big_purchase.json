@@ -1,0 +1,913 @@
+{
+  "options": [
+    {
+      "id": "cash_now",
+      "label": "Pay in cash",
+      "attributes": {
+        "term_months": 0,
+        "apr_bps": 0,
+        "monthly_payment_cents": 0,
+        "total_cost_cents": 180000,
+        "interest_cents": 0,
+        "date": "2026-11-01"
+      },
+      "commitment": {
+        "id": "cmt_cash_now",
+        "label": "Laptop (paid in cash)",
+        "upfront_cents": -180000,
+        "recurring_cents": 0,
+        "cadence": "monthly",
+        "start_date": "2026-11-01",
+        "term_months": null,
+        "risk_exposure_cents": 0
+      },
+      "price": {
+        "cents": 180000,
+        "kind": "user_quote",
+        "source_url": null,
+        "source_title": "Your purchase price",
+        "retrieved": "2026-10-24"
+      },
+      "status": "allowed",
+      "constraint_ids": []
+    },
+    {
+      "id": "financed_12",
+      "label": "Finance over 12 months",
+      "attributes": {
+        "term_months": 12,
+        "apr_bps": 2499,
+        "monthly_payment_cents": 17107,
+        "total_cost_cents": 205284,
+        "interest_cents": 25284,
+        "down_payment_cents": 0,
+        "date": "2026-11-01"
+      },
+      "commitment": {
+        "id": "cmt_financed_12",
+        "label": "Laptop payment (12 months)",
+        "upfront_cents": 0,
+        "recurring_cents": -17107,
+        "cadence": "monthly",
+        "start_date": "2026-11-01",
+        "term_months": 12,
+        "risk_exposure_cents": 0
+      },
+      "price": {
+        "cents": 17107,
+        "kind": "estimate",
+        "source_url": null,
+        "source_title": "Assumed APR; enter your lender's rate",
+        "retrieved": "2026-10-24"
+      },
+      "status": "flagged",
+      "constraint_ids": [
+        "c_interest_cost"
+      ]
+    }
+  ],
+  "constraints": [
+    {
+      "id": "c_interest_cost",
+      "kind": "flag",
+      "applies_to": [
+        "financed_12"
+      ],
+      "rule": "Financing adds $252 of interest over 12 months at the assumed rate, for a total cost of $2,052.",
+      "citation_ids": []
+    }
+  ],
+  "projections": {
+    "baseline": {
+      "option_id": null,
+      "series": [
+        {
+          "month": "2026-11",
+          "end_balance_cents": 211531,
+          "min_balance_cents": 93129,
+          "min_balance_date": "2026-11-01",
+          "inflow_cents": 170000,
+          "outflow_cents": 136598
+        }
+      ],
+      "min_balance_cents": 93129,
+      "min_balance_date": "2026-11-01",
+      "monthly_slack_cents": 63069,
+      "months_below_floor": [],
+      "months_negative": [],
+      "flags": [
+        {
+          "id": "flag_target_reached",
+          "severity": "info",
+          "month": "2026-11",
+          "code": "target_reached",
+          "detail": {
+            "end_balance_cents": 211531,
+            "target_cents": 120000,
+            "floor_cents": 20000
+          }
+        }
+      ],
+      "band": null
+    },
+    "cash_now": {
+      "option_id": "cash_now",
+      "series": [
+        {
+          "month": "2026-11",
+          "end_balance_cents": 31531,
+          "min_balance_cents": -86871,
+          "min_balance_date": "2026-11-01",
+          "inflow_cents": 170000,
+          "outflow_cents": 316598
+        }
+      ],
+      "min_balance_cents": -86871,
+      "min_balance_date": "2026-11-01",
+      "monthly_slack_cents": 63069,
+      "months_below_floor": [
+        "2026-11",
+        "2026-12",
+        "2027-01",
+        "2027-02",
+        "2027-03"
+      ],
+      "months_negative": [
+        "2026-11",
+        "2026-12",
+        "2027-01",
+        "2027-02",
+        "2027-03"
+      ],
+      "flags": [
+        {
+          "id": "flag_below_floor_2026-11",
+          "severity": "warn",
+          "month": "2026-11",
+          "code": "below_floor",
+          "detail": {
+            "min_balance_cents": -86871,
+            "min_balance_date": "2026-11-01",
+            "floor_cents": 20000,
+            "shortfall_cents": 106871,
+            "contributors": [
+              {
+                "id": "cmt_cash_now",
+                "label": "Laptop (paid in cash) (upfront)",
+                "amount_cents": -180000,
+                "date": "2026-11-01",
+                "kind": "commitment"
+              },
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2026-11-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "variable",
+                "label": "Variable spending",
+                "amount_cents": -5899,
+                "date": "2026-11-01",
+                "kind": "variable",
+                "window_days": 7
+              }
+            ],
+            "largest_outflows": [
+              {
+                "id": "cmt_cash_now",
+                "label": "Laptop (paid in cash) (upfront)",
+                "amount_cents": -180000,
+                "date": "2026-11-01",
+                "kind": "commitment"
+              },
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2026-11-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "oo_registration",
+                "label": "Vehicle registration/title",
+                "amount_cents": -18000,
+                "date": "2026-11-05",
+                "kind": "one_off"
+              },
+              {
+                "id": "rec_verizon_wireless",
+                "label": "Phone",
+                "amount_cents": -4500,
+                "date": "2026-11-12",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_planet_fitness",
+                "label": "Gym",
+                "amount_cents": -2499,
+                "date": "2026-11-05",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_spotify",
+                "label": "Music streaming",
+                "amount_cents": -599,
+                "date": "2026-11-18",
+                "kind": "recurring"
+              }
+            ]
+          }
+        },
+        {
+          "id": "flag_negative_2026-11",
+          "severity": "danger",
+          "month": "2026-11",
+          "code": "negative",
+          "detail": {
+            "min_balance_cents": -86871,
+            "min_balance_date": "2026-11-01",
+            "floor_cents": 20000,
+            "shortfall_cents": 106871,
+            "contributors": [
+              {
+                "id": "cmt_cash_now",
+                "label": "Laptop (paid in cash) (upfront)",
+                "amount_cents": -180000,
+                "date": "2026-11-01",
+                "kind": "commitment"
+              },
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2026-11-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "variable",
+                "label": "Variable spending",
+                "amount_cents": -5899,
+                "date": "2026-11-01",
+                "kind": "variable",
+                "window_days": 7
+              }
+            ],
+            "largest_outflows": [
+              {
+                "id": "cmt_cash_now",
+                "label": "Laptop (paid in cash) (upfront)",
+                "amount_cents": -180000,
+                "date": "2026-11-01",
+                "kind": "commitment"
+              },
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2026-11-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "oo_registration",
+                "label": "Vehicle registration/title",
+                "amount_cents": -18000,
+                "date": "2026-11-05",
+                "kind": "one_off"
+              },
+              {
+                "id": "rec_verizon_wireless",
+                "label": "Phone",
+                "amount_cents": -4500,
+                "date": "2026-11-12",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_planet_fitness",
+                "label": "Gym",
+                "amount_cents": -2499,
+                "date": "2026-11-05",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_spotify",
+                "label": "Music streaming",
+                "amount_cents": -599,
+                "date": "2026-11-18",
+                "kind": "recurring"
+              }
+            ]
+          }
+        },
+        {
+          "id": "flag_below_floor_2026-12",
+          "severity": "warn",
+          "month": "2026-12",
+          "code": "below_floor",
+          "detail": {
+            "min_balance_cents": -53469,
+            "min_balance_date": "2026-12-01",
+            "floor_cents": 20000,
+            "shortfall_cents": 73469,
+            "contributors": [
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2026-12-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "variable",
+                "label": "Variable spending",
+                "amount_cents": -6038,
+                "date": "2026-12-01",
+                "kind": "variable",
+                "window_days": 7
+              }
+            ],
+            "largest_outflows": [
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2026-12-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_verizon_wireless",
+                "label": "Phone",
+                "amount_cents": -4500,
+                "date": "2026-12-12",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_planet_fitness",
+                "label": "Gym",
+                "amount_cents": -2499,
+                "date": "2026-12-05",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_spotify",
+                "label": "Music streaming",
+                "amount_cents": -599,
+                "date": "2026-12-18",
+                "kind": "recurring"
+              }
+            ]
+          }
+        },
+        {
+          "id": "flag_negative_2026-12",
+          "severity": "danger",
+          "month": "2026-12",
+          "code": "negative",
+          "detail": {
+            "min_balance_cents": -53469,
+            "min_balance_date": "2026-12-01",
+            "floor_cents": 20000,
+            "shortfall_cents": 73469,
+            "contributors": [
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2026-12-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "variable",
+                "label": "Variable spending",
+                "amount_cents": -6038,
+                "date": "2026-12-01",
+                "kind": "variable",
+                "window_days": 7
+              }
+            ],
+            "largest_outflows": [
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2026-12-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_verizon_wireless",
+                "label": "Phone",
+                "amount_cents": -4500,
+                "date": "2026-12-12",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_planet_fitness",
+                "label": "Gym",
+                "amount_cents": -2499,
+                "date": "2026-12-05",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_spotify",
+                "label": "Music streaming",
+                "amount_cents": -599,
+                "date": "2026-12-18",
+                "kind": "recurring"
+              }
+            ]
+          }
+        },
+        {
+          "id": "flag_below_floor_2027-01",
+          "severity": "warn",
+          "month": "2027-01",
+          "code": "below_floor",
+          "detail": {
+            "min_balance_cents": -70807,
+            "min_balance_date": "2027-01-15",
+            "floor_cents": 20000,
+            "shortfall_cents": 90807,
+            "contributors": [
+              {
+                "id": "oo_tuition",
+                "label": "Tuition installment",
+                "amount_cents": -150000,
+                "date": "2027-01-15",
+                "kind": "one_off"
+              },
+              {
+                "id": "rec_verizon_wireless",
+                "label": "Phone",
+                "amount_cents": -4500,
+                "date": "2027-01-12",
+                "kind": "recurring"
+              },
+              {
+                "id": "variable",
+                "label": "Variable spending",
+                "amount_cents": -5871,
+                "date": "2027-01-15",
+                "kind": "variable",
+                "window_days": 7
+              }
+            ],
+            "largest_outflows": [
+              {
+                "id": "oo_tuition",
+                "label": "Tuition installment",
+                "amount_cents": -150000,
+                "date": "2027-01-15",
+                "kind": "one_off"
+              },
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2027-01-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "oo_textbooks",
+                "label": "Textbooks",
+                "amount_cents": -22000,
+                "date": "2027-01-20",
+                "kind": "one_off"
+              },
+              {
+                "id": "rec_verizon_wireless",
+                "label": "Phone",
+                "amount_cents": -4500,
+                "date": "2027-01-12",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_planet_fitness",
+                "label": "Gym",
+                "amount_cents": -2499,
+                "date": "2027-01-05",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_spotify",
+                "label": "Music streaming",
+                "amount_cents": -599,
+                "date": "2027-01-18",
+                "kind": "recurring"
+              }
+            ]
+          }
+        },
+        {
+          "id": "flag_negative_2027-01",
+          "severity": "danger",
+          "month": "2027-01",
+          "code": "negative",
+          "detail": {
+            "min_balance_cents": -70807,
+            "min_balance_date": "2027-01-15",
+            "floor_cents": 20000,
+            "shortfall_cents": 90807,
+            "contributors": [
+              {
+                "id": "oo_tuition",
+                "label": "Tuition installment",
+                "amount_cents": -150000,
+                "date": "2027-01-15",
+                "kind": "one_off"
+              },
+              {
+                "id": "rec_verizon_wireless",
+                "label": "Phone",
+                "amount_cents": -4500,
+                "date": "2027-01-12",
+                "kind": "recurring"
+              },
+              {
+                "id": "variable",
+                "label": "Variable spending",
+                "amount_cents": -5871,
+                "date": "2027-01-15",
+                "kind": "variable",
+                "window_days": 7
+              }
+            ],
+            "largest_outflows": [
+              {
+                "id": "oo_tuition",
+                "label": "Tuition installment",
+                "amount_cents": -150000,
+                "date": "2027-01-15",
+                "kind": "one_off"
+              },
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2027-01-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "oo_textbooks",
+                "label": "Textbooks",
+                "amount_cents": -22000,
+                "date": "2027-01-20",
+                "kind": "one_off"
+              },
+              {
+                "id": "rec_verizon_wireless",
+                "label": "Phone",
+                "amount_cents": -4500,
+                "date": "2027-01-12",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_planet_fitness",
+                "label": "Gym",
+                "amount_cents": -2499,
+                "date": "2027-01-05",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_spotify",
+                "label": "Music streaming",
+                "amount_cents": -599,
+                "date": "2027-01-18",
+                "kind": "recurring"
+              }
+            ]
+          }
+        },
+        {
+          "id": "flag_below_floor_2027-02",
+          "severity": "warn",
+          "month": "2027-02",
+          "code": "below_floor",
+          "detail": {
+            "min_balance_cents": -52665,
+            "min_balance_date": "2027-02-01",
+            "floor_cents": 20000,
+            "shortfall_cents": 72665,
+            "contributors": [
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2027-02-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "variable",
+                "label": "Variable spending",
+                "amount_cents": -5961,
+                "date": "2027-02-01",
+                "kind": "variable",
+                "window_days": 7
+              }
+            ],
+            "largest_outflows": [
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2027-02-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_verizon_wireless",
+                "label": "Phone",
+                "amount_cents": -4500,
+                "date": "2027-02-12",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_planet_fitness",
+                "label": "Gym",
+                "amount_cents": -2499,
+                "date": "2027-02-05",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_spotify",
+                "label": "Music streaming",
+                "amount_cents": -599,
+                "date": "2027-02-18",
+                "kind": "recurring"
+              }
+            ]
+          }
+        },
+        {
+          "id": "flag_negative_2027-02",
+          "severity": "danger",
+          "month": "2027-02",
+          "code": "negative",
+          "detail": {
+            "min_balance_cents": -52665,
+            "min_balance_date": "2027-02-01",
+            "floor_cents": 20000,
+            "shortfall_cents": 72665,
+            "contributors": [
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2027-02-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "variable",
+                "label": "Variable spending",
+                "amount_cents": -5961,
+                "date": "2027-02-01",
+                "kind": "variable",
+                "window_days": 7
+              }
+            ],
+            "largest_outflows": [
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2027-02-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_verizon_wireless",
+                "label": "Phone",
+                "amount_cents": -4500,
+                "date": "2027-02-12",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_planet_fitness",
+                "label": "Gym",
+                "amount_cents": -2499,
+                "date": "2027-02-05",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_spotify",
+                "label": "Music streaming",
+                "amount_cents": -599,
+                "date": "2027-02-18",
+                "kind": "recurring"
+              }
+            ]
+          }
+        },
+        {
+          "id": "flag_below_floor_2027-03",
+          "severity": "warn",
+          "month": "2027-03",
+          "code": "below_floor",
+          "detail": {
+            "min_balance_cents": -1263,
+            "min_balance_date": "2027-03-01",
+            "floor_cents": 20000,
+            "shortfall_cents": 21263,
+            "contributors": [
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2027-03-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "variable",
+                "label": "Variable spending",
+                "amount_cents": -6410,
+                "date": "2027-03-01",
+                "kind": "variable",
+                "window_days": 7
+              }
+            ],
+            "largest_outflows": [
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2027-03-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_verizon_wireless",
+                "label": "Phone",
+                "amount_cents": -4500,
+                "date": "2027-03-12",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_planet_fitness",
+                "label": "Gym",
+                "amount_cents": -2499,
+                "date": "2027-03-05",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_spotify",
+                "label": "Music streaming",
+                "amount_cents": -599,
+                "date": "2027-03-18",
+                "kind": "recurring"
+              }
+            ]
+          }
+        },
+        {
+          "id": "flag_negative_2027-03",
+          "severity": "danger",
+          "month": "2027-03",
+          "code": "negative",
+          "detail": {
+            "min_balance_cents": -1263,
+            "min_balance_date": "2027-03-01",
+            "floor_cents": 20000,
+            "shortfall_cents": 21263,
+            "contributors": [
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2027-03-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "variable",
+                "label": "Variable spending",
+                "amount_cents": -6410,
+                "date": "2027-03-01",
+                "kind": "variable",
+                "window_days": 7
+              }
+            ],
+            "largest_outflows": [
+              {
+                "id": "rec_rent_meta",
+                "label": "Rent",
+                "amount_cents": -85000,
+                "date": "2027-03-01",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_verizon_wireless",
+                "label": "Phone",
+                "amount_cents": -4500,
+                "date": "2027-03-12",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_planet_fitness",
+                "label": "Gym",
+                "amount_cents": -2499,
+                "date": "2027-03-05",
+                "kind": "recurring"
+              },
+              {
+                "id": "rec_spotify",
+                "label": "Music streaming",
+                "amount_cents": -599,
+                "date": "2027-03-18",
+                "kind": "recurring"
+              }
+            ]
+          }
+        },
+        {
+          "id": "flag_target_reached",
+          "severity": "info",
+          "month": "2027-03",
+          "code": "target_reached",
+          "detail": {
+            "end_balance_cents": 135139,
+            "target_cents": 120000,
+            "floor_cents": 20000
+          }
+        }
+      ],
+      "band": null
+    },
+    "financed_12": {
+      "option_id": "financed_12",
+      "series": [
+        {
+          "month": "2026-11",
+          "end_balance_cents": 194424,
+          "min_balance_cents": 76022,
+          "min_balance_date": "2026-11-01",
+          "inflow_cents": 170000,
+          "outflow_cents": 153705
+        },
+        {
+          "month": "2027-01",
+          "end_balance_cents": 161014,
+          "min_balance_cents": 57872,
+          "min_balance_date": "2027-01-15",
+          "inflow_cents": 240000,
+          "outflow_cents": 307705
+        }
+      ],
+      "min_balance_cents": 57872,
+      "min_balance_date": "2027-01-15",
+      "monthly_slack_cents": 45962,
+      "months_below_floor": [],
+      "months_negative": [],
+      "flags": [
+        {
+          "id": "flag_target_reached",
+          "severity": "info",
+          "month": "2026-11",
+          "code": "target_reached",
+          "detail": {
+            "end_balance_cents": 194424,
+            "target_cents": 120000,
+            "floor_cents": 20000
+          }
+        }
+      ],
+      "band": null
+    }
+  },
+  "eval_id": "eval_fixture_big_purchase_0001",
+  "suggestions": [
+    {
+      "id": "s_earliest_safe_date",
+      "type": "earliest_safe_date",
+      "label": "Wait until 2027-03-13 to pay cash",
+      "rationale": "Paying $1,800 in cash on 2027-03-13 keeps every month at or above your $200 floor; paying on 2026-11-01 does not.",
+      "patch": {
+        "date": "2027-03-13"
+      },
+      "projected": {
+        "option_id": "cash_now",
+        "min_balance_cents": 50139,
+        "min_balance_date": "2027-04-01",
+        "months_below_floor": [],
+        "monthly_slack_cents": 63069,
+        "total_cost_cents": 180000
+      }
+    },
+    {
+      "id": "s_safest_financing",
+      "type": "safest_financing",
+      "label": "Finance over 12 months with $450 down",
+      "rationale": "Of the financing plans that keep every month at or above your $200 floor, this one costs the least: $1,989 in total, $189 of it interest at the assumed rate.",
+      "patch": {
+        "financing": {
+          "apr_bps": 2499,
+          "term_months": 12,
+          "down_payment_cents": 45000
+        }
+      },
+      "projected": {
+        "option_id": "financed_12",
+        "min_balance_cents": 25703,
+        "min_balance_date": "2027-01-15",
+        "months_below_floor": [],
+        "monthly_slack_cents": 50239,
+        "total_cost_cents": 198960
+      }
+    }
+  ]
+}

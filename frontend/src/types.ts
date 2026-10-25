@@ -225,11 +225,33 @@ export interface DecisionSummary {
   input_schema: Record<string, unknown>;
 }
 
+export type SuggestionType = "earliest_safe_date" | "safest_financing" | "wait_beyond_horizon";
+
+// A code-generated alternative: merge `patch` into the module inputs and re-submit /evaluate.
+export interface Suggestion {
+  id: string;
+  type: SuggestionType;
+  label: string;
+  rationale: string; // templated by code, not the LLM
+  patch: Record<string, unknown>; // partial inputs; never changes `name` or raises `amount_cents`
+  projected: {
+    option_id: string;
+    min_balance_cents: number;
+    min_balance_date: string;
+    months_below_floor: string[];
+    monthly_slack_cents: number;
+    total_cost_cents: number;
+    cash_gap_cents?: number; // wait_beyond_horizon only
+    [key: string]: unknown;
+  };
+}
+
 export interface EvaluateResponse {
   options: Option[];
   constraints: Constraint[];
   projections: Record<string, ProjectionResult>; // "baseline" + one per option id
   eval_id: string;
+  suggestions: Suggestion[];
 }
 
 export interface ExplainResponse {
@@ -268,4 +290,18 @@ export interface AutoInsuranceInputs {
   deductible_comfort_cents: number;
   registration_deadline: string | null;
   user_quotes: UserQuote[];
+}
+
+// Big purchase module inputs (SPEC.md §6.4 pattern; module `big_purchase`).
+export interface Financing {
+  apr_bps: number; // 2499 = 24.99% APR; 0 allowed
+  term_months: number;
+  down_payment_cents: number;
+}
+
+export interface BigPurchaseInputs {
+  name: string;
+  amount_cents: number;
+  date: string; // ISO; the purchase or financing start date
+  financing: Financing | null;
 }

@@ -27,3 +27,5 @@ DATA_DIR = BACKEND_DIR / "data"
 CORPUS_DIR = BACKEND_DIR / "corpus"
 RAG_DIR = BACKEND_DIR / "rag"
 FRONTEND_DIST = BACKEND_DIR.parent / "frontend" / "dist"
+# sqlite file for the evaluation cache (gitignored as backend/*.db); ":memory:"-style paths are not supported.
+DB_PATH = Path(os.getenv("DB_PATH") or (BACKEND_DIR / "waypoint.db"))

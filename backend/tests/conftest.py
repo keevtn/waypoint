@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import tempfile
 
 os.environ.setdefault("DATA_MODE", "local")
 os.environ.setdefault("LLM_FAKE", "1")
@@ -9,6 +10,7 @@ os.environ.setdefault("DEV_MODE", "1")
 os.environ.setdefault("ANTHROPIC_API_KEY", "test")
 os.environ.setdefault("PLAID_CLIENT_ID", "test")
 os.environ.setdefault("PLAID_SECRET", "test")
+os.environ.setdefault("DB_PATH", os.path.join(tempfile.mkdtemp(prefix="waypoint-test-"), "waypoint.db"))  # never the dev db
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402

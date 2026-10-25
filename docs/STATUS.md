@@ -170,3 +170,10 @@ Fixtures were remapped to these ids in contract commit 1d0b65c.
 3. Every LLM-backed panel has a skeleton and a plain-language error with Retry (`friendlyError` maps 502/504/`llm_unavailable` and expired `eval_id`). Action requests are deduped per (eval, option) so StrictMode remounts don't double-call.
 4. Stress flag lists dedupe below_floor/negative pairs and collapse past 6 rows ("Show N more").
 5. For A, cosmetic only: LLM prose on Stress/Compare sometimes uses raw ids (`std_limited_1000`, `deductible_unaffordable`); the explainer/critique prompts could ask for option labels instead.
+
+## Session B — S1 rent UI merged (2026-10-25)
+
+1. Moment: the Rent card is live (no more "Coming soon"). Hand-built form for 2–4 units (name, rent, deposit, utilities estimate, lease months, start date) plus optional "what you pay now"; blank uses the rent detected in the profile. Defaults: three State College units ($520 room / $725 shared 2BR / $1,050 studio) so the demo shows Fits / Flagged (over 30%) / Not allowed (over 45%) at once.
+2. Compare, Stress, Action work unchanged for rent against the live backend (`LLM_FAKE=1`, headless Chrome, no console errors, no 4xx/5xx). Option cards render rent attributes (rent, utilities, move-in, lease, "vs. today"); constraint badges map `c_housing_45pct` / `c_rent_30pct` / `c_rent_30pct_standard` / `c_move_in_cash`; baseline is labelled "stay put"; Ask-with-sources has a rent placeholder and a HUD 30% suggestion.
+3. `RentInputs` lives in `frontend/src/lib/decisionInputs.ts` (frontend-only, mirrors `rent/inputs.py`) rather than `types.ts`, to avoid a contract commit. The store's `inputs` is now tagged `{ decisionId, inputs }`; `withFreshEval` re-evaluates with the right module. There is no `evaluate_rent.json` fixture, so `VITE_USE_FIXTURES=1` only covers the auto module.
+4. Next (B): big-purchase UI once A's contract commit + `fixtures/evaluate_big_purchase.json` land.

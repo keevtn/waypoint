@@ -8,8 +8,27 @@
 
 body {
   @apply bg-white text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
+  /* Every number lines up: tabular figures everywhere, not only where .tabular is set. */
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "calt" 1;
+}
+
+h1,
+h2,
+h3 {
+  @apply tracking-tightest;
 }
 
 .tabular {
   font-variant-numeric: tabular-nums;
+}
+
+/* Motion only on data change; nothing decorative animates. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }

@@ -101,6 +101,32 @@ def update_profile(patch: dict[str, Any]) -> Profile:
     return new
 
 
+def import_transactions(transactions: list[Transaction], balance_cents: int | None, as_of: date | None = None) -> tuple[Profile, list[str]]:
+    """POST /bank/import_csv: replace the store's transactions with an upload, keep the current
+    balance unless one is given (and warn), rebuild the profile through the detector. The persona's
+    user one-offs and floor are not carried over; the floor keeps the Profile default or the current
+    value. POST /bank/connect undoes all of this."""
+    warnings: list[str] = []
+    if _state.profile is None:
+        connect()
+    assert _state.profile is not None
+    if balance_cents is None:
+        balance_cents = _state.profile.balance_cents
+        warnings.append("No balance was given; the current balance was kept. Enter your balance to make the projection accurate.")
+    as_of = as_of or date.today()
+    profile = detect.build_profile(transactions, balance_cents, as_of, user_one_offs=[], safety_floor_cents=_state.profile.safety_floor_cents)
+    if len(profile.income) == 0:
+        warnings.append("No recurring income was detected in the file")
+    with _lock:
+        _state.item_id = "item_csv_import"
+        _state.institution = "CSV import"
+        _state.as_of = as_of
+        _state.balance_cents = balance_cents
+        _state.transactions = sorted(transactions, key=lambda t: t.date, reverse=True)
+        _state.profile = profile
+    return profile, warnings
+
+
 def set_profile(profile: Profile) -> None:
     with _lock:
         _state.profile = profile

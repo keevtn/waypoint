@@ -21,7 +21,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 
 | Session | Branch | Phase | Last merged to main | Blocked on | Updated |
 |---------|--------|-------|---------------------|------------|---------|
-| A llm | a/horizon | done | P6 + P7 @ 2026-10-24; labels fix; S1 rent module; eval cache sqlite; S2 big_purchase module + suggestions @ 2026-10-25 ~03:30; scenario labels in stress prose; projection-derived status flags + flag labels; PUT /profile full edit; 12/60/120-month horizons @ 2026-10-25 | — | 2026-10-25 |
+| A llm | a/import | in progress | P6 + P7 @ 2026-10-24; labels fix; S1 rent module; eval cache sqlite; S2 big_purchase module + suggestions @ 2026-10-25 ~03:30; scenario labels in stress prose; projection-derived status flags + flag labels; PUT /profile full edit; 12/60/120-month horizons; CSV import @ 2026-10-25 09:35 | — | 2026-10-25 |
 | B wire | b/p4-live | P4 live | All pages verified on live explain/stress/action @ 2026-10-24 (528e997) | — | 2026-10-24 |
 | D plaid | d/p8-plaid | P8 | — | A-P1 | — |
 
@@ -69,6 +69,13 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 ## Session A note: evaluation cache persisted to sqlite (merged to main)
 
 `decisions/cache.py` now writes every evaluation through to a sqlite table (`evaluations` in `config.DB_PATH`, default `backend/waypoint.db`, already gitignored; override with `DB_PATH`) and reads it back on an in-memory miss, so a restart or redeploy between `/evaluate` and `/explain|/stress|/action` no longer yields 404 `unknown_eval`. TTL stays 1h in both layers (expired rows are evicted on every put/get). Rows are pydantic JSON dumps rehydrated through the module's `InputModel`; a row that no longer validates (contract change) or whose module is gone is treated as a miss. If the file cannot be created (read-only disk) the cache logs once and runs memory-only. Tests use a temp `DB_PATH` (`tests/conftest.py`). **Render: the disk is ephemeral per deploy, so this covers restarts within a deploy, not across deploys, unless a persistent disk is mounted and `DB_PATH` points at it.**
+
+## Session A note: POST /api/bank/import_csv (merged to main)
+
+- Multipart form: `file` (CSV, max 2 MB, UTF-8 or latin-1), optional `mapping` (JSON string: `{"date", "description", "amount"}` or `{"date", "description", "debit", "credit"}` by header name), optional `balance_cents` (int). Columns and the date format are auto-detected (Chase-style single signed `Amount`, Bank of America-style `Debit`/`Credit` split, parentheses negatives, `$` and thousands separators). Dedupe by (date, amount, normalized name).
+- Replaces the store's transactions, rebuilds the profile through the detector (as_of = today, floor kept, persona one-offs dropped), returns `CsvImportResponse {imported, skipped, profile, warnings}`. Warnings: skipped rows, ambiguous columns, < 60 days of history, no balance given (balance kept), no income detected. Errors: `400 invalid_csv` / `400 invalid_mapping` in the error envelope. `POST /bank/connect` is still the reset.
+- **B:** after a successful import, refetch `/projection/baseline` and re-run any evaluation; show `warnings` as a list under the upload. `GET /profile/transactions` then returns the imported rows (ids `csv_00001`...).
+- `python-multipart` added to requirements.txt (needed for form uploads).
 
 ## Session A note: projection horizons 12 / 60 / 120 (merged to main)
 

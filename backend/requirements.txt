@@ -7,4 +7,5 @@ plaid-python>=25.0
 pydantic>=2.8
 pytest>=8.0
 python-dotenv>=1.0
+python-multipart>=0.0.9
 uvicorn[standard]>=0.30

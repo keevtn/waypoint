@@ -13,7 +13,7 @@ from typing import Any
 
 from .. import config
 from ..bank import local_loader
-from ..models import OneOff, Profile, RecurringItem, Transaction
+from ..models import Profile, Transaction
 from . import detect
 
 
@@ -79,17 +79,22 @@ def get_transactions(limit: int = 50) -> list[Transaction]:
     return _state.transactions[:limit]
 
 
+EDITABLE_FIELDS = ("balance_cents", "income", "recurring", "one_offs", "safety_floor_cents")
+
+
 def update_profile(patch: dict[str, Any]) -> Profile:
-    """PUT /profile: safety_floor_cents, one_offs, recurring are user-editable; slack is recomputed."""
+    """PUT /profile: a partial Profile body. `balance_cents`, `income`, `recurring`, `one_offs`
+    (each list replaced whole) and `safety_floor_cents` are user-editable; everything else in the
+    body (unknown keys, `as_of`, `variable`, the computed `monthly_slack_cents`) is ignored. The
+    merged profile is validated by the Profile model (pydantic.ValidationError on bad input),
+    slack is recomputed, and the result persists in the single-user store so /projection/baseline
+    and every later /evaluate see it. POST /bank/connect rebuilds from the persona and discards edits."""
     base = get_profile()
-    update: dict[str, Any] = {}
-    if "safety_floor_cents" in patch:
-        update["safety_floor_cents"] = int(patch["safety_floor_cents"])
-    if "one_offs" in patch:
-        update["one_offs"] = [OneOff.model_validate(o) for o in patch["one_offs"]]
-    if "recurring" in patch:
-        update["recurring"] = [RecurringItem.model_validate(r) for r in patch["recurring"]]
-    new = base.model_copy(update=update)
+    data = base.model_dump()
+    for key in EDITABLE_FIELDS:
+        if key in patch:
+            data[key] = patch[key]
+    new = Profile.model_validate(data)
     new = new.model_copy(update={"monthly_slack_cents": detect.compute_slack(new.income, new.recurring, new.variable)})
     with _lock:
         _state.profile = new

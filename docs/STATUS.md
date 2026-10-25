@@ -21,7 +21,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 
 | Session | Branch | Phase | Last merged to main | Blocked on | Updated |
 |---------|--------|-------|---------------------|------------|---------|
-| A llm | a/status-flags | done | P6 + P7 @ 2026-10-24; labels fix; S1 rent module; eval cache sqlite; S2 big_purchase module + suggestions @ 2026-10-25 ~03:30; scenario labels in stress prose; projection-derived status flags + flag labels @ 2026-10-25 | — | 2026-10-25 |
+| A llm | a/profile-edit | done | P6 + P7 @ 2026-10-24; labels fix; S1 rent module; eval cache sqlite; S2 big_purchase module + suggestions @ 2026-10-25 ~03:30; scenario labels in stress prose; projection-derived status flags + flag labels; PUT /profile full edit @ 2026-10-25 | — | 2026-10-25 |
 | B wire | b/p4-live | P4 live | All pages verified on live explain/stress/action @ 2026-10-24 (528e997) | — | 2026-10-24 |
 | D plaid | d/p8-plaid | P8 | — | A-P1 | — |
 
@@ -65,6 +65,14 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 ## Session A note: evaluation cache persisted to sqlite (merged to main)
 
 `decisions/cache.py` now writes every evaluation through to a sqlite table (`evaluations` in `config.DB_PATH`, default `backend/waypoint.db`, already gitignored; override with `DB_PATH`) and reads it back on an in-memory miss, so a restart or redeploy between `/evaluate` and `/explain|/stress|/action` no longer yields 404 `unknown_eval`. TTL stays 1h in both layers (expired rows are evicted on every put/get). Rows are pydantic JSON dumps rehydrated through the module's `InputModel`; a row that no longer validates (contract change) or whose module is gone is treated as a miss. If the file cannot be created (read-only disk) the cache logs once and runs memory-only. Tests use a temp `DB_PATH` (`tests/conftest.py`). **Render: the disk is ephemeral per deploy, so this covers restarts within a deploy, not across deploys, unless a persistent disk is mounted and `DB_PATH` points at it.**
+
+## Session A note: PUT /profile edits the whole profile (merged to main)
+
+- `PUT /api/profile` takes a partial `Profile` body. Editable: `balance_cents`, `income`, `recurring`, `one_offs` (each list is replaced whole: send the full new list to add, remove or edit an item), `safety_floor_cents`. Anything else in the body (`as_of`, `variable`, `monthly_slack_cents`, unknown keys) is ignored.
+- Validation is the existing Pydantic models (`IncomeStream`, `RecurringItem`, `OneOff`); a bad body is `422 {"error": {"code": "invalid_profile", "message": "income.0.label: Field required; ..."}}` and the stored profile is left as it was.
+- `monthly_slack_cents` is recomputed server-side and the edited profile persists in the single-user store, so `GET /profile`, `/projection/baseline` and every later `/evaluate` use it. No contract change.
+- `POST /api/bank/connect` is the reset: it rebuilds the profile from the persona and discards edits. For B: a "Reset to bank data" control is just that call.
+- Tests in `test_smoke_api.py`: balance edit shifts the baseline; list replace recomputes slack and flows into `/evaluate`; connect after edits restores the persona byte-for-byte.
 
 ## Session A note: projection-derived status flags + flag labels (merged to main)
 

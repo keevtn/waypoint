@@ -53,6 +53,67 @@ def test_put_profile_floor(client):
     assert r.json()["safety_floor_cents"] == 20000
 
 
+
+def test_put_profile_balance_reflects_in_baseline(client):
+    client.post("/api/bank/connect", json={})
+    before = client.get("/api/projection/baseline").json()
+    p = client.get("/api/profile").json()
+    r = client.put("/api/profile", json={"balance_cents": p["balance_cents"] + 50000, "ignored_key": 1, "monthly_slack_cents": 1, "as_of": "1999-01-01"})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["balance_cents"] == p["balance_cents"] + 50000
+    assert body["as_of"] == p["as_of"] and body["monthly_slack_cents"] == p["monthly_slack_cents"]  # computed/unknown fields ignored
+    after = client.get("/api/projection/baseline").json()
+    assert after["min_balance_cents"] == before["min_balance_cents"] + 50000
+    assert after["series"][0]["end_balance_cents"] == before["series"][0]["end_balance_cents"] + 50000
+    client.post("/api/bank/connect", json={})
+
+
+def test_put_profile_replaces_lists_and_recomputes_slack(client):
+    client.post("/api/bank/connect", json={})
+    p = client.get("/api/profile").json()
+    # drop every recurring item but rent and halve its amount; add a second income stream; one one-off
+    rent = next(r for r in p["recurring"] if "rent" in r["label"].lower())
+    rent = {**rent, "amount_cents": rent["amount_cents"] // 2}
+    extra = {"id": "inc_tutoring", "label": "Tutoring", "amount_cents": 20000, "cadence": "monthly", "next_date": "2026-11-05", "confidence": 1.0}
+    r = client.put("/api/profile", json={"recurring": [rent], "income": [*p["income"], extra], "one_offs": [{"id": "oo_x", "label": "Books", "amount_cents": -5000, "date": "2026-12-01", "source": "user"}]})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert [x["id"] for x in body["recurring"]] == [rent["id"]] and body["recurring"][0]["amount_cents"] == rent["amount_cents"]
+    assert [x["id"] for x in body["income"]][-1] == "inc_tutoring" and len(body["income"]) == len(p["income"]) + 1
+    assert [x["id"] for x in body["one_offs"]] == ["oo_x"]
+    from app.models import Profile
+    from app.profile.detect import compute_slack
+
+    prof = Profile.model_validate(body)
+    assert body["monthly_slack_cents"] == compute_slack(prof.income, prof.recurring, prof.variable) != p["monthly_slack_cents"]
+    monthly_rec = {x["id"]: x for x in p["recurring"] if x["cadence"] == "monthly"}
+    if set(monthly_rec) == {x["id"] for x in p["recurring"]}:  # persona: every recurring item is monthly, so the delta is exact
+        removed = sum(-x["amount_cents"] for x in p["recurring"]) + rent["amount_cents"]  # rent's new (halved) amount stays
+        assert body["monthly_slack_cents"] == p["monthly_slack_cents"] + removed + 20000
+    assert client.get("/api/profile").json()["monthly_slack_cents"] == body["monthly_slack_cents"]  # persisted
+    # a later /evaluate uses the edited profile
+    ev = client.post("/api/decisions/big_purchase/evaluate", json={"inputs": {"name": "Laptop", "amount_cents": 180000, "date": "2026-11-01"}}).json()
+    assert ev["projections"]["baseline"]["monthly_slack_cents"] == body["monthly_slack_cents"]
+    # bad bodies are 422, and leave the stored profile untouched
+    r = client.put("/api/profile", json={"income": [{"id": "bad"}]})
+    assert r.status_code == 422 and r.json()["error"]["code"] == "invalid_profile"
+    assert client.put("/api/profile", json={"recurring": [{**rent, "cadence": "yearly"}]}).status_code == 422
+    assert client.get("/api/profile").json()["monthly_slack_cents"] == body["monthly_slack_cents"]
+    client.post("/api/bank/connect", json={})
+
+
+def test_bank_connect_resets_profile_edits(client):
+    client.post("/api/bank/connect", json={})
+    persona = client.get("/api/profile").json()
+    client.put("/api/profile", json={"balance_cents": 1, "recurring": [], "income": [], "one_offs": [], "safety_floor_cents": 99900})
+    edited = client.get("/api/profile").json()
+    assert edited["balance_cents"] == 1 and edited["recurring"] == [] and edited["monthly_slack_cents"] != persona["monthly_slack_cents"]
+    r = client.post("/api/bank/connect", json={})
+    assert r.status_code == 200
+    assert client.get("/api/profile").json() == persona
+    assert client.get("/api/projection/baseline").json()["monthly_slack_cents"] == persona["monthly_slack_cents"]
+
 def test_baseline_no_negative_months(client):
     """§8 outcome 5: no month goes negative in the baseline."""
     r = client.get("/api/projection/baseline")

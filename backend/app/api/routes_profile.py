@@ -1,12 +1,14 @@
 """Profile + baseline projection routes (SPEC.md §7).
 
 Phase 1 (Session A): GET/PUT /profile and /profile/transactions come from
-profile/store.py (detect.py over the ingested transactions).
+profile/store.py (detect.py over the ingested transactions). PUT /profile edits balance,
+income, recurring, one-offs and the floor in the single-user store; POST /bank/connect resets.
 Phase 2 (Session A): /projection/baseline = project(profile, []) from projection/engine.py.
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query
+from pydantic import ValidationError
 
 from ..models import Profile, ProjectionResult, Transaction
 from ..profile import store
@@ -22,7 +24,13 @@ def get_profile() -> Profile:
 
 @router.put("/profile", response_model=Profile)
 def put_profile(patch: dict) -> Profile:
-    return store.update_profile(patch)
+    """Partial Profile body: balance_cents, income / recurring / one_offs (full list replace) and
+    safety_floor_cents. Unknown and computed fields are ignored; slack is recomputed server-side."""
+    try:
+        return store.update_profile(patch)
+    except ValidationError as exc:
+        msg = "; ".join(f"{'.'.join(str(x) for x in e['loc'])}: {e['msg']}" for e in exc.errors(include_url=False))
+        raise HTTPException(status_code=422, detail={"code": "invalid_profile", "message": msg})
 
 
 @router.get("/profile/transactions", response_model=list[Transaction])

@@ -1,7 +1,7 @@
 // Option card: label, monthly price with Estimate/Quote/Unsourced badge, key attributes,
 // constraint badges, and status styling (disallowed = greyed with reason).
 import type { Constraint, Option, ProjectionResult } from "../types";
-import { fmtCents, fmtDollars } from "../lib/format";
+import { fmtCents, fmtDate, fmtDollars } from "../lib/format";
 import { Badge, Dot, type Tone } from "./ui";
 import { StatusBadge, constraintShortLabel } from "./ConstraintBadge";
 
@@ -40,6 +40,17 @@ export function describeAttributes(a: Option["attributes"]): { label: string; va
     out.push({ label: "Physical damage", value: both ? "Collision + comprehensive" : a.collision ? "Collision only" : a.comprehensive ? "Comprehensive only" : "None" });
   }
   if ("deductible" in a) out.push({ label: "Deductible", value: Number(a.deductible) > 0 ? `$${Number(a.deductible).toLocaleString("en-US")}` : "n/a" });
+  // Rent module (backend/app/decisions/rent/options.py attributes).
+  if ("rent_cents" in a) {
+    out.push({ label: "Rent", value: `${fmtCents(Number(a.rent_cents))}/mo` });
+    if (Number(a.utilities_est_cents) > 0) out.push({ label: "Utilities (est.)", value: `${fmtCents(Number(a.utilities_est_cents))}/mo` });
+    out.push({ label: "Move-in", value: fmtCents(Number(a.move_in_cents ?? 0)) }); // deposit + first month
+    out.push({ label: "Lease", value: `${a.lease_months} mo from ${fmtDate(String(a.start_date))}` });
+    if (Number(a.current_rent_cents) > 0) {
+      const delta = Number(a.monthly_housing_cents) - Number(a.current_rent_cents);
+      out.push({ label: "vs. today", value: delta === 0 ? "same monthly cost" : `${fmtCents(Math.abs(delta))}/mo ${delta > 0 ? "more" : "less"}` });
+    }
+  }
   if (out.length === 0) {
     for (const [key, v] of Object.entries(a)) out.push({ label: key.replace(/_/g, " "), value: String(v) });
   }

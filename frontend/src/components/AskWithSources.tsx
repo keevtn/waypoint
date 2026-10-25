@@ -6,6 +6,9 @@ import { errorMessage } from "../lib/hooks";
 import CitationChip, { CitedText } from "./CitationChip";
 import { Button, Card, ErrorNote, SkeletonLines, inputClass } from "./ui";
 
+const SUGGESTIONS_BY_MODULE: Record<string, string[]> = {
+  rent: ["What share of income is considered affordable for housing?", "Should I invest my emergency fund in index funds?"],
+};
 const SUGGESTIONS = ["What does limited tort mean in Pennsylvania?", "Should I invest my emergency fund in index funds?"];
 
 export default function AskWithSources({ module }: { module: string | null }) {
@@ -41,7 +44,7 @@ export default function AskWithSources({ module }: { module: string | null }) {
       <form onSubmit={onSubmit} className="flex gap-2">
         <input
           className={inputClass}
-          placeholder="Ask about coverage terms, state requirements, or lender rules"
+          placeholder={module === "rent" ? "Ask about leases, deposits, or what counts as affordable rent" : "Ask about coverage terms, state requirements, or lender rules"}
           value={q}
           onChange={(e) => setQ(e.target.value)}
           aria-label="Question"
@@ -51,7 +54,7 @@ export default function AskWithSources({ module }: { module: string | null }) {
         </Button>
       </form>
       <div className="mt-2 flex flex-wrap gap-1.5">
-        {SUGGESTIONS.map((s) => (
+        {(SUGGESTIONS_BY_MODULE[module ?? ""] ?? SUGGESTIONS).map((s) => (
           <button
             key={s}
             type="button"

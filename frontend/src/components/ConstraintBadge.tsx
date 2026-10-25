@@ -32,6 +32,10 @@ export function StatusBadge({ status }: { status: OptionStatus }) {
 /** Short label for a constraint that is more specific than its kind, derived from its id. */
 export function constraintShortLabel(c: Constraint): string {
   if (/lender/i.test(c.id)) return "Required by lender";
+  if (/housing_45/i.test(c.id)) return "Over 45% of income";
+  if (/rent_30pct_standard/i.test(c.id)) return "30% standard";
+  if (/rent_30/i.test(c.id)) return "Over 30% of income";
+  if (/move_in/i.test(c.id)) return "Move-in cash";
   if (/minimum|state/i.test(c.id)) return "State minimum";
   if (/deductible/i.test(c.id)) return "Deductible comfort";
   if (/tort/i.test(c.id)) return "Limited tort";

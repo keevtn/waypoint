@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useAppState } from "../state";
+import { baselineLabel } from "../lib/decisionInputs";
 import type { Critique, RecommendationShift, Scenario, StressResult } from "../types";
 import { fmtCents, fmtMonth } from "../lib/format";
 import { friendlyError } from "../lib/hooks";
@@ -90,7 +91,7 @@ export default function StressTest() {
       : null;
 
   const series: ChartSeries[] = [];
-  if (projections[BASELINE_KEY]) series.push({ id: BASELINE_KEY, label: "Baseline (no policy)", result: projections[BASELINE_KEY] });
+  if (projections[BASELINE_KEY]) series.push({ id: BASELINE_KEY, label: baselineLabel(decisionId), result: projections[BASELINE_KEY] });
   if (preferred && projections[preferred.id]) series.push({ id: preferred.id, label: `${preferred.label} · as planned`, result: projections[preferred.id] });
   if (shownScenario && shownLabel) series.push({ id: "scenario", label: shownLabel, result: shownScenario });
 

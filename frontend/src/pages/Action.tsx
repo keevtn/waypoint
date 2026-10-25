@@ -77,7 +77,9 @@ export default function Action() {
       <header className="flex flex-wrap items-end justify-between gap-2 print:hidden">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Your next action</h1>
-          <p className="text-sm text-slate-500">A coverage configuration, not a carrier. Take this to real people and get real quotes.</p>
+          <p className="text-sm text-slate-500">
+            {decisionId === "rent" ? "A unit and a plan, not a landlord's pitch. Get everything in writing before you pay." : "A coverage configuration, not a carrier. Take this to real people and get real quotes."}
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           {choosable.length > 1 && (
@@ -201,7 +203,9 @@ export default function Action() {
               <section className="mt-6 rounded-md border border-slate-200 p-4 dark:border-slate-800 print:hidden">
                 <div className="text-sm font-medium">Talk to a human</div>
                 <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                  An independent agent or your own bank can check this configuration against your lender&apos;s letter before you buy.
+                  {decisionId === "rent"
+                    ? "A campus housing office or tenant resource center can read the lease with you before you sign."
+                    : "An independent agent or your own bank can check this configuration against your lender's letter before you buy."}
                 </p>
                 <a
                   href={card.talk_to_human_url}

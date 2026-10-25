@@ -2,13 +2,15 @@
 import { create } from "zustand";
 import { ApiError, api } from "./api";
 import { friendlyError } from "./lib/hooks";
-import type { ActionCard, AutoInsuranceInputs, EvaluateResponse, Explanation, Profile, ProjectionResult, StressResponse } from "./types";
+import type { DecisionInputs } from "./lib/decisionInputs";
+import type { ActionCard, EvaluateResponse, Explanation, Profile, ProjectionResult, StressResponse } from "./types";
 
 interface AppState {
   profile: Profile | null;
   baseline: ProjectionResult | null;
   decisionId: string;
-  inputs: AutoInsuranceInputs | null;
+  /** The inputs behind `evaluation`, tagged with their module. */
+  inputs: DecisionInputs | null;
   evaluation: EvaluateResponse | null;
   /** Bumps when the user runs a new evaluation (not on a transparent eval_id refresh). */
   evalGen: number;
@@ -20,7 +22,8 @@ interface AppState {
   actionCard: ActionCard | null; // for selectedOptionId; cleared when the option changes
   setProfile: (p: Profile | null) => void;
   setBaseline: (b: ProjectionResult | null) => void;
-  setInputs: (i: AutoInsuranceInputs) => void;
+  /** Record the module + inputs about to be evaluated. */
+  setInputs: (i: DecisionInputs) => void;
   setEvaluation: (e: EvaluateResponse | null) => void;
   setExplanations: (x: Explanation[] | null) => void;
   /** Kick off /explain for the current evaluation (idempotent). Called right after /evaluate returns so Compare is instant. */
@@ -50,7 +53,7 @@ export const useAppState = create<AppState>((set, get) => ({
   actionCard: null,
   setProfile: (profile) => set({ profile }),
   setBaseline: (baseline) => set({ baseline }),
-  setInputs: (inputs) => set({ inputs }),
+  setInputs: (inputs) => set({ inputs, decisionId: inputs.decisionId }),
   setEvaluation: (evaluation) =>
     set((s) => ({
       evaluation,
@@ -92,7 +95,7 @@ export const useAppState = create<AppState>((set, get) => ({
       const { inputs, decisionId, evalGen } = get();
       if (!inputs) throw e;
       // Re-evaluate silently with the inputs the user already entered; deterministic, so the options are the same.
-      const fresh = await (refreshing ??= api.evaluate(decisionId, inputs).finally(() => (refreshing = null)));
+      const fresh = await (refreshing ??= api.evaluate(decisionId, inputs.inputs).finally(() => (refreshing = null)));
       if (get().evalGen !== evalGen) throw e; // user started a new evaluation meanwhile
       set((s) => ({
         evaluation: fresh,

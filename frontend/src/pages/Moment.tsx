@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useAppState } from "../state";
 import type { AutoInsuranceInputs, DecisionSummary, UserQuote } from "../types";
+import { isAutoInputs, isRentInputs, type DecisionInputs, type RentInputs, type RentUnit } from "../lib/decisionInputs";
 import { addDays, centsToDollarsText, dollarsToCents, fmtCents, todayIso } from "../lib/format";
 import { errorMessage, useAsync } from "../lib/hooks";
 import { Badge, Button, Card, ErrorNote, Field, Skeleton, inputClass } from "../components/ui";
@@ -42,22 +43,87 @@ const fromInputs = (i: AutoInsuranceInputs): FormState => ({
   quotes: i.user_quotes.map((q) => ({ label: q.label, monthly: centsToDollarsText(q.monthly_cents) })),
 });
 
+
+// ---------- Rent module (mirrors backend/app/decisions/rent/inputs.py) ----------
+
+interface UnitForm {
+  label: string;
+  rent: string;
+  deposit: string;
+  utilities: string;
+  leaseMonths: string;
+  startDate: string;
+}
+
+interface RentFormState {
+  units: UnitForm[];
+  /** "" = use the rent detected in transactions. */
+  currentRent: string;
+}
+
+const MIN_UNITS = 2;
+const MAX_UNITS = 4;
+
+/** First day of the month after next: a realistic lease start for someone looking now. */
+const nextLeaseStart = (asOf: string): string => {
+  const [y, m] = asOf.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1 + 2, 1)).toISOString().slice(0, 10);
+};
+
+const emptyUnit = (startDate: string): UnitForm => ({ label: "", rent: "", deposit: "", utilities: "", leaseMonths: "12", startDate });
+
+// Demo defaults: three State College units around the $850 the persona pays now; one fits, one is flagged, one is over 45%.
+const rentDefaultsFor = (asOf: string): RentFormState => {
+  const start = nextLeaseStart(asOf);
+  return {
+    currentRent: "",
+    units: [
+      { label: "Room in a shared house", rent: "520", deposit: "520", utilities: "40", leaseMonths: "12", startDate: start },
+      { label: "Shared 2BR near campus", rent: "725", deposit: "725", utilities: "60", leaseMonths: "12", startDate: start },
+      { label: "Studio downtown", rent: "1050", deposit: "1050", utilities: "90", leaseMonths: "12", startDate: start },
+    ],
+  };
+};
+
+const rentFromInputs = (i: RentInputs): RentFormState => ({
+  currentRent: centsToDollarsText(i.current_rent_cents),
+  units: i.units.map((u) => ({
+    label: u.label,
+    rent: centsToDollarsText(u.rent_cents),
+    deposit: centsToDollarsText(u.deposit_cents),
+    utilities: centsToDollarsText(u.utilities_est_cents),
+    leaseMonths: String(u.lease_months),
+    startDate: u.start_date,
+  })),
+});
+
 export default function Moment() {
   const navigate = useNavigate();
   const { profile, inputs, decisionId, setInputs, setEvaluation } = useAppState();
   const decisions = useAsync(() => api.decisions(), []);
   const [moduleId, setModuleId] = useState(decisionId);
-  const [form, setForm] = useState<FormState>(() => (inputs ? fromInputs(inputs) : defaultsFor(profile?.as_of ?? todayIso())));
+  const asOf = profile?.as_of ?? todayIso();
+  const [form, setForm] = useState<FormState>(() => (isAutoInputs(inputs) ? fromInputs(inputs.inputs) : defaultsFor(asOf)));
+  const [rentForm, setRentForm] = useState<RentFormState>(() => (isRentInputs(inputs) ? rentFromInputs(inputs.inputs) : rentDefaultsFor(asOf)));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   // If the profile arrives after first render, refresh the deadline default once.
   useEffect(() => {
-    if (profile && !inputs) setForm((f) => ({ ...f, registrationDeadline: addDays(profile.as_of, 30) }));
+    if (profile && !inputs) {
+      setForm((f) => ({ ...f, registrationDeadline: addDays(profile.as_of, 30) }));
+      const start = nextLeaseStart(profile.as_of);
+      setRentForm((f) => ({ ...f, units: f.units.map((u) => ({ ...u, startDate: start })) }));
+    }
   }, [profile, inputs]);
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((f) => ({ ...f, [k]: v }));
+
+  const detectedRent = profile?.recurring.find((r) => /rent/i.test(r.label));
+  const currentRentHint = detectedRent
+    ? `Optional. Blank uses the ${fmtCents(Math.abs(detectedRent.amount_cents))}/mo rent in your transactions. Enter 0 if you pay no rent today.`
+    : "Optional. Blank uses the rent detected in your transactions; enter 0 if you pay no rent today.";
 
   const validate = (): AutoInsuranceInputs | null => {
     const e: Record<string, string> = {};
@@ -92,15 +158,63 @@ export default function Moment() {
     };
   };
 
+
+  const setUnit = (i: number, patch: Partial<UnitForm>) =>
+    setRentForm((f) => ({ ...f, units: f.units.map((u, j) => (j === i ? { ...u, ...patch } : u)) }));
+  const addUnit = () => setRentForm((f) => (f.units.length >= MAX_UNITS ? f : { ...f, units: [...f.units, emptyUnit(nextLeaseStart(asOf))] }));
+  const removeUnit = (i: number) => setRentForm((f) => (f.units.length <= MIN_UNITS ? f : { ...f, units: f.units.filter((_, j) => j !== i) }));
+
+  const validateRent = (): RentInputs | null => {
+    const e: Record<string, string> = {};
+    const units: RentUnit[] = [];
+    rentForm.units.forEach((u, i) => {
+      const rent = dollarsToCents(u.rent);
+      const deposit = u.deposit.trim() === "" ? 0 : dollarsToCents(u.deposit);
+      const utilities = u.utilities.trim() === "" ? 0 : dollarsToCents(u.utilities);
+      const months = Number(u.leaseMonths);
+      if (!u.label.trim()) e[`unit${i}.label`] = "Give this unit a name.";
+      if (rent === null || rent <= 0) e[`unit${i}.rent`] = "Enter the monthly rent.";
+      if (deposit === null || deposit < 0) e[`unit${i}.deposit`] = "Enter an amount or leave blank.";
+      if (utilities === null || utilities < 0) e[`unit${i}.utilities`] = "Enter an amount or leave blank.";
+      if (!Number.isInteger(months) || months < 1 || months > 36) e[`unit${i}.leaseMonths`] = "1 to 36 months.";
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(u.startDate)) e[`unit${i}.startDate`] = "Pick a start date.";
+      if (rent !== null && deposit !== null && utilities !== null)
+        units.push({
+          label: u.label.trim(),
+          rent_cents: rent,
+          deposit_cents: deposit,
+          utilities_est_cents: utilities,
+          lease_months: months,
+          start_date: u.startDate,
+        });
+    });
+    const labels = rentForm.units.map((u) => u.label.trim().toLowerCase());
+    labels.forEach((l, i) => {
+      if (l && labels.indexOf(l) !== i) e[`unit${i}.label`] = "Two units have the same name.";
+    });
+    const current = rentForm.currentRent.trim() === "" ? null : dollarsToCents(rentForm.currentRent);
+    if (rentForm.currentRent.trim() !== "" && (current === null || current < 0)) e.currentRent = "Enter an amount or leave blank.";
+    setErrors(e);
+    if (Object.keys(e).length > 0 || units.length < MIN_UNITS) return null;
+    return { units, current_rent_cents: current };
+  };
+
   const onSubmit = async (ev: FormEvent) => {
     ev.preventDefault();
-    const parsed = validate();
-    if (!parsed) return;
+    let tagged: DecisionInputs | null = null;
+    if (moduleId === "rent") {
+      const parsed = validateRent();
+      if (parsed) tagged = { decisionId: "rent", inputs: parsed };
+    } else {
+      const parsed = validate();
+      if (parsed) tagged = { decisionId: "auto_insurance", inputs: parsed };
+    }
+    if (!tagged) return;
     setSubmitting(true);
     setSubmitError(null);
     try {
-      setInputs(parsed);
-      const result = await api.evaluate(moduleId, parsed);
+      setInputs(tagged);
+      const result = await api.evaluate(tagged.decisionId, tagged.inputs);
       setEvaluation(result);
       // /explain takes 10-20s live: start it now so Compare has it by the time the user clicks an option.
       useAppState.getState().prefetchExplanations();
@@ -137,7 +251,11 @@ export default function Moment() {
         )}
         {decisions.error && <ErrorNote message={decisions.error} />}
         {decisions.data?.map((d) => (
-          <ModuleCard key={d.id} decision={d} selected={moduleId === d.id} onSelect={() => setModuleId(d.id)} />
+          <ModuleCard key={d.id} decision={d} selected={moduleId === d.id} onSelect={() => {
+              setModuleId(d.id);
+              setErrors({});
+              setSubmitError(null);
+            }} />
         ))}
       </div>
 
@@ -235,12 +353,99 @@ export default function Moment() {
           </form>
         </Card>
       )}
+
+      {moduleId === "rent" && (
+        <Card title="Rent · the units you're weighing">
+          <form onSubmit={onSubmit} className="space-y-5" noValidate>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              Enter {MIN_UNITS} to {MAX_UNITS} places. Staying put is the baseline; each unit is tested as a move, with the deposit and first month due at
+              lease start.
+            </p>
+
+            <ul className="space-y-4">
+              {rentForm.units.map((u, i) => (
+                <li key={i} className="rounded-md border border-slate-200 p-3 dark:border-slate-800">
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Unit {i + 1}</span>
+                    {rentForm.units.length > MIN_UNITS && (
+                      <Button type="button" variant="ghost" onClick={() => removeUnit(i)} className="px-2 py-1 text-xs">
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Field label="Name" hint="How you refer to it.">
+                      <input className={inputClass} placeholder="e.g. Studio on Beaver Ave" value={u.label} onChange={(e) => setUnit(i, { label: e.target.value })} />
+                      <FieldError msg={errors[`unit${i}.label`]} />
+                    </Field>
+                    <Field label="Monthly rent">
+                      <DollarInput value={u.rent} onChange={(v) => setUnit(i, { rent: v })} error={errors[`unit${i}.rent`]} />
+                    </Field>
+                    <Field label="Security deposit" hint="Due at signing. Blank = none.">
+                      <DollarInput value={u.deposit} onChange={(v) => setUnit(i, { deposit: v })} error={errors[`unit${i}.deposit`]} />
+                    </Field>
+                    <Field label="Utilities not included" hint="Monthly estimate. Blank = none.">
+                      <DollarInput value={u.utilities} onChange={(v) => setUnit(i, { utilities: v })} error={errors[`unit${i}.utilities`]} />
+                    </Field>
+                    <Field label="Lease length (months)">
+                      <input className={inputClass} inputMode="numeric" value={u.leaseMonths} onChange={(e) => setUnit(i, { leaseMonths: e.target.value })} />
+                      <FieldError msg={errors[`unit${i}.leaseMonths`]} />
+                    </Field>
+                    <Field label="Lease start" hint="Deposit and first month are due then.">
+                      <input type="date" className={inputClass} value={u.startDate} onChange={(e) => setUnit(i, { startDate: e.target.value })} />
+                      <FieldError msg={errors[`unit${i}.startDate`]} />
+                    </Field>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="flex items-center justify-between">
+              <button
+                type="button"
+                onClick={addUnit}
+                disabled={rentForm.units.length >= MAX_UNITS}
+                className="text-xs font-medium text-accent hover:underline disabled:cursor-not-allowed disabled:opacity-50 dark:text-accent-light"
+              >
+                Add another unit
+              </button>
+              <span className="text-xs text-slate-500">
+                {rentForm.units.length} of {MAX_UNITS}
+              </span>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="What you pay now" hint={currentRentHint}>
+                <DollarInput
+                  value={rentForm.currentRent}
+                  onChange={(v) => setRentForm((f) => ({ ...f, currentRent: v }))}
+                  error={errors.currentRent}
+                  placeholder="from your transactions"
+                />
+              </Field>
+            </div>
+
+            {submitError && <ErrorNote message={submitError} />}
+
+            <div className="flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
+              <span className="text-xs text-slate-500">
+                Affordability uses the HUD 30% standard. {profile && <>Floor {fmtCents(profile.safety_floor_cents)}.</>}
+              </span>
+              <Button type="submit" disabled={submitting || !profile}>
+                {submitting ? "Running projections…" : "Compare units"}
+              </Button>
+            </div>
+          </form>
+        </Card>
+      )}
     </section>
   );
 }
 
+const SUPPORTED = new Set(["auto_insurance", "rent"]);
+
 function ModuleCard({ decision, selected, onSelect }: { decision: DecisionSummary; selected: boolean; onSelect: () => void }) {
-  const soon = decision.id !== "auto_insurance";
+  const soon = !SUPPORTED.has(decision.id);
   return (
     <button
       type="button"

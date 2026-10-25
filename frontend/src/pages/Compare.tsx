@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppState } from "../state";
+import { baselineLabel, isAutoInputs, isRentInputs, priceFootnote, type DecisionInputs } from "../lib/decisionInputs";
 import type { Flag } from "../types";
 import { fmtCents, fmtDollars } from "../lib/format";
 import { useDarkMode } from "../lib/hooks";
@@ -50,7 +51,7 @@ export default function Compare() {
     activeMonth && selectedProjection ? (selectedProjection.flags.find((f) => f.month === activeMonth) ?? null) : null;
 
   const series = [
-    ...(projections[BASELINE_KEY] ? [{ id: BASELINE_KEY, label: "Baseline (no policy)", result: projections[BASELINE_KEY] }] : []),
+    ...(projections[BASELINE_KEY] ? [{ id: BASELINE_KEY, label: baselineLabel(decisionId), result: projections[BASELINE_KEY] }] : []),
     ...options.filter((o) => projections[o.id]).map((o) => ({ id: o.id, label: o.label, result: projections[o.id] })),
   ];
   const colorFor = (optionId: string) => seriesColor(options.findIndex((o) => o.id === optionId), dark);
@@ -60,12 +61,7 @@ export default function Compare() {
       <header className="flex flex-wrap items-end justify-between gap-2">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Compare options</h1>
-          {inputs && (
-            <p className="text-xs text-slate-500">
-              {fmtDollars(inputs.vehicle_value_cents)} car · {inputs.financed ? `financed, ${fmtCents(inputs.loan_payment_cents ?? 0)}/mo` : "owned outright"} · age{" "}
-              <span className="tabular">{inputs.driver_age}</span> · comfortable with a {fmtDollars(inputs.deductible_comfort_cents)} deductible
-            </p>
-          )}
+          {inputs && <p className="text-xs text-slate-500">{inputsSummary(inputs)}</p>}
         </div>
         <div className="flex gap-2">
           <Link to="/moment">
@@ -95,7 +91,7 @@ export default function Compare() {
             />
           ))}
           <p className="px-1 text-xs text-slate-500">
-            Prices marked Estimate come from a cited public source, not a carrier. Get real quotes before you decide.
+            {priceFootnote(decisionId)}
           </p>
         </div>
 
@@ -149,4 +145,18 @@ export default function Compare() {
       <AskWithSources module={decisionId} />
     </section>
   );
+}
+
+/** One-line recap of what the user told us, per module. */
+function inputsSummary(d: DecisionInputs): string {
+  if (isAutoInputs(d)) {
+    const i = d.inputs;
+    return `${fmtDollars(i.vehicle_value_cents)} car · ${i.financed ? `financed, ${fmtCents(i.loan_payment_cents ?? 0)}/mo` : "owned outright"} · age ${i.driver_age} · comfortable with a ${fmtDollars(i.deductible_comfort_cents)} deductible`;
+  }
+  if (isRentInputs(d)) {
+    const i = d.inputs;
+    const current = i.current_rent_cents === null ? "current rent from your transactions" : i.current_rent_cents === 0 ? "no rent today" : `paying ${fmtCents(i.current_rent_cents)}/mo now`;
+    return `${i.units.length} units · ${current} · each option is "move to this unit", the baseline is staying put`;
+  }
+  return "";
 }

@@ -113,7 +113,7 @@ export const api = {
       ? Promise.resolve({ name: null, price_cents: null, currency: null, source_url: url, image_url: null, confidence: "none", note: "Lookup is unavailable in fixture mode." })
       : post<ProductLookupResponse>("/products/lookup", { url }),
 
-  updateProfile: (patch: Partial<Pick<Profile, "safety_floor_cents" | "one_offs" | "recurring">>) =>
+  updateProfile: (patch: Partial<Pick<Profile, "balance_cents" | "income" | "recurring" | "one_offs" | "safety_floor_cents" | "variable">>) =>
     USE_FIXTURES
       ? Promise.resolve({ ...fixture<Profile>("profile"), ...patch })
       : request<Profile>("/profile", { method: "PUT", body: JSON.stringify(patch) }),

@@ -6,7 +6,7 @@ import { useState, type ReactNode } from "react";
 import { api } from "../api";
 import { useAppState } from "../state";
 import type { Cadence, IncomeStream, OneOff, Profile, RecurringItem } from "../types";
-import { centsToDollarsText, dollarsToCents, fmtCents } from "../lib/format";
+import { centsToDollarsText, dollarsToCents, fmtCents, fmtDollars } from "../lib/format";
 import { errorMessage } from "../lib/hooks";
 import { Button, Card, Stat, inputClass } from "./ui";
 
@@ -21,7 +21,7 @@ const isIsoDate = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(
 const newId = (prefix: string) => `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
 /** Send one PUT /profile, then refetch profile + baseline and drop any cached evaluation. */
-export async function saveProfilePatch(patch: Partial<Pick<Profile, "balance_cents" | "income" | "recurring" | "one_offs" | "safety_floor_cents">>): Promise<Profile> {
+export async function saveProfilePatch(patch: Partial<Pick<Profile, "balance_cents" | "income" | "recurring" | "one_offs" | "safety_floor_cents" | "variable">>): Promise<Profile> {
   await api.updateProfile(patch);
   const [p, b] = await Promise.all([api.profile(), api.baseline(useAppState.getState().horizonMonths)]);
   const st = useAppState.getState();
@@ -128,6 +128,77 @@ export function BalanceEditor({ profile }: { profile: Profile }) {
         <span className="text-sm text-slate-500 dark:text-slate-400">$</span>
         <input className={inputClass} value={text} onChange={(e) => setText(e.target.value)} inputMode="decimal" autoFocus aria-label="Current balance in dollars" />
       </div>
+      <Err msg={fieldError} />
+      <FormFooter saving={saving} error={error} onCancel={() => setEditing(false)} />
+    </form>
+  );
+}
+
+// ---------- Typical monthly spending (variable.mean_monthly_cents; std stays computed) ----------
+
+export function SpendEditor({ profile }: { profile: Profile }) {
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState(centsToDollarsText(profile.variable.mean_monthly_cents));
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [fieldError, setFieldError] = useState<string | undefined>();
+  const stdLine = (
+    <>
+      ± {fmtDollars(profile.variable.std_monthly_cents)} · <span className="tabular">{profile.variable.months_observed}</span> months observed
+    </>
+  );
+
+  const open = () => {
+    setText(centsToDollarsText(profile.variable.mean_monthly_cents));
+    setFieldError(undefined);
+    setError(null);
+    setEditing(true);
+  };
+  const save = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cents = dollarsToCents(text);
+    if (cents === null || cents < 0) {
+      setFieldError("Enter a dollar amount of 0 or more.");
+      return;
+    }
+    setSaving(true);
+    setError(null);
+    try {
+      const p = await saveProfilePatch({ variable: { ...profile.variable, mean_monthly_cents: cents } });
+      if (p.variable.mean_monthly_cents !== cents) {
+        setError(NOT_ACCEPTED);
+        return;
+      }
+      setEditing(false);
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!editing) {
+    return (
+      <Stat
+        label="Typical monthly spending"
+        value={`${fmtDollars(profile.variable.mean_monthly_cents)} / mo`}
+        sub={
+          <>
+            {stdLine}. <EditLink onClick={open} />
+          </>
+        }
+      />
+    );
+  }
+  return (
+    <form onSubmit={save} noValidate>
+      <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Typical monthly spending</div>
+      <div className="mt-1 flex items-center gap-2">
+        <span className="text-sm text-slate-500 dark:text-slate-400">$</span>
+        <input className={inputClass} value={text} onChange={(e) => setText(e.target.value)} inputMode="decimal" autoFocus aria-label="Typical monthly spending in dollars" />
+        <span className="shrink-0 text-xs text-slate-500 dark:text-slate-400">/ mo</span>
+      </div>
+      <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">{stdLine}</div>
       <Err msg={fieldError} />
       <FormFooter saving={saving} error={error} onCancel={() => setEditing(false)} />
     </form>

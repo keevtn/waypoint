@@ -6,7 +6,7 @@ import type { ProductLookupResponse } from "../types";
 import { errorMessage } from "../lib/hooks";
 import { Button, Field, inputClass } from "./ui";
 
-export default function ProductLookup({ onFound }: { onFound: (r: ProductLookupResponse) => void }) {
+export default function ProductLookup({ onFound, onNone }: { onFound: (r: ProductLookupResponse) => void; onNone?: (r: ProductLookupResponse) => void }) {
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,6 +25,7 @@ export default function ProductLookup({ onFound }: { onFound: (r: ProductLookupR
       const r = await api.productLookup(u);
       setResult(r);
       if (r.confidence !== "none") onFound(r);
+      else onNone?.(r);
     } catch (e) {
       setError(errorMessage(e));
     } finally {

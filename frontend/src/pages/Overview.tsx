@@ -4,12 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useAppState } from "../state";
 import type { Profile, RecurringItem } from "../types";
-import { centsToDollarsText, dollarsToCents, fmtCadence, fmtCents, fmtDate, fmtDollars, fmtPct } from "../lib/format";
+import { centsToDollarsText, dollarsToCents, fmtCadence, fmtCents, fmtDate, fmtPct } from "../lib/format";
 import { errorMessage } from "../lib/hooks";
 import { markConnected } from "../lib/session";
 import ProjectionChart, { BASELINE_KEY } from "../components/ProjectionChart";
 import { Badge, Button, Card, Dot, ErrorNote, Skeleton, Stat, inputClass, type Tone } from "../components/ui";
-import { BalanceEditor, ListEditorCard, resetToDemo } from "../components/ProfileEditors";
+import { BalanceEditor, ListEditorCard, SpendEditor, resetToDemo } from "../components/ProfileEditors";
 import HorizonSelect, { HorizonNote } from "../components/HorizonSelect";
 import CsvImport from "../components/CsvImport";
 
@@ -128,15 +128,7 @@ export default function Overview() {
           />
         </Card>
         <Card>
-          <Stat
-            label="Variable spend"
-            value={`${fmtDollars(profile.variable.mean_monthly_cents)} / mo`}
-            sub={
-              <>
-                ± {fmtDollars(profile.variable.std_monthly_cents)} · <span className="tabular">{profile.variable.months_observed}</span> months observed
-              </>
-            }
-          />
+          <SpendEditor profile={profile} />
         </Card>
         <Card>
           <FloorEditor profile={profile} onSaved={setProfile} />

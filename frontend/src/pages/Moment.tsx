@@ -531,6 +531,7 @@ export default function Moment() {
                   amount: r.price_cents !== null && r.price_cents > 0 ? centsToDollarsText(r.price_cents) : f.amount,
                 }))
               }
+              onNone={() => document.getElementById("purchase-price")?.focus()}
             />
 
             <div className="grid gap-4 sm:grid-cols-3">
@@ -539,7 +540,7 @@ export default function Moment() {
                 <FieldError msg={errors.pName} />
               </Field>
               <Field label="Full price">
-                <DollarInput value={purchase.amount} onChange={(v) => setP("amount", v)} error={errors.pAmount} />
+                <DollarInput id="purchase-price" value={purchase.amount} onChange={(v) => setP("amount", v)} error={errors.pAmount} />
               </Field>
               <Field label="When" hint="Purchase date, or when payments would start.">
                 <input type="date" className={inputClass} value={purchase.date} onChange={(e) => setP("date", e.target.value)} />
@@ -640,12 +641,12 @@ function Choice({ active, onClick, children }: { active: boolean; onClick: () =>
   );
 }
 
-function DollarInput({ value, onChange, error, placeholder }: { value: string; onChange: (v: string) => void; error?: string; placeholder?: string }) {
+function DollarInput({ id, value, onChange, error, placeholder }: { id?: string; value: string; onChange: (v: string) => void; error?: string; placeholder?: string }) {
   return (
     <div>
       <div className="relative">
         <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-slate-500 dark:text-slate-400">$</span>
-        <input className={`${inputClass} pl-7`} inputMode="decimal" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+        <input id={id} className={`${inputClass} pl-7`} inputMode="decimal" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
       </div>
       <FieldError msg={error} />
     </div>

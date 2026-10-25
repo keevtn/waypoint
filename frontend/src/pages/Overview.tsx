@@ -316,7 +316,7 @@ function FloorEditor({ profile, onSaved }: { profile: Profile; onSaved: (p: Prof
         sub={
           <>
             The balance you never want to drop below.{" "}
-            <button type="button" onClick={() => setEditing(true)} className="text-accent hover:underline dark:text-accent-light">
+            <button type="button" onClick={() => setEditing(true)} className="text-sm font-medium text-accent hover:underline dark:text-accent-light">
               Edit
             </button>
           </>

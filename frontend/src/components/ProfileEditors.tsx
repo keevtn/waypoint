@@ -48,7 +48,7 @@ export async function resetToDemo() {
 
 export function EditLink({ onClick, children = "Edit" }: { onClick: () => void; children?: ReactNode }) {
   return (
-    <button type="button" onClick={onClick} className="text-xs text-accent hover:underline dark:text-accent-light">
+    <button type="button" onClick={onClick} className="text-sm font-medium text-accent hover:underline dark:text-accent-light">
       {children}
     </button>
   );
@@ -325,7 +325,7 @@ export function ListEditorCard({
             ))}
           </ul>
           <div className="mt-3">
-            <button type="button" onClick={add} className="text-xs text-accent hover:underline dark:text-accent-light">
+            <button type="button" onClick={add} className="text-sm font-medium text-accent hover:underline dark:text-accent-light">
               {meta.addLabel}
             </button>
           </div>

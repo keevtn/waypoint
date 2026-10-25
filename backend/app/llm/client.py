@@ -80,6 +80,15 @@ _PROMPT_FILES = {"explain": "explainer", "select": "select", "critique": "critiq
 # ---------------------------------------------------------------------------
 
 
+_FAKE_RATIONALES = {
+    "deductible_claim": "You have a single biweekly income stream, so a claim in the month your balance is already lowest tests whether each deductible is actually affordable.",
+    "shock_expense": "Your variable spend already swings month to month and December has no buffer beyond the usual transfer.",
+    "income_gap": "Payroll is your only earned income; a one-month gap shows how much of the January dip carries forward.",
+    "hours_cut": "A cut in hours lowers every paycheck for the rest of the year.",
+    "rent_increase": "Rent is your largest fixed cost; a renewal increase compounds every month.",
+}
+
+
 class FakeLLM:
     """Returns canned objects derived from the fixtures. Ignores the payload text but
     keeps option ids consistent with it where that matters for the pipeline."""
@@ -101,13 +110,21 @@ class FakeLLM:
                 ]
             }
         elif call_type == "select":
-            data = {"scenarios": [s["scenario"] for s in fixtures.load("stress_auto")["scenarios"]]}
+            # Fixture rationales quote persona figures that may not be in the payload; the
+            # guardrail still runs on the fake path, so use number-free rationales here.
+            data = {
+                "scenarios": [
+                    {**s["scenario"], "rationale": _FAKE_RATIONALES.get(s["scenario"]["template_id"], "A plausible setback for this plan.")}
+                    for s in fixtures.load("stress_auto")["scenarios"]
+                ]
+            }
         elif call_type == "critique":
             c = fixtures.load("stress_auto")["critique"]
             data = {
                 "case_against": c["case_against"],
                 "case_for": c["case_for"],
                 "recommendation_shift": c["recommendation_shift"],
+                "summary": "",
                 "citation_ids": [x["chunk_id"] for x in c["citations"]],
             }
         elif call_type == "action":

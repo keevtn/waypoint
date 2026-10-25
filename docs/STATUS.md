@@ -21,7 +21,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 
 | Session | Branch | Phase | Last merged to main | Blocked on | Updated |
 |---------|--------|-------|---------------------|------------|---------|
-| A llm | a/p6-p7 | P6 | — | A-P3, C | — |
+| A llm | a/p6-p7 | done | P6 + P7 @ 2026-10-24 (explain/stress/action live; CI green) | — | 2026-10-24 |
 | B wire | b/p4-live | P4 live | Compare verified on real /evaluate @ 2026-10-24 (98b5e63) | A-P6/P7 for real explain/stress/action | 2026-10-24 |
 | D plaid | d/p8-plaid | P8 | — | A-P1 | — |
 
@@ -50,6 +50,14 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 3. Decision framework: `decisions/base.py` (Protocol + `resolve_statuses`: disallowed > flagged > allowed), `registry.py`, `evaluate.py`; auto module in `decisions/auto_insurance/` (`inputs.py`, `options.py` + sourced `pricing.json`, `rules.py`, `scenarios.py`, `action.py`). The lender rule is emitted with kind `disallowed` applying to options lacking comp+collision; `required` is informational (PA minimum, applies to all).
 4. Constraint citation ids live in `decisions/citations.py` and import Session C's `app.rag.facts` constants (PA minimum `pa-auto-insurance-guide#0`, tort `#1`, lender `cfpb-auto-loan-insurance#0`, deductible `naic-deductibles#2`); `test_decisions.py` checks every constraint id is in `facts.EXPECTED_TEXT`.
 5. Prices: Insurify PA state averages (all ages, retrieved 2026-10-24), $90 / $161 / $185 per month; the $185 figure is the $161 full-coverage average plus a labeled ~15% adjustment for the $500 deductible, higher limits and full tort. `source_title` says "all ages; young drivers typically pay more" so the UI can show the caveat; nothing renders "Unsourced".
+
+## Session A summary (Phases 6-7 done, merged to main)
+
+1. `/explain`, `/stress`, `/action` are live on the cached evaluation (`eval_id` from `/evaluate`; 404 `unknown_eval` after the 1h TTL, so the UI should re-run evaluate). `LLM_FAKE=1` still returns fixture-shaped answers through the same pipeline, so CI and the stage fallback never touch the network. Checked manually against the real key: explain ~11-19s, action ~6s, stress ~19s (two calls); all passed the guardrail in `DEV_MODE=1`.
+2. `llm/client.py`: `AnthropicLLM` forces JSON with structured outputs (`output_config.format=json_schema`, closed schemas from the LLM-facing Pydantic models), validates with Pydantic and retries once with the error appended; 30s timeout, 1 SDK retry. **Forced `tool_choice` (SPEC §6.6) is a 400 on `claude-sonnet-5-5` per current docs, so structured outputs replace it.** Prompts live in `llm/prompts/{explainer,select,critique,action,rag}.txt` (C: `rag.txt` is there as requested).
+3. `llm/guardrail.py`: every number in LLM output must be in the payload (numeric values, cents→dollars, numbers inside payload strings incl. chunk text and `*_display` labels; small ints 0-12 and years 2020-2030 whitelisted; ±1%). `DEV_MODE=1` → the route answers 502 `guardrail_violation` naming the numbers (pitch demo); `DEV_MODE=0` → the offending sentence is stripped and logged. **Set `DEV_MODE=0` on the presenting laptop and Render** unless you want a strict fail. LLM failures are 502 `llm_unavailable`.
+4. Citations are never model-generated: the model returns `[s:chunk]` / `[c:constraint]` markers and chunk ids; code drops markers for ids it was not given and rebuilds `Citation` objects via `rag.retrieve.citation_for`. Payloads (`llm/payload.py`) carry compact views with `*_display` strings ("$1,000") so the model copies figures instead of converting cents.
+5. Stress (`llm/stress.py`): the model picks 3 scenarios from the module's menu; code clamps params to the template's min/max, drops unknown templates/duplicates, forces a `deductible_claim` when any option has a deductible, and back-fills from deterministic defaults if the call fails. Scenarios run through `project()` via `one_off_overrides` (claim, shock, rent increase as monthly one-offs) and `income_multiplier` (gap, hours cut) for baseline + every non-disallowed option. On the persona the critique returns `reconsider` for `std_limited_1000` citing `naic-deductibles#2` (§11). Tests: `test_guardrail.py` (planted $1,337 caught), `test_llm.py`, `test_stress.py`; smoke extended.
 
 ## Session A notes (P1+P2 merged)
 

@@ -2,7 +2,7 @@
 
 Phase 3 (Session A): GET /decisions and POST /evaluate are real (decisions/registry.py,
 decisions/evaluate.py). Phase 6 (Session A, Wave 2): /explain and /action call the LLM
-layer (llm/explainer.py, llm/action.py) on the cached evaluation; /stress is Phase 7.
+layer (llm/explainer.py, llm/action.py) on the cached evaluation; Phase 7: /stress (llm/stress.py).
 
 An unknown or expired eval_id is 404 `unknown_eval` (cache TTL is 1h). LLM failures are
 502 `llm_unavailable`; a numeric-guardrail violation under DEV_MODE=1 is 502
@@ -14,11 +14,10 @@ from fastapi import APIRouter, HTTPException
 
 import logging
 
-from .. import fixtures
 from ..decisions import cache, registry
 from ..decisions.evaluate import InvalidInputs, evaluate as run_evaluate
 from ..llm import action as llm_action
-from ..llm import explainer
+from ..llm import explainer, stress as llm_stress
 from ..llm.client import LLMError
 from ..llm.guardrail import GuardrailViolation
 from ..models import (
@@ -108,8 +107,14 @@ def explain(decision_id: str, body: ExplainRequest) -> ExplainResponse:
 
 @router.post("/{decision_id}/stress", response_model=StressResponse)
 def stress(decision_id: str, body: StressRequest) -> StressResponse:
-    _check(decision_id)
-    return StressResponse.model_validate(fixtures.load("stress_auto"))
+    mod = _module(decision_id)
+    ev = _evaluation(decision_id, body.eval_id)
+    preferred = _option(ev, body.preferred_option_id)
+    try:
+        results, crit = llm_stress.stress_test(ev, mod, preferred)
+    except (LLMError, GuardrailViolation) as e:
+        raise _llm_errors(e) from e
+    return StressResponse(scenarios=results, critique=crit)
 
 
 @router.post("/{decision_id}/action", response_model=ActionCard)

@@ -114,6 +114,16 @@ def test_bank_connect_resets_profile_edits(client):
     assert client.get("/api/profile").json() == persona
     assert client.get("/api/projection/baseline").json()["monthly_slack_cents"] == persona["monthly_slack_cents"]
 
+
+def test_horizon_contract(client):
+    """horizon_months is optional on /evaluate and /projection/baseline; only 12, 60, 120 are accepted."""
+    r = client.get("/api/projection/baseline?horizon_months=36")
+    assert r.status_code == 422 and r.json()["error"]["code"] == "invalid_horizon"
+    r = client.post("/api/decisions/auto_insurance/evaluate", json={"inputs": {}, "horizon_months": 36})
+    assert r.status_code == 422 and r.json()["error"]["code"] == "invalid_horizon"
+    assert client.get("/api/projection/baseline?horizon_months=12").status_code == 200
+    assert len(client.get("/api/projection/baseline?horizon_months=60").json()["series"]) == 60
+
 def test_baseline_no_negative_months(client):
     """§8 outcome 5: no month goes negative in the baseline."""
     r = client.get("/api/projection/baseline")

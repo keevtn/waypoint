@@ -221,8 +221,12 @@ class DecisionSummary(BaseModel):
     input_schema: dict
 
 
+HORIZON_CHOICES: tuple[int, ...] = (12, 60, 120)
+
+
 class EvaluateRequest(BaseModel):
     inputs: dict
+    horizon_months: int = 12  # 12, 60 or 120; routes reject anything else with 422 invalid_horizon
 
 
 class Suggestion(BaseModel):

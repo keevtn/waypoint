@@ -10,7 +10,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import ValidationError
 
-from ..models import Profile, ProjectionResult, Transaction
+from ..models import HORIZON_CHOICES, Profile, ProjectionResult, Transaction
 from ..profile import store
 from ..projection import project
 
@@ -38,6 +38,12 @@ def get_transactions(limit: int = Query(50, ge=1, le=500)) -> list[Transaction]:
     return store.get_transactions(limit)
 
 
+def check_horizon(horizon_months: int) -> int:
+    if horizon_months not in HORIZON_CHOICES:
+        raise HTTPException(status_code=422, detail={"code": "invalid_horizon", "message": f"horizon_months must be one of {', '.join(map(str, HORIZON_CHOICES))}"})
+    return horizon_months
+
+
 @router.get("/projection/baseline", response_model=ProjectionResult)
-def get_baseline() -> ProjectionResult:
-    return project(store.get_profile(), [])
+def get_baseline(horizon_months: int = Query(12)) -> ProjectionResult:
+    return project(store.get_profile(), [], horizon_months=check_horizon(horizon_months))

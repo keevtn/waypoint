@@ -227,6 +227,15 @@ export interface DecisionSummary {
 
 export type SuggestionType = "earliest_safe_date" | "safest_financing" | "wait_beyond_horizon";
 
+// Projection horizon. POST /evaluate body `{ inputs, horizon_months? }` and GET /projection/baseline?horizon_months=;
+// anything other than 12, 60 or 120 is 422 invalid_horizon. Default 12.
+export type HorizonMonths = 12 | 60 | 120;
+
+export interface EvaluateRequest {
+  inputs: Record<string, unknown>;
+  horizon_months?: HorizonMonths;
+}
+
 // A code-generated alternative: merge `patch` into the module inputs and re-submit /evaluate.
 export interface Suggestion {
   id: string;

@@ -33,6 +33,7 @@ from ..models import (
 )
 
 from ..profile import store
+from .routes_profile import check_horizon
 
 log = logging.getLogger(__name__)
 
@@ -89,6 +90,7 @@ def list_decisions() -> list[DecisionSummary]:
 @router.post("/{decision_id}/evaluate", response_model=EvaluateResponse)
 def evaluate(decision_id: str, body: EvaluateRequest) -> EvaluateResponse:
     mod = _module(decision_id)
+    check_horizon(body.horizon_months)
     try:
         return run_evaluate(mod, body.inputs, store.get_profile())
     except InvalidInputs as e:

@@ -22,7 +22,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 | Session | Branch | Phase | Last merged to main | Blocked on | Updated |
 |---------|--------|-------|---------------------|------------|---------|
 | A llm | a/p6-p7 | P6 | — | A-P3, C | — |
-| B wire | b/p4-live | P4 live | Stress + Action pages, live connect/profile/baseline verified @ 2026-10-24 | A-P3 (evaluate), then A-P6/P7 for real explain/stress/action | 2026-10-24 |
+| B wire | b/p4-live | P4 live | Compare verified on real /evaluate @ 2026-10-24 (98b5e63) | A-P6/P7 for real explain/stress/action | 2026-10-24 |
 | D plaid | d/p8-plaid | P8 | — | A-P1 | — |
 
 ## Wave 3 — from roughly hour 14
@@ -81,7 +81,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 - The app only restores a profile on refresh after this tab has gone through Connect (sessionStorage flag), because the local backend serves `/api/profile` before any connect and the demo must start on the Connect button.
 - Overview lists one-offs dated on/after `as_of` as upcoming and summarizes earlier `detected` ones in a footnote.
 - Action page: printable card, "Copy as text", "Add reminder" (.ics with a 3-day alarm, only when `deadline` is set), "Talk to a human" hidden when `talk_to_human_url` is null.
-- Remaining for B: re-verify Compare once A-P3's real `/evaluate` lands (option ids and `PriceEstimate.source_*` drive badges), then Stress/Action once A-P6/P7 land. No frontend code change is expected for the swap.
+- Compare verified against real `/evaluate` with the §8 inputs: ids/statuses, constraint badges, Jan+Feb below-floor bands, "Estimate · source" badges (full source title in tooltip). Deductible flag summary reads the engine's `claim_date`/`min_balance_cents` keys as well as the fixture keys. Remaining: re-verify Stress/Action once A-P6/P7 land.
 
 ## Session C notes (P5 RAG)
 

@@ -22,7 +22,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 | Session | Branch | Phase | Last merged to main | Blocked on | Updated |
 |---------|--------|-------|---------------------|------------|---------|
 | A llm | a/p6-p7 | done | P6 + P7 @ 2026-10-24 (explain/stress/action live; CI green) | — | 2026-10-24 |
-| B wire | b/p4-live | P4 live | Compare verified on real /evaluate @ 2026-10-24 (98b5e63) | A-P6/P7 for real explain/stress/action | 2026-10-24 |
+| B wire | b/p4-live | P4 live | All pages verified on live explain/stress/action @ 2026-10-24 (528e997) | — | 2026-10-24 |
 | D plaid | d/p8-plaid | P8 | — | A-P1 | — |
 
 ## Wave 3 — from roughly hour 14
@@ -139,3 +139,11 @@ Fixtures were remapped to these ids in contract commit 1d0b65c.
 - Plan: free tier spins down after idle (cold start ~1 min). Use a paid instance on demo day (SPEC §13).
 - `[VERIFY]` blueprint keys couldn't be checked against render.com from the build sandbox. `autoDeployTrigger: commit` is the current key (it replaces the older `autoDeploy: true`). If Render rejects it, use `autoDeploy: true`. `checksPass` would wait for GitHub Actions before deploying; this is worth switching to.
 - Optional: set the deployed URL as repo variable for the §15.5 `deploy-smoke` job.
+
+## Session B summary (P4 live complete)
+
+1. All five pages verified end to end against the live backend with the real key (`LLM_FAKE=0`): evaluate, explain, stress, action all 200; full flow ~53s in headless Chrome, no console errors. 502 `llm_unavailable` states verified by intercepting each LLM endpoint.
+2. `/explain` is prefetched the moment `/evaluate` returns (store action `prefetchExplanations`, keyed by `eval_id`, ignores stale responses), so Compare shows the explanation as soon as it exists; the Compare effect only re-triggers on a direct landing or Retry.
+3. Every LLM-backed panel has a skeleton and a plain-language error with Retry (`friendlyError` maps 502/504/`llm_unavailable` and expired `eval_id`). Action requests are deduped per (eval, option) so StrictMode remounts don't double-call.
+4. Stress flag lists dedupe below_floor/negative pairs and collapse past 6 rows ("Show N more").
+5. For A, cosmetic only: LLM prose on Stress/Compare sometimes uses raw ids (`std_limited_1000`, `deductible_unaffordable`); the explainer/critique prompts could ask for option labels instead.

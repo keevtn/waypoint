@@ -21,7 +21,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 
 | Session | Branch | Phase | Last merged to main | Blocked on | Updated |
 |---------|--------|-------|---------------------|------------|---------|
-| A llm | a/import | in progress | P6 + P7 @ 2026-10-24; labels fix; S1 rent module; eval cache sqlite; S2 big_purchase module + suggestions @ 2026-10-25 ~03:30; scenario labels in stress prose; projection-derived status flags + flag labels; PUT /profile full edit; 12/60/120-month horizons; CSV import @ 2026-10-25 09:35 | — | 2026-10-25 |
+| A llm | a/import | done | P6 + P7 @ 2026-10-24; labels fix; S1 rent module; eval cache sqlite; S2 big_purchase module + suggestions @ 2026-10-25 ~03:30; scenario labels in stress prose; projection-derived status flags + flag labels; PUT /profile full edit; 12/60/120-month horizons; CSV import + product lookup @ 2026-10-25 09:40 | — | 2026-10-25 |
 | B wire | b/p4-live | P4 live | All pages verified on live explain/stress/action @ 2026-10-24 (528e997) | — | 2026-10-24 |
 | D plaid | d/p8-plaid | P8 | — | A-P1 | — |
 
@@ -69,6 +69,13 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 ## Session A note: evaluation cache persisted to sqlite (merged to main)
 
 `decisions/cache.py` now writes every evaluation through to a sqlite table (`evaluations` in `config.DB_PATH`, default `backend/waypoint.db`, already gitignored; override with `DB_PATH`) and reads it back on an in-memory miss, so a restart or redeploy between `/evaluate` and `/explain|/stress|/action` no longer yields 404 `unknown_eval`. TTL stays 1h in both layers (expired rows are evicted on every put/get). Rows are pydantic JSON dumps rehydrated through the module's `InputModel`; a row that no longer validates (contract change) or whose module is gone is treated as a miss. If the file cannot be created (read-only disk) the cache logs once and runs memory-only. Tests use a temp `DB_PATH` (`tests/conftest.py`). **Render: the disk is ephemeral per deploy, so this covers restarts within a deploy, not across deploys, unless a persistent disk is mounted and `DB_PATH` points at it.**
+
+## Session A note: POST /api/products/lookup (merged to main)
+
+- Body `{url}`; returns `ProductLookupResponse {name, price_cents, currency, source_url, image_url, confidence, note}`. Server-side fetch: http(s) only, 6 s timeout, 1 MB cap, up to 3 redirects, SSRF guard (host resolved; private / loopback / link-local / metadata addresses rejected on every hop). Parse order: JSON-LD `@type: Product` (`confidence: "high"`), Open Graph `og:title` / `product:price:amount` / `og:image` (`"low"`), `<title>` + price regex (`"low"`), else `"none"` with a note. Non-USD: `currency` set, `price_cents` null, note says to enter the USD amount.
+- Errors in the envelope: `400 invalid_url` (not http/https, no host), `400 blocked_url` (private address), `502 fetch_failed` / `502 unreachable`. The LLM is not involved; every number comes from the page.
+- **B:** on the big-purchase form, a "Paste a product link" field -> POST, then prefill `name` and `amount_cents` from `price_cents` when non-null; show `note` when present; `confidence: "low"` deserves a "check this" hint. `source_url` is what the page redirected to.
+- Tests use saved HTML under `backend/tests/html/` with the fetch monkeypatched; real sites were not exercised in CI.
 
 ## Session A note: POST /api/bank/import_csv (merged to main)
 

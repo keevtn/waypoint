@@ -7,7 +7,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import config
-from .api import routes_bank, routes_decisions, routes_profile, routes_rag
+from .api import routes_bank, routes_decisions, routes_products, routes_profile, routes_rag
 from .models import HealthResponse
 from .rag.index import index_chunk_count
 
@@ -41,6 +41,7 @@ def health() -> HealthResponse:
 # One include_router line per router file; each session adds only its own (SPEC.md §15.3).
 app.include_router(routes_bank.router)
 app.include_router(routes_decisions.router)
+app.include_router(routes_products.router)
 app.include_router(routes_profile.router)
 app.include_router(routes_rag.router)
 

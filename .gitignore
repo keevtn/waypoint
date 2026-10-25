@@ -14,3 +14,5 @@ frontend/dist/
 .DS_Store
 .env
 .cache/
+backend/CACHEDIR.TAG
+backend/models--*/

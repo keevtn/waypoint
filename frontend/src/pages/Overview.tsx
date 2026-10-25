@@ -41,15 +41,13 @@ export default function Overview() {
       <section className="mx-auto max-w-2xl py-10">
         <h1 className="text-2xl font-semibold tracking-tight">Decide with your real cash flow, not a guess.</h1>
         <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
-          Connect a checking account and we build a 12-month projection from your actual income, bills, and spending.
-          Then test a real decision, like insuring a car you just financed, against it. Every number is computed; every
-          fact is cited.
+          Connect a checking account to get a 12-month projection from your income, bills, and spending, then test a decision against it.
         </p>
         <div className="mt-6 flex items-center gap-3">
           <Button onClick={connect} disabled={connecting}>
             {connecting ? "Connecting…" : "Connect your bank"}
           </Button>
-          <span className="text-xs text-slate-500">Demo bank · Plaid sandbox</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400">Demo bank · Plaid sandbox</span>
         </div>
         {connecting && (
           <div className="mt-6 space-y-3">
@@ -65,15 +63,15 @@ export default function Overview() {
         <ul className="mt-10 grid gap-3 text-sm text-slate-600 dark:text-slate-300 sm:grid-cols-3">
           <li className="rounded-md border border-slate-200 p-3 dark:border-slate-800">
             <div className="font-medium text-slate-900 dark:text-slate-100">Numbers come from code</div>
-            Projections, flags, and deductible math are deterministic. The AI never invents a figure.
+            The model never produces a figure you act on.
           </li>
           <li className="rounded-md border border-slate-200 p-3 dark:border-slate-800">
             <div className="font-medium text-slate-900 dark:text-slate-100">Facts come with sources</div>
-            Every claim about coverage, law, or lenders links to a public regulator or non-profit source.
+            Every claim links to a regulator or non-profit page.
           </li>
           <li className="rounded-md border border-slate-200 p-3 dark:border-slate-800">
             <div className="font-medium text-slate-900 dark:text-slate-100">No carrier, no bank</div>
-            We recommend a coverage configuration, then send you to get quotes from people.
+            You get a configuration, not a product.
           </li>
         </ul>
       </section>
@@ -89,7 +87,7 @@ export default function Overview() {
       <header className="flex flex-wrap items-end justify-between gap-2">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Your cash flow</h1>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             {institution ?? "Demo bank · Plaid sandbox"} · as of {fmtDate(profile.as_of)}
           </p>
         </div>
@@ -107,7 +105,7 @@ export default function Overview() {
             label="Monthly slack"
             value={fmtCents(profile.monthly_slack_cents)}
             tone={profile.monthly_slack_cents < 0 ? "danger" : "ok"}
-            sub="Income minus bills minus typical spending"
+            sub="Income minus bills and typical spending"
           />
         </Card>
         <Card>
@@ -135,7 +133,7 @@ export default function Overview() {
                   <Dot tone={confidenceTone(s.confidence)} className="mt-1.5" />
                   <div>
                     <div className="font-medium">{s.label}</div>
-                    <div className="text-xs text-slate-500">
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
                       {fmtCadence(s.cadence)} · next {fmtDate(s.next_date)}
                     </div>
                   </div>
@@ -156,14 +154,14 @@ export default function Overview() {
 
         <Card title="Upcoming one-time costs" className="lg:col-span-1">
           {upcoming.length === 0 ? (
-            <p className="text-sm text-slate-500">None on file.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">None.</p>
           ) : (
             <ul className="divide-y divide-slate-100 dark:divide-slate-800">
               {upcoming.map((o) => (
                 <li key={o.id} className="flex items-start justify-between gap-3 py-2 text-sm">
                   <div>
                     <div className="font-medium">{o.label}</div>
-                    <div className="text-xs text-slate-500">
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
                       {fmtDate(o.date)} ·{" "}
                       <Badge tone="neutral" className="align-middle">
                         {o.source === "user" ? "You added" : o.source === "module" ? "From decision" : "Detected"}
@@ -176,9 +174,8 @@ export default function Overview() {
             </ul>
           )}
           {past.length > 0 && (
-            <p className="mt-2 text-xs text-slate-500">
-              <span className="tabular">{past.length}</span> past one-time {past.length === 1 ? "cost" : "costs"} detected in your history (
-              {past.map((o) => o.label).join(", ")}); already reflected in your balance.
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+              <span className="tabular">{past.length}</span> past one-time {past.length === 1 ? "cost" : "costs"} ({past.map((o) => o.label).join(", ")}) already in your balance.
             </p>
           )}
         </Card>
@@ -188,7 +185,7 @@ export default function Overview() {
         title="12-month baseline"
         aside={
           baseline && (
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-slate-500 dark:text-slate-400">
               Lowest point <span className="tabular font-medium text-slate-700 dark:text-slate-200">{fmtCents(baseline.min_balance_cents)}</span> on{" "}
               {fmtDate(baseline.min_balance_date)}
             </span>
@@ -197,7 +194,7 @@ export default function Overview() {
       >
         {baseline ? (
           <ProjectionChart
-            series={[{ id: BASELINE_KEY, label: "Baseline (no new commitment)", result: baseline }]}
+            series={[{ id: BASELINE_KEY, label: "Baseline", result: baseline }]}
             selectedId={BASELINE_KEY}
             floorCents={profile.safety_floor_cents}
             height={260}
@@ -205,14 +202,14 @@ export default function Overview() {
         ) : (
           <Skeleton className="h-[260px]" />
         )}
-        <p className="mt-3 text-xs text-slate-500">
-          End-of-month balance assuming your detected income, bills, one-time costs, and average variable spending continue.
+        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+          End-of-month balance if your income, bills, one-time costs, and typical spending continue.
         </p>
       </Card>
 
       <div className="flex justify-end">
         <Link to="/moment" className="text-sm font-medium text-accent hover:underline dark:text-accent-light">
-          Next: pick a decision to test against this →
+          Pick a decision to test against this
         </Link>
       </div>
     </section>
@@ -226,7 +223,7 @@ function RecurringRow({ item }: { item: RecurringItem }) {
         <Dot tone={confidenceTone(item.confidence)} className="mt-1.5" />
         <div>
           <div className="font-medium">{item.label}</div>
-          <div className="text-xs text-slate-500">
+          <div className="text-xs text-slate-500 dark:text-slate-400">
             {fmtCadence(item.cadence)} · next {fmtDate(item.next_date)} · {fmtPct(item.confidence)} confident
           </div>
         </div>
@@ -238,7 +235,7 @@ function RecurringRow({ item }: { item: RecurringItem }) {
 
 function ConfidenceLegend() {
   return (
-    <span className="flex items-center gap-2 text-[11px] text-slate-500">
+    <span className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
       <span className="flex items-center gap-1">
         <Dot tone="ok" /> high
       </span>
@@ -289,18 +286,21 @@ function FloorEditor({ profile, onSaved }: { profile: Profile; onSaved: (p: Prof
         label="Safety floor"
         value={fmtCents(profile.safety_floor_cents)}
         sub={
-          <button type="button" onClick={() => setEditing(true)} className="text-accent hover:underline dark:text-accent-light">
-            Edit the balance you never want to drop below
-          </button>
+          <>
+            The balance you never want to drop below.{" "}
+            <button type="button" onClick={() => setEditing(true)} className="text-accent hover:underline dark:text-accent-light">
+              Edit
+            </button>
+          </>
         }
       />
     );
   }
   return (
     <form onSubmit={save}>
-      <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Safety floor</div>
+      <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Safety floor</div>
       <div className="mt-1 flex items-center gap-2">
-        <span className="text-sm text-slate-500">$</span>
+        <span className="text-sm text-slate-500 dark:text-slate-400">$</span>
         <input className={inputClass} value={text} onChange={(e) => setText(e.target.value)} inputMode="decimal" autoFocus aria-label="Safety floor in dollars" />
       </div>
       <div className="mt-2 flex gap-2">

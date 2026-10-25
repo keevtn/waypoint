@@ -7,6 +7,13 @@ import { Badge, Dot, type Tone } from "./ui";
 import { StatusBadge, constraintShortLabel } from "./ConstraintBadge";
 
 const KIND_TONE: Record<Constraint["kind"], Tone> = { required: "accent", disallowed: "danger", flag: "warn" };
+const MIN_TEXT: Record<Tone, string> = {
+  neutral: "",
+  accent: "text-accent dark:text-accent-light",
+  warn: "text-warn dark:text-amber-300",
+  danger: "text-danger dark:text-red-300",
+  ok: "text-ok dark:text-green-300",
+};
 
 /** "per month" for recurring prices; "one time" for a lump sum (big-purchase cash option: term_months 0). */
 export function priceCadence(option: Option): string {
@@ -115,18 +122,18 @@ export default function OptionCard({
       onClick={onSelect}
       aria-pressed={selected}
       className={[
-        "w-full rounded-lg border p-4 text-left transition",
+        "w-full rounded-md border p-4 text-left",
         selected
-          ? "border-accent ring-1 ring-accent dark:border-accent-light dark:ring-accent-light"
+          ? "border-accent ring-1 ring-inset ring-accent dark:border-accent-light dark:ring-accent-light"
           : "border-slate-200 hover:border-slate-400 dark:border-slate-800 dark:hover:border-slate-600",
-        disallowed ? "bg-slate-50 opacity-75 dark:bg-slate-900/50" : "bg-white dark:bg-slate-900",
+        disallowed ? "bg-slate-50 dark:bg-slate-950" : "bg-white dark:bg-slate-900",
       ].join(" ")}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-2">
           {color && <span aria-hidden className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: color }} />}
           <div>
-            <div className={`text-sm font-semibold ${disallowed ? "text-slate-500 line-through decoration-slate-400" : ""}`}>
+            <div className={`text-sm font-semibold ${disallowed ? "text-slate-500 dark:text-slate-400 line-through decoration-slate-400" : ""}`}>
               {option.label}
             </div>
             <div className="mt-1 flex flex-wrap gap-1">
@@ -140,8 +147,10 @@ export default function OptionCard({
           </div>
         </div>
         <div className="shrink-0 text-right">
-          <div className={`tabular text-lg font-semibold ${disallowed ? "text-slate-500" : ""}`}>{fmtCents(option.price.cents)}</div>
-          <div className="text-xs text-slate-500">{priceCadence(option)}</div>
+          <div className={`tabular text-2xl font-semibold leading-none tracking-tightest ${disallowed ? "text-slate-500 dark:text-slate-400" : ""}`}>
+            {fmtCents(option.price.cents)}
+          </div>
+          <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">{priceCadence(option)}</div>
           <div className="mt-1 flex justify-end">
             <PriceBadge price={option.price} />
           </div>
@@ -153,25 +162,29 @@ export default function OptionCard({
       <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
         {describeAttributes(option.attributes).map((row) => (
           <div key={row.label} className="flex justify-between gap-2 border-b border-slate-100 py-0.5 dark:border-slate-800">
-            <dt className="text-slate-500">{row.label}</dt>
+            <dt className="text-slate-500 dark:text-slate-400">{row.label}</dt>
             <dd className="tabular font-medium">{row.value}</dd>
           </div>
         ))}
       </dl>
 
       {projection && (
-        <div className="mt-3 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
-          <Dot tone={minTone} />
-          <span>
-            Lowest point <span className="tabular font-medium">{fmtDollars(projection.min_balance_cents)}</span>
-            {projection.months_below_floor.length > 0 && (
-              <>
-                {" · "}
-                <span className="tabular">{projection.months_below_floor.length}</span>{" "}
-                {projection.months_below_floor.length === 1 ? "month" : "months"} below floor
-              </>
-            )}
-          </span>
+        <div className="mt-3 flex items-end justify-between gap-3 border-t border-slate-100 pt-3 dark:border-slate-800">
+          <div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400">Lowest point</div>
+            <div className={`tabular mt-0.5 flex items-center gap-1.5 text-base font-semibold leading-none ${MIN_TEXT[minTone]}`}>
+              <Dot tone={minTone} />
+              {fmtDollars(projection.min_balance_cents)}
+            </div>
+          </div>
+          {projection.months_below_floor.length > 0 && (
+            <div className="text-right">
+              <div className="text-[11px] text-slate-500 dark:text-slate-400">Below floor</div>
+              <div className="tabular mt-0.5 text-base font-semibold leading-none">
+                {projection.months_below_floor.length} <span className="text-xs font-normal text-slate-500 dark:text-slate-400">{projection.months_below_floor.length === 1 ? "month" : "months"}</span>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </button>

@@ -1,6 +1,6 @@
-// Recharts LineChart: x = month, y = end-of-month balance. Baseline dashed grey; one line per option;
-// floor as a ReferenceLine; months below floor tinted for the selected option; legend toggles lines.
-import { useMemo, useState } from "react";
+// Recharts LineChart: x = month, y = end-of-month balance. Thin lines: baseline dashed in ink, options in
+// accent/ink shades, floor as a hairline, below-floor months as a flat tint. Animates only on data change.
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CartesianGrid,
   Line,
@@ -18,9 +18,9 @@ import { useDarkMode } from "../lib/hooks";
 
 export const BASELINE_KEY = "baseline";
 
-// Validated categorical palettes (dataviz six checks), one per mode. Baseline is a neutral dashed reference line.
-const LIGHT = ["#2f52c9", "#0f8a7a", "#c2410c"];
-const DARK = ["#6b8ae8", "#2aa38f", "#d66a2e"];
+// Option series: accent first, then ink shades. Baseline is dashed ink. Semantic colors stay on flags.
+const LIGHT = ["#0e5a57", "#393631", "#8a8478", "#5aa09b"];
+const DARK = ["#3fa39d", "#dcd8cf", "#8a8478", "#1f7a76"];
 
 export function seriesColor(index: number, dark: boolean): string {
   const p = dark ? DARK : LIGHT;
@@ -54,6 +54,18 @@ export default function ProjectionChart({
 }) {
   const dark = useDarkMode();
   const [hidden, setHidden] = useState<Set<string>>(new Set());
+  // Motion only on data change: the first paint (and container resizes) draw instantly; when the series
+  // themselves change after mount (new evaluation, scenario, suggestion tap) the lines animate once.
+  const signature = series.map((s) => `${s.id}:${s.result.series.length}:${s.result.min_balance_cents}:${s.result.series[s.result.series.length - 1]?.end_balance_cents ?? ""}`).join("|");
+  const prevSignature = useRef(signature);
+  const [animate, setAnimate] = useState(false);
+  useEffect(() => {
+    if (prevSignature.current === signature) return;
+    prevSignature.current = signature;
+    setAnimate(true);
+    const t = setTimeout(() => setAnimate(false), 600);
+    return () => clearTimeout(t);
+  }, [signature]);
 
   const rows = useMemo<Row[]>(() => {
     const months = new Set<string>();
@@ -74,12 +86,13 @@ export default function ProjectionChart({
   const tinted = selected ? selected.result.months_below_floor.filter((m) => idxOf(m) >= 0) : [];
   const monthAt = (v: unknown) => rows[Number(v)]?.month ?? "";
 
-  const grid = dark ? "#1f2937" : "#e2e8f0";
-  const axis = dark ? "#94a3b8" : "#64748b";
-  const baselineColor = dark ? "#94a3b8" : "#64748b";
-  const floorColor = dark ? "#fbbf24" : "#b45309";
-  const tint = dark ? "rgba(251,191,36,0.10)" : "rgba(180,83,9,0.08)";
-  const negTint = dark ? "rgba(248,113,113,0.12)" : "rgba(185,28,28,0.08)";
+  const grid = dark ? "#252320" : "#ebe8e1";
+  const axis = dark ? "#918b80" : "#787369";
+  const ink = dark ? "#ebe8e1" : "#171614";
+  const baselineColor = ink;
+  const floorColor = dark ? "#c3beb2" : "#4d4942";
+  const tint = dark ? "rgba(252,211,77,0.10)" : "rgba(154,90,0,0.08)";
+  const negTint = dark ? "rgba(252,165,165,0.12)" : "rgba(180,35,24,0.08)";
 
   const colorOf = (id: string): string => {
     if (id === BASELINE_KEY) return baselineColor;
@@ -109,7 +122,7 @@ export default function ProjectionChart({
               if (m && onMonthClick) onMonthClick(m);
             }}
           >
-            <CartesianGrid stroke={grid} vertical={false} />
+            <CartesianGrid stroke={grid} strokeOpacity={0.8} vertical={false} />
             <XAxis
               dataKey="idx"
               type="number"
@@ -134,14 +147,14 @@ export default function ProjectionChart({
               const i = idxOf(m);
               return <ReferenceArea key={m} x1={i - 0.5} x2={i + 0.5} fill={neg ? negTint : tint} stroke="none" />;
             })}
-            <ReferenceLine y={0} stroke={axis} strokeOpacity={0.6} />
-            <ReferenceLine y={floorCents} stroke={floorColor} strokeDasharray="2 4" />
+            <ReferenceLine y={0} stroke={axis} strokeOpacity={0.5} />
+            <ReferenceLine y={floorCents} stroke={floorColor} strokeWidth={1} />
             <Tooltip
               cursor={{ stroke: axis, strokeWidth: 1 }}
               content={({ active, payload, label }) => {
                 if (!active || !payload?.length) return null;
                 return (
-                  <div className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                  <div className="rounded border border-slate-200 bg-white px-3 py-2 text-xs dark:border-slate-700 dark:bg-slate-900">
                     <div className="mb-1 font-medium">{fmtMonth(monthAt(label))}</div>
                     {payload
                       .filter((p) => p.value !== null && p.value !== undefined)
@@ -170,13 +183,15 @@ export default function ProjectionChart({
                   name={s.label}
                   hide={hidden.has(s.id)}
                   stroke={colorOf(s.id)}
-                  strokeWidth={isSel ? 2.5 : 2}
-                  strokeDasharray={isBase ? "6 4" : undefined}
-                  strokeOpacity={selectedId && !isSel && !isBase ? 0.55 : 1}
-                  dot={{ r: 3, strokeWidth: 0, fill: colorOf(s.id) }}
-                  activeDot={{ r: 5, stroke: dark ? "#0f172a" : "#ffffff", strokeWidth: 2 }}
+                  strokeWidth={isSel ? 2 : isBase ? 1 : 1.25}
+                  strokeDasharray={isBase ? "4 4" : undefined}
+                  strokeOpacity={selectedId && !isSel && !isBase ? 0.6 : 1}
+                  dot={false}
+                  activeDot={{ r: 3.5, stroke: dark ? "#171614" : "#fbfaf7", strokeWidth: 1.5 }}
                   connectNulls
-                  isAnimationActive={false}
+                  isAnimationActive={animate}
+                  animationDuration={450}
+                  animationEasing="ease-out"
                 />
               );
             })}
@@ -198,22 +213,19 @@ export default function ProjectionChart({
             >
               <span
                 aria-hidden
-                className="inline-block h-0.5 w-4"
-                style={{
-                  background: isBase ? "transparent" : colorOf(s.id),
-                  borderTop: isBase ? `2px dashed ${colorOf(s.id)}` : undefined,
-                }}
+                className="inline-block w-4"
+                style={{ borderTop: isBase ? `1px dashed ${colorOf(s.id)}` : `2px solid ${colorOf(s.id)}` }}
               />
               {s.label}
             </button>
           );
         })}
-        <span className="ml-auto flex items-center gap-1.5 text-slate-500">
-          <span aria-hidden className="inline-block w-4" style={{ borderTop: `2px dotted ${floorColor}` }} />
+        <span className="ml-auto flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+          <span aria-hidden className="inline-block w-4" style={{ borderTop: `1px solid ${floorColor}` }} />
           Floor {fmtDollars(floorCents)}
         </span>
-        <span className="flex items-center gap-1.5 text-slate-500">
-          <span aria-hidden className="inline-block h-3 w-3 rounded-sm" style={{ background: tint, border: `1px solid ${floorColor}` }} />
+        <span className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+          <span aria-hidden className="inline-block h-3 w-3 rounded-sm" style={{ background: dark ? "rgba(252,211,77,0.25)" : "rgba(154,90,0,0.18)" }} />
           Below floor
         </span>
       </div>

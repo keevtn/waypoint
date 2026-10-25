@@ -77,7 +77,7 @@ export default function Action() {
       <header className="flex flex-wrap items-end justify-between gap-2 print:hidden">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Your next action</h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             {decisionId === "rent"
               ? "A unit and a plan, not a landlord's pitch. Get everything in writing before you pay."
               : decisionId === "big_purchase"
@@ -89,7 +89,7 @@ export default function Action() {
           {choosable.length > 1 && (
             <select
               aria-label="Chosen option"
-              className="rounded-md border border-slate-300 bg-white px-2 py-2 text-sm dark:border-slate-700 dark:bg-slate-950"
+              className="rounded border border-slate-300 bg-white px-2 py-2 text-sm dark:border-slate-700 dark:bg-slate-950"
               value={option.id}
               onChange={(e) => selectOption(e.target.value)}
             >
@@ -114,23 +114,23 @@ export default function Action() {
         </div>
       </header>
 
-      <article className="mx-auto max-w-3xl rounded-lg border border-slate-200 bg-white p-6 shadow-sm print:border-0 print:shadow-none dark:border-slate-800 dark:bg-slate-900">
+      <article className="mx-auto max-w-3xl rounded-md border border-slate-200 bg-white p-6 print:border-0 print:shadow-none dark:border-slate-800 dark:bg-slate-900">
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
           <div>
-            <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Chosen configuration</div>
+            <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Chosen configuration</div>
             <div className="mt-1 text-lg font-semibold">{option.label}</div>
             <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600 dark:text-slate-300">
               {describeAttributes(option.attributes).map((r) => (
                 <div key={r.label} className="flex gap-1">
-                  <dt className="text-slate-500">{r.label}</dt>
+                  <dt className="text-slate-500 dark:text-slate-400">{r.label}</dt>
                   <dd className="tabular font-medium">{r.value}</dd>
                 </div>
               ))}
             </dl>
           </div>
-          <div className="text-right">
-            <div className="tabular text-xl font-semibold">{fmtCents(option.price.cents)}</div>
-            <div className="text-xs text-slate-500">{priceCadence(option)}</div>
+          <div className="ml-auto text-right">
+            <div className="tabular text-2xl font-semibold leading-none tracking-tightest">{fmtCents(option.price.cents)}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">{priceCadence(option)}</div>
             <div className="mt-1 flex justify-end">
               <PriceBadge price={option.price} />
             </div>
@@ -153,7 +153,7 @@ export default function Action() {
             <Skeleton className="h-6 w-3/4" />
             <SkeletonLines n={5} />
             <SkeletonLines n={3} />
-            <p className="text-xs text-slate-400">Writing your action card{loading ? "…" : ""}</p>
+            <p className="text-xs text-slate-400">Writing the card{loading ? "…" : ""}</p>
           </div>
         )}
 
@@ -164,21 +164,19 @@ export default function Action() {
             </h2>
 
             {card.deadline && (
-              <div className="mt-3 inline-flex items-baseline gap-2 rounded-md border border-warn/40 bg-amber-50 px-3 py-1.5 text-sm dark:bg-amber-950/40">
-                <span className="text-xs font-medium uppercase tracking-wide text-warn">Deadline</span>
-                <span className="tabular font-semibold">{fmtDate(card.deadline)}</span>
-                {card.deadline_reason && <span className="text-xs text-slate-600 dark:text-slate-300">{card.deadline_reason}</span>}
+              <div className="mt-4 border-l-2 border-warn pl-3 dark:border-amber-300">
+                <div className="text-[11px] text-slate-500 dark:text-slate-400">Deadline</div>
+                <div className="tabular text-xl font-semibold leading-none">{fmtDate(card.deadline)}</div>
+                {card.deadline_reason && <div className="mt-1 text-xs text-slate-600 dark:text-slate-300">{card.deadline_reason}</div>}
               </div>
             )}
 
             <section className="mt-6">
-              <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">Next steps</h3>
+              <h3 className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-400">Next steps</h3>
               <ol className="space-y-2">
                 {card.steps.map((s, i) => (
                   <li key={i} className="flex gap-3 text-sm leading-6">
-                    <span className="tabular flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-semibold text-accent dark:bg-slate-800 dark:text-accent-light">
-                      {i + 1}
-                    </span>
+                    <span className="tabular w-5 shrink-0 pt-px text-xs font-medium text-slate-500 dark:text-slate-400">{i + 1}</span>
                     <span>
                       <CitedText text={s} citations={card.citations} />
                     </span>
@@ -189,7 +187,7 @@ export default function Action() {
 
             {card.questions_to_ask.length > 0 && (
               <section className="mt-6">
-                <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">Questions to ask an agent</h3>
+                <h3 className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-400">Questions to ask</h3>
                 <ul className="space-y-1.5">
                   {card.questions_to_ask.map((q, i) => (
                     <li key={i} className="flex gap-2 text-sm leading-6">
@@ -226,7 +224,7 @@ export default function Action() {
 
             {card.citations.length > 0 && (
               <section className="mt-6 border-t border-slate-100 pt-3 dark:border-slate-800">
-                <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">Sources</h3>
+                <h3 className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">Sources</h3>
                 <ol className="space-y-1 text-xs">
                   {card.citations.map((c, i) => (
                     <li key={c.chunk_id} className="flex items-start gap-2">
@@ -253,10 +251,10 @@ export default function Action() {
       </article>
 
       <div className="flex justify-between print:hidden">
-        <Link to="/stress" className="text-sm text-slate-500 hover:underline">
+        <Link to="/stress" className="text-sm text-slate-500 dark:text-slate-400 hover:underline">
           Back to stress test
         </Link>
-        <Link to="/" className="text-sm text-slate-500 hover:underline">
+        <Link to="/" className="text-sm text-slate-500 dark:text-slate-400 hover:underline">
           Start over
         </Link>
       </div>

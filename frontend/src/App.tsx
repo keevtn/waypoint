@@ -69,30 +69,20 @@ export default function App() {
                   aria-disabled={!enabled}
                   onClick={(e) => !enabled && e.preventDefault()}
                   className={[
-                    "flex items-center gap-2 rounded-md px-2 py-1",
+                    "flex items-center gap-1.5 rounded px-2 py-1",
                     active ? "font-medium text-accent dark:text-accent-light" : done ? "text-slate-700 dark:text-slate-200" : "text-slate-400",
                     enabled ? "hover:bg-slate-100 dark:hover:bg-slate-800" : "cursor-default",
                   ].join(" ")}
                 >
-                  <span
-                    className={`tabular flex h-5 w-5 items-center justify-center rounded-full border text-[11px] ${
-                      active
-                        ? "border-accent bg-accent text-white dark:border-accent-light dark:bg-accent-light"
-                        : done
-                          ? "border-accent text-accent dark:border-accent-light dark:text-accent-light"
-                          : "border-slate-300 dark:border-slate-700"
-                    }`}
-                  >
-                    {i + 1}
-                  </span>
+                  <span className="tabular text-[11px]">{i + 1}</span>
                   <span className="hidden sm:inline">{s.label}</span>
-                  {i < STEPS.length - 1 && <span aria-hidden className="ml-1 h-px w-4 bg-slate-300 dark:bg-slate-700" />}
+                  {i < STEPS.length - 1 && <span aria-hidden className="ml-2 h-3 w-px bg-slate-300 dark:bg-slate-700" />}
                 </NavLink>
               );
             })}
           </nav>
           {profile && (
-            <span className="ml-auto hidden text-xs text-slate-500 md:inline">
+            <span className="ml-auto hidden text-xs text-slate-500 dark:text-slate-400 md:inline">
               Demo bank · Plaid sandbox
             </span>
           )}
@@ -107,9 +97,10 @@ export default function App() {
           <Route path="/action" element={<Action />} />
         </Routes>
       </main>
-      <footer className="border-t border-slate-200 px-4 py-3 text-center text-xs text-slate-500 dark:border-slate-800">
-        Estimates and educational information, not financial advice. Numbers are computed from your transactions; facts
-        are cited.
+      <footer className="border-t border-slate-200 dark:border-slate-800">
+        <div className="mx-auto max-w-6xl px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
+          Estimates and educational information, not financial advice. Numbers are computed from your transactions; facts are cited.
+        </div>
       </footer>
     </div>
   );

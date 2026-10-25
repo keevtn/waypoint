@@ -11,7 +11,7 @@ export default function CitationChip({ citation, index }: { citation: Citation; 
       target="_blank"
       rel="noopener noreferrer"
       title={tip}
-      className="inline-flex max-w-full items-center gap-1 rounded border border-accent/30 bg-accent-soft px-1.5 py-0.5 align-baseline text-[11px] font-medium leading-4 text-accent hover:bg-accent/10 dark:border-accent-light/40 dark:bg-slate-800 dark:text-accent-light"
+      className="inline-flex max-w-full items-center gap-1 rounded-sm border border-slate-300 bg-slate-50 px-1.5 py-0.5 align-baseline text-[11px] font-medium leading-4 text-slate-700 hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
     >
       {index !== undefined && <span className="tabular">[{index}]</span>}
       <span className="truncate">{citation.publisher}</span>

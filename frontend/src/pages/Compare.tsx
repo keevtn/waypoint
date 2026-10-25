@@ -21,15 +21,20 @@ export default function Compare() {
     useAppState();
   const [applyingId, setApplyingId] = useState<string | null>(null);
   const [applyError, setApplyError] = useState<string | null>(null);
+  // The suggestion the user tapped, with the list it came from, so the panel can keep showing it as "Applied"
+  // after the re-evaluation (which usually no longer needs to suggest anything).
+  const [applied, setApplied] = useState<{ id: string; evalId: string; suggestions: Suggestion[] } | null>(null);
 
   /** Merge a suggestion's patch into the inputs and re-run /evaluate; the new options replace the current ones. */
   const applySuggestion = async (s: Suggestion) => {
     if (!inputs || applyingId) return;
     const next = applySuggestionPatch(inputs, s);
+    const from = evaluation?.suggestions ?? [];
     setApplyingId(s.id);
     setApplyError(null);
     try {
       const result = await api.evaluate(next.decisionId, next.inputs);
+      setApplied({ id: s.id, evalId: result.eval_id, suggestions: from });
       const st = useAppState.getState();
       st.setInputs(next);
       st.setEvaluation(result);
@@ -88,7 +93,7 @@ export default function Compare() {
       <header className="flex flex-wrap items-end justify-between gap-2">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Compare options</h1>
-          {inputs && <p className="text-xs text-slate-500">{inputsSummary(inputs)}</p>}
+          {inputs && <p className="text-xs text-slate-500 dark:text-slate-400">{inputsSummary(inputs)}</p>}
         </div>
         <div className="flex gap-2">
           <Link to="/moment">
@@ -117,7 +122,7 @@ export default function Compare() {
               }}
             />
           ))}
-          <p className="px-1 text-xs text-slate-500">
+          <p className="px-1 text-xs text-slate-500 dark:text-slate-400">
             {priceFootnote(decisionId)}
           </p>
         </div>
@@ -127,7 +132,7 @@ export default function Compare() {
             title="12-month projection"
             aside={
               selectedProjection && (
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-slate-500 dark:text-slate-400">
                   {selected?.label}: lowest point{" "}
                   <span className={`tabular font-medium ${selectedProjection.min_balance_cents < 0 ? "text-danger" : selectedProjection.min_balance_cents < floor ? "text-warn" : "text-ok"}`}>
                     {fmtCents(selectedProjection.min_balance_cents)}
@@ -154,7 +159,14 @@ export default function Compare() {
       </div>
 
       {applyError && <ErrorNote message={applyError} />}
-      <SuggestionsPanel suggestions={evaluation.suggestions ?? []} options={options} floorCents={floor} applyingId={applyingId} onApply={applySuggestion} />
+      <SuggestionsPanel
+        suggestions={applied && applied.evalId === evaluation.eval_id ? applied.suggestions : (evaluation.suggestions ?? [])}
+        options={options}
+        floorCents={floor}
+        applyingId={applyingId}
+        appliedId={applied && applied.evalId === evaluation.eval_id ? applied.id : null}
+        onApply={applySuggestion}
+      />
 
       {selected &&
         (explainLoading && explanations === null ? (

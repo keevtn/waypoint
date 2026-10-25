@@ -36,6 +36,8 @@ export function constraintShortLabel(c: Constraint): string {
   if (/rent_30pct_standard/i.test(c.id)) return "30% standard";
   if (/rent_30/i.test(c.id)) return "Over 30% of income";
   if (/move_in/i.test(c.id)) return "Move-in cash";
+  if (/^negative_/i.test(c.id)) return "Goes negative";
+  if (/^below_floor_/i.test(c.id)) return "Below floor";
   if (/low_slack/i.test(c.id)) return "Little slack";
   if (/interest/i.test(c.id)) return "Interest cost";
   if (/minimum|state/i.test(c.id)) return "State minimum";

@@ -41,7 +41,7 @@ export default function AskWithSources({ module }: { module: string | null }) {
   };
 
   return (
-    <Card title="Ask with sources" aside={<span className="text-xs text-slate-400">Answers only from cited public sources</span>}>
+    <Card title="Ask with sources" aside={<span className="text-xs text-slate-400">Cited public sources only</span>}>
       <form onSubmit={onSubmit} className="flex gap-2">
         <input
           className={inputClass}
@@ -69,7 +69,7 @@ export default function AskWithSources({ module }: { module: string | null }) {
               setQ(s);
               void ask(s);
             }}
-            className="rounded-full border border-slate-200 px-2.5 py-0.5 text-xs text-slate-600 hover:border-slate-400 dark:border-slate-700 dark:text-slate-300"
+            className="rounded border border-slate-200 px-2.5 py-0.5 text-xs text-slate-600 hover:border-slate-400 dark:border-slate-700 dark:text-slate-300"
           >
             {s}
           </button>
@@ -78,7 +78,7 @@ export default function AskWithSources({ module }: { module: string | null }) {
 
       {asked && (
         <div className="mt-4">
-          <div className="mb-1.5 text-xs text-slate-500">You asked: {asked}</div>
+          <div className="mb-1.5 text-xs text-slate-500 dark:text-slate-400">You asked: {asked}</div>
           {loading && (
             <div className="rounded-md border border-slate-200 p-3 dark:border-slate-800">
               <SkeletonLines n={2} />
@@ -87,7 +87,7 @@ export default function AskWithSources({ module }: { module: string | null }) {
           {error && <ErrorNote message={error} />}
           {result && result.refusal && (
             <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
-              <div className="mb-0.5 text-xs font-medium uppercase tracking-wide text-slate-500">Not answered</div>
+              <div className="mb-0.5 text-xs font-medium text-slate-500 dark:text-slate-400">Not answered</div>
               {result.refusal}
             </div>
           )}
@@ -95,7 +95,7 @@ export default function AskWithSources({ module }: { module: string | null }) {
             <div className="rounded-md border border-slate-200 p-3 text-sm leading-6 dark:border-slate-800">
               <CitedText text={result.answer} citations={result.citations} />
               {result.citations.length > 0 && (
-                <div className="mt-2 flex flex-wrap items-center gap-1.5 border-t border-slate-100 pt-2 text-xs text-slate-500 dark:border-slate-800">
+                <div className="mt-2 flex flex-wrap items-center gap-1.5 border-t border-slate-100 pt-2 text-xs text-slate-500 dark:text-slate-400 dark:border-slate-800">
                   <span>Sources:</span>
                   {result.citations.map((c, i) => (
                     <CitationChip key={c.chunk_id} citation={c} index={i + 1} />

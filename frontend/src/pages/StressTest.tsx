@@ -22,9 +22,9 @@ const TEMPLATE_LABEL: Record<string, string> = {
 };
 
 const SHIFT: Record<RecommendationShift, { label: string; tone: Tone; blurb: string }> = {
-  stay: { label: "Stay with it", tone: "ok", blurb: "The case against did not find a scenario that breaks this option." },
-  reconsider: { label: "Reconsider", tone: "warn", blurb: "At least one realistic scenario breaks this option. Weigh the case against before committing." },
-  switch: { label: "Switch", tone: "danger", blurb: "A different option holds up better under the scenarios that matter for you." },
+  stay: { label: "Stay with it", tone: "ok", blurb: "No scenario breaks this option." },
+  reconsider: { label: "Reconsider", tone: "warn", blurb: "At least one realistic scenario breaks this option." },
+  switch: { label: "Switch", tone: "danger", blurb: "Another option holds up better under these scenarios." },
 };
 
 /** Human summary of scenario params; amounts are already computed by the backend. */
@@ -101,8 +101,8 @@ export default function StressTest() {
       <header className="flex flex-wrap items-end justify-between gap-2">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Try to break my plan</h1>
-          <p className="text-sm text-slate-500">
-            The AI picks three scenarios tailored to your cash flow. The projection engine runs them; the AI then argues against your pick.
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Three scenarios chosen for your cash flow, run by the projection engine. The model then argues against your pick.
           </p>
         </div>
         <div className="flex gap-2">
@@ -123,14 +123,14 @@ export default function StressTest() {
               type="button"
               onClick={() => selectOption(o.id)}
               aria-pressed={preferred?.id === o.id}
-              className={`rounded-md border px-3 py-1.5 text-sm ${
+              className={`rounded border px-3 py-1.5 text-sm ${
                 preferred?.id === o.id
                   ? "border-accent bg-accent-soft font-medium text-accent dark:border-accent-light dark:bg-slate-800 dark:text-accent-light"
                   : "border-slate-300 text-slate-700 hover:border-slate-400 dark:border-slate-700 dark:text-slate-200"
               }`}
             >
               {o.label}
-              <span className="tabular ml-2 text-xs text-slate-500">
+              <span className="tabular ml-2 text-xs text-slate-500 dark:text-slate-400">
                 {fmtCents(o.price.cents)}
                 {priceCadence(o) === "per month" ? "/mo" : ""}
               </span>
@@ -181,20 +181,22 @@ export default function StressTest() {
                   type="button"
                   onClick={() => setActiveIdx(i)}
                   aria-pressed={on}
-                  className={`rounded-lg border p-4 text-left transition ${
-                    on ? "border-accent ring-1 ring-accent dark:border-accent-light dark:ring-accent-light" : "border-slate-200 hover:border-slate-400 dark:border-slate-800"
+                  className={`rounded-md border p-4 text-left ${
+                    on ? "border-accent ring-1 ring-inset ring-accent dark:border-accent-light dark:ring-accent-light" : "border-slate-200 hover:border-slate-400 dark:border-slate-800"
                   } bg-white dark:bg-slate-900`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="text-sm font-semibold">{TEMPLATE_LABEL[s.scenario.template_id] ?? s.scenario.template_id}</div>
                     <Badge tone={tone}>{tone === "danger" ? "Goes negative" : tone === "warn" ? "Below floor" : tone === "ok" ? "Holds" : "No run"}</Badge>
                   </div>
-                  <div className="tabular mt-0.5 text-xs text-slate-500">{describeParams(s.scenario)}</div>
+                  <div className="tabular mt-0.5 text-xs text-slate-500 dark:text-slate-400">{describeParams(s.scenario)}</div>
                   <p className="mt-2 text-sm leading-5 text-slate-700 dark:text-slate-300">{s.scenario.rationale}</p>
                   {r && (
-                    <div className="tabular mt-2 text-xs text-slate-500">
-                      Lowest point <span className="font-medium text-slate-700 dark:text-slate-200">{fmtCents(r.min_balance_cents)}</span>
-                      {r.min_balance_date && <> in {fmtMonth(r.min_balance_date.slice(0, 7))}</>}
+                    <div className="mt-3 border-t border-slate-100 pt-2 dark:border-slate-800">
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400">Lowest point{r.min_balance_date && <>, {fmtMonth(r.min_balance_date.slice(0, 7))}</>}</div>
+                      <div className={`tabular mt-0.5 text-xl font-semibold leading-none ${tone === "danger" ? "text-danger dark:text-red-300" : tone === "warn" ? "text-warn dark:text-amber-300" : tone === "ok" ? "text-ok dark:text-green-300" : ""}`}>
+                        {fmtCents(r.min_balance_cents)}
+                      </div>
                     </div>
                   )}
                 </button>
@@ -207,7 +209,7 @@ export default function StressTest() {
               title={active ? `Projection · ${TEMPLATE_LABEL[active.scenario.template_id] ?? active.scenario.template_id}` : "Projection"}
               aside={
                 shownScenario && (
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
                     Lowest point{" "}
                     <span className={`tabular font-medium ${shownScenario.min_balance_cents < 0 ? "text-danger" : shownScenario.min_balance_cents < floor ? "text-warn" : "text-ok"}`}>
                       {fmtCents(shownScenario.min_balance_cents)}
@@ -222,7 +224,7 @@ export default function StressTest() {
                 <Empty>No projection returned for this scenario.</Empty>
               )}
               {!scenarioResult && scenarioBaseline && (
-                <p className="mt-2 text-xs text-slate-500">This scenario was only run against the baseline; the option line shows the plan without the shock.</p>
+                <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">This scenario was only run against the baseline; the option line shows the plan without the shock.</p>
               )}
             </Card>
             <Card title="Flags under this scenario">
@@ -235,7 +237,7 @@ export default function StressTest() {
       )}
 
       {!stress && !loading && !error && (
-        <Empty>Pick the option you are leaning toward above, then let the AI try to break it.</Empty>
+        <Empty>Pick an option above, then run the scenarios.</Empty>
       )}
     </section>
   );
@@ -255,7 +257,7 @@ function CritiquePanel({ critique, optionLabel }: { critique: Critique; optionLa
       <p className="mb-3 text-sm text-slate-600 dark:text-slate-300">{v.blurb}</p>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <h3 className="mb-1 text-xs font-medium uppercase tracking-wide text-danger">Case against</h3>
+          <h3 className="mb-1 text-xs font-medium text-danger">Case against</h3>
           <ul className="space-y-1.5 text-sm">
             {critique.case_against.map((p, i) => (
               <li key={i} className="flex gap-2">
@@ -268,7 +270,7 @@ function CritiquePanel({ critique, optionLabel }: { critique: Critique; optionLa
           </ul>
         </div>
         <div>
-          <h3 className="mb-1 text-xs font-medium uppercase tracking-wide text-ok">Case for</h3>
+          <h3 className="mb-1 text-xs font-medium text-ok">Case for</h3>
           <ul className="space-y-1.5 text-sm">
             {critique.case_for.map((p, i) => (
               <li key={i} className="flex gap-2">
@@ -282,7 +284,7 @@ function CritiquePanel({ critique, optionLabel }: { critique: Critique; optionLa
         </div>
       </div>
       {critique.citations.length > 0 && (
-        <div className="mt-4 flex flex-wrap items-center gap-1.5 border-t border-slate-100 pt-3 text-xs text-slate-500 dark:border-slate-800">
+        <div className="mt-4 flex flex-wrap items-center gap-1.5 border-t border-slate-100 pt-3 text-xs text-slate-500 dark:text-slate-400 dark:border-slate-800">
           <span>Sources:</span>
           {critique.citations.map((c, i) => (
             <CitationChip key={c.chunk_id} citation={c} index={i + 1} />

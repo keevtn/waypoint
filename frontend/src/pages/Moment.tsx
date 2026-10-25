@@ -303,12 +303,12 @@ export default function Moment() {
     <section className="space-y-4">
       <header>
         <h1 className="text-xl font-semibold tracking-tight">What are you deciding?</h1>
-        <p className="text-sm text-slate-500">We run each option through your projection and tell you which months get tight.</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Each option is run through your projection; tight months are flagged.</p>
       </header>
 
       {!profile && (
         <div className="rounded-md border border-warn/40 bg-amber-50 px-3 py-2 text-sm text-warn dark:bg-amber-950/40 dark:text-amber-300">
-          Connect your bank first so the options can be tested against your actual cash flow.{" "}
+          Connect your bank first.{" "}
           <Link to="/" className="font-medium underline">
             Go to Overview
           </Link>
@@ -355,7 +355,7 @@ export default function Moment() {
                   No, I own it outright
                 </Choice>
               </div>
-              <p className="mt-1 text-xs text-slate-500">Lenders usually set coverage requirements for a financed car; we check options against them.</p>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Lenders set coverage requirements for a financed car.</p>
             </fieldset>
 
             {form.financed && (
@@ -371,7 +371,7 @@ export default function Moment() {
             )}
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Deductible you could pay on short notice" hint="If you had a claim next month, what could you cover without borrowing?">
+              <Field label="Deductible you could pay on short notice" hint="What you could cover next month without borrowing.">
                 <DollarInput value={form.deductibleComfort} onChange={(v) => set("deductibleComfort", v)} error={errors.deductibleComfort} />
               </Field>
               <Field label="Registration deadline" hint="Optional. Sets the deadline on your action card.">
@@ -391,7 +391,7 @@ export default function Moment() {
                 </button>
               </div>
               {form.quotes.length === 0 ? (
-                <p className="text-xs text-slate-500">Optional. A real quote replaces our estimate for that configuration.</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Optional. A quote replaces the estimate for that configuration.</p>
               ) : (
                 <ul className="space-y-2">
                   {form.quotes.map((q, i) => (
@@ -416,7 +416,7 @@ export default function Moment() {
             {submitError && <ErrorNote message={submitError} />}
 
             <div className="flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
                 Pennsylvania rules apply. {profile && <>Floor {fmtCents(profile.safety_floor_cents)}.</>}
               </span>
               <Button type="submit" disabled={submitting || !profile}>
@@ -431,15 +431,14 @@ export default function Moment() {
         <Card title="Rent · the units you're weighing">
           <form onSubmit={onSubmit} className="space-y-5" noValidate>
             <p className="text-sm text-slate-600 dark:text-slate-300">
-              Enter {MIN_UNITS} to {MAX_UNITS} places. Staying put is the baseline; each unit is tested as a move, with the deposit and first month due at
-              lease start.
+              Staying put is the baseline. Each unit is tested as a move, with the deposit and first month due at lease start.
             </p>
 
             <ul className="space-y-4">
               {rentForm.units.map((u, i) => (
                 <li key={i} className="rounded-md border border-slate-200 p-3 dark:border-slate-800">
                   <div className="mb-3 flex items-center justify-between gap-2">
-                    <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Unit {i + 1}</span>
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Unit {i + 1}</span>
                     {rentForm.units.length > MIN_UNITS && (
                       <Button type="button" variant="ghost" onClick={() => removeUnit(i)} className="px-2 py-1 text-xs">
                         Remove
@@ -482,7 +481,7 @@ export default function Moment() {
               >
                 Add another unit
               </button>
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
                 {rentForm.units.length} of {MAX_UNITS}
               </span>
             </div>
@@ -501,8 +500,8 @@ export default function Moment() {
             {submitError && <ErrorNote message={submitError} />}
 
             <div className="flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
-              <span className="text-xs text-slate-500">
-                Affordability uses the HUD 30% standard. {profile && <>Floor {fmtCents(profile.safety_floor_cents)}.</>}
+              <span className="text-xs text-slate-500 dark:text-slate-400">
+                HUD 30% standard. {profile && <>Floor {fmtCents(profile.safety_floor_cents)}.</>}
               </span>
               <Button type="submit" disabled={submitting || !profile}>
                 {submitting ? "Running projections…" : "Compare units"}
@@ -516,7 +515,7 @@ export default function Moment() {
         <Card title="Big purchase · what, how much, and when">
           <form onSubmit={onSubmit} className="space-y-5" noValidate>
             <p className="text-sm text-slate-600 dark:text-slate-300">
-              We test paying cash on that date against financing it, and if neither keeps your floor we look for a date or a plan that does.
+              Cash on that date is tested against financing. If neither keeps your floor, a date or a plan that does is suggested.
             </p>
 
             <div className="grid gap-4 sm:grid-cols-3">
@@ -543,9 +542,9 @@ export default function Moment() {
                   Yes, I know the terms
                 </Choice>
               </div>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 {purchase.hasOffer
-                  ? "We use your lender's numbers for the financed plans."
+                  ? "Financed plans use your lender's numbers."
                   : "Without an offer, financed plans use an assumed APR and are marked Estimate."}
               </p>
             </fieldset>
@@ -569,7 +568,7 @@ export default function Moment() {
             {submitError && <ErrorNote message={submitError} />}
 
             <div className="flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
-              <span className="text-xs text-slate-500">Cash vs. financing, against your own projection. {profile && <>Floor {fmtCents(profile.safety_floor_cents)}.</>}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">{profile && <>Floor {fmtCents(profile.safety_floor_cents)}.</>}</span>
               <Button type="submit" disabled={submitting || !profile}>
                 {submitting ? "Running projections…" : "Compare ways to pay"}
               </Button>
@@ -592,7 +591,7 @@ function ModuleCard({ decision, selected, onSelect }: { decision: DecisionSummar
       onClick={onSelect}
       aria-pressed={selected}
       className={[
-        "rounded-lg border p-4 text-left transition",
+        "rounded-lg border p-4 text-left",
         soon ? "cursor-not-allowed border-slate-200 bg-slate-50 opacity-70 dark:border-slate-800 dark:bg-slate-900/50" : "",
         !soon && selected ? "border-accent ring-1 ring-accent dark:border-accent-light dark:ring-accent-light" : "",
         !soon && !selected ? "border-slate-200 hover:border-slate-400 dark:border-slate-800" : "",
@@ -602,7 +601,7 @@ function ModuleCard({ decision, selected, onSelect }: { decision: DecisionSummar
         <span className="font-semibold">{decision.title}</span>
         {soon && <Badge tone="neutral">Coming soon</Badge>}
       </div>
-      <p className="mt-1 text-sm text-slate-500">{decision.description.replace(/\s*Coming soon\.?$/i, "")}</p>
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{decision.description.replace(/\s*Coming soon\.?$/i, "")}</p>
     </button>
   );
 }
@@ -628,7 +627,7 @@ function DollarInput({ value, onChange, error, placeholder }: { value: string; o
   return (
     <div>
       <div className="relative">
-        <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-slate-500">$</span>
+        <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-slate-500 dark:text-slate-400">$</span>
         <input className={`${inputClass} pl-7`} inputMode="decimal" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
       </div>
       <FieldError msg={error} />

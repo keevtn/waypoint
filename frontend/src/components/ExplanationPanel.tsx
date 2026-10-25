@@ -28,7 +28,7 @@ export default function ExplanationPanel({
   if (!explanation) {
     return (
       <Card title="Why this option">
-        <p className="text-sm text-slate-500">No explanation was produced for {optionLabel}.</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">No explanation for {optionLabel}.</p>
       </Card>
     );
   }
@@ -40,7 +40,7 @@ export default function ExplanationPanel({
       </p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div>
-          <h3 className="mb-1 text-xs font-medium uppercase tracking-wide text-ok">For</h3>
+          <h3 className="mb-1 text-xs font-medium text-ok">For</h3>
           <ul className="space-y-1.5 text-sm">
             {explanation.pros.map((p, i) => (
               <li key={i} className="flex gap-2">
@@ -53,7 +53,7 @@ export default function ExplanationPanel({
           </ul>
         </div>
         <div>
-          <h3 className="mb-1 text-xs font-medium uppercase tracking-wide text-warn">Against</h3>
+          <h3 className="mb-1 text-xs font-medium text-warn">Against</h3>
           <ul className="space-y-1.5 text-sm">
             {explanation.cons.map((p, i) => (
               <li key={i} className="flex gap-2">
@@ -68,7 +68,7 @@ export default function ExplanationPanel({
       </div>
       {cites.length > 0 && (
         <div className="mt-4 border-t border-slate-100 pt-3 dark:border-slate-800">
-          <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">Sources</h3>
+          <h3 className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">Sources</h3>
           <ol className="space-y-1 text-xs">
             {cites.map((c, i) => (
               <li key={c.chunk_id} className="flex items-start gap-2">
@@ -106,7 +106,7 @@ export function TightMonthPanel({
     <Card
       title={`Why ${fmtMonth(month)} is tight`}
       aside={
-        <button type="button" onClick={onClose} className="text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
+        <button type="button" onClick={onClose} className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200">
           Close
         </button>
       }
@@ -116,8 +116,8 @@ export function TightMonthPanel({
       ) : why ? (
         <p className="text-sm leading-6">{why}</p>
       ) : (
-        <p className="text-sm text-slate-500">
-          {contributors.length > 0 ? "Large one-time costs land this month:" : "No narrative available for this month yet."}
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          {contributors.length > 0 ? "One-time costs this month:" : "No narrative for this month yet."}
         </p>
       )}
       {contributors.length > 0 && (
@@ -125,7 +125,7 @@ export function TightMonthPanel({
           {contributors.map((c) => (
             <li key={c.id} className="flex items-baseline justify-between py-1.5">
               <span>
-                {c.label} <span className="text-xs text-slate-500">{fmtDate(c.date)}</span>
+                {c.label} <span className="text-xs text-slate-500 dark:text-slate-400">{fmtDate(c.date)}</span>
               </span>
               <span className="tabular font-medium">{fmtCents(c.amount_cents)}</span>
             </li>

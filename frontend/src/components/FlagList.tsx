@@ -80,7 +80,7 @@ export default function FlagList({
   collapse?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
-  if (flags.length === 0) return <Empty>No flags for this option. Every month stays above your floor.</Empty>;
+  if (flags.length === 0) return <Empty>No flags. Every month stays above your floor.</Empty>;
   const order: FlagSeverity[] = ["danger", "warn", "info"];
   const sorted = [...flags].sort((a, b) => order.indexOf(a.severity) - order.indexOf(b.severity) || (a.month ?? "").localeCompare(b.month ?? ""));
   const shown = collapse && !expanded && sorted.length > INITIAL + 1 ? sorted.slice(0, INITIAL) : sorted;
@@ -100,7 +100,7 @@ export default function FlagList({
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="font-medium">{flagTitle(f)}</span>
-                  {f.month && <span className="tabular shrink-0 text-xs text-slate-500">{fmtMonth(f.month)}</span>}
+                  {f.month && <span className="tabular shrink-0 text-xs text-slate-500 dark:text-slate-400">{fmtMonth(f.month)}</span>}
                 </div>
                 <div className="tabular text-xs text-slate-600 dark:text-slate-300">{flagSummary(f)}</div>
               </div>

@@ -13,7 +13,7 @@ import { Button, Empty, ErrorNote, Skeleton, SkeletonLines } from "../components
 const inflight = new Map<string, Promise<ActionCard>>();
 
 export default function Action() {
-  const { evaluation, selectedOptionId, decisionId, actionCard, selectOption, setActionCard } = useAppState();
+  const { evaluation, selectedOptionId, decisionId, actionCard, evalGen, selectOption, setActionCard, withFreshEval } = useAppState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -31,8 +31,9 @@ export default function Action() {
     setError(null);
     // Share one in-flight request per (eval, option): StrictMode remounts and quick re-renders must not
     // trigger a second 10-20s LLM call.
-    const key = `${evalId}:${optionId}`;
-    const req = inflight.get(key) ?? api.action(decisionId, evalId, optionId).finally(() => inflight.delete(key));
+    const key = `${evalGen}:${optionId}`;
+    const req =
+      inflight.get(key) ?? withFreshEval((id) => api.action(decisionId, id, optionId)).finally(() => inflight.delete(key));
     inflight.set(key, req);
     req
       .then((c) => alive && setActionCard(c))
@@ -41,7 +42,7 @@ export default function Action() {
     return () => {
       alive = false;
     };
-  }, [evalId, optionId, decisionId, actionCard, setActionCard]);
+  }, [evalId, evalGen, optionId, decisionId, actionCard, setActionCard, withFreshEval]);
 
   if (!evaluation || !option) {
     return (

@@ -34,7 +34,9 @@ export const friendlyError = (e: unknown): string => {
     if (e.status === 502 || e.status === 504 || e.code === "llm_unavailable") {
       return "The explanation service did not respond (busy or timed out). Your projections and flags are unaffected. Try again.";
     }
-    if (e.status === 404 && /eval/i.test(e.code)) return "This comparison has expired on the server. Re-run it from the Moment page.";
+    if (e.status === 404 && e.code === "unknown_eval") {
+      return "This comparison expired on the server and could not be refreshed automatically. Re-run it from the Moment page.";
+    }
     if (e.status >= 500) return `Server error (${e.status}). Try again in a moment.`;
     return e.message || `Request failed (${e.status}).`;
   }

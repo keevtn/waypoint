@@ -39,7 +39,7 @@ function describeParams(s: Scenario): string {
 
 export default function StressTest() {
   const navigate = useNavigate();
-  const { evaluation, selectedOptionId, decisionId, stress, selectOption, setStress } = useAppState();
+  const { evaluation, selectedOptionId, decisionId, stress, selectOption, setStress, withFreshEval } = useAppState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeIdx, setActiveIdx] = useState(0);
@@ -71,7 +71,7 @@ export default function StressTest() {
     setStress(null);
     setActiveIdx(0);
     try {
-      setStress(await api.stress(decisionId, evaluation.eval_id, preferred.id));
+      setStress(await withFreshEval((evalId) => api.stress(decisionId, evalId, preferred.id)));
     } catch (e) {
       setError(friendlyError(e));
     } finally {

@@ -108,6 +108,7 @@ def default_scenarios(menu: list[ScenarioTemplate], ev: Evaluation) -> list[Scen
 
 def select_payload(ev: Evaluation, menu: list[ScenarioTemplate], preferred_option_id: str) -> dict:
     return {
+        "module": payload.module_view(ev.module_id),
         "profile": payload.profile_view(ev.profile),
         "inputs": payload.inputs_view(ev.inputs),
         "options": [
@@ -194,13 +195,18 @@ def perturbation(scenario: Scenario, profile: Profile, option: Option | None) ->
         return [], mult
 
     if tid == "rent_increase":
-        rent = _rent_item(profile)
-        if rent is None:
-            return [], None
-        extra = -int(round(abs(rent.amount_cents) * p["pct"] / 100.0))
+        # Rent module: the option itself is the rent, so the increase scales the unit's rent
+        # from its lease start. Otherwise it scales the profile's rent item.
+        if option is not None and isinstance(option.attributes.get("rent_cents"), int):
+            base_rent, day = int(option.attributes["rent_cents"]), min(option.commitment.start_date.day, 28)
+        else:
+            rent = _rent_item(profile)
+            if rent is None:
+                return [], None
+            base_rent, day = abs(rent.amount_cents), min(rent.next_date.day, 28)
+        extra = -int(round(base_rent * p["pct"] / 100.0))
         if extra == 0:
             return [], None
-        day = min(rent.next_date.day, 28)
         one_offs = []
         for n in range(p["from_month"], HORIZON + 1):
             d = start(n).replace(day=day)
@@ -234,6 +240,7 @@ def critique_payload(ev: Evaluation, preferred: Option, stress: list[StressResul
     query = "deductible you can afford higher deductible lower premium emergency savings lender requires collision comprehensive"
     chunks = payload.merge_chunks(payload.chunks_for_ids(cited), payload.retrieve_chunks(query, ev.module_id, k=4))
     return {
+        "module": payload.module_view(ev.module_id),
         "preferred_option_id": preferred.id,
         "preferred_option_label": preferred.label,
         "option_labels": payload.option_labels(ev.options),
@@ -244,7 +251,7 @@ def critique_payload(ev: Evaluation, preferred: Option, stress: list[StressResul
         "scenarios": [
             {
                 "template_id": s.scenario.template_id,
-                "params": s.scenario.params,
+                "params": payload.with_displays(s.scenario.params),
                 "rationale": s.scenario.rationale,
                 "results": payload.projections_view(s.results, ev.options),
             }

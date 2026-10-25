@@ -30,9 +30,18 @@ def dollars(cents: int | None) -> str | None:
 
 def inputs_view(inputs: Any) -> dict[str, Any]:
     data = inputs.model_dump(mode="json") if hasattr(inputs, "model_dump") else dict(inputs)
+    return with_displays(data)
+
+
+def with_displays(data: Any) -> Any:
+    """Add a `*_display` string next to every `*_cents` integer, recursively (rent units are nested)."""
+    if isinstance(data, list):
+        return [with_displays(x) for x in data]
+    if not isinstance(data, dict):
+        return data
     out: dict[str, Any] = {}
     for k, v in data.items():
-        out[k] = v
+        out[k] = with_displays(v)
         if k.endswith("_cents") and isinstance(v, int):
             out[k[: -len("_cents")] + "_display"] = dollars(v)
     return out
@@ -93,6 +102,13 @@ def projection_view(p: ProjectionResult, *, series: bool = False) -> dict[str, A
             for m in p.series
         ]
     return out
+
+
+def module_view(module_id: str) -> dict[str, str]:
+    from ..decisions import registry
+
+    m = registry.get(module_id)
+    return {"id": module_id, "title": getattr(m, "title", module_id), "description": getattr(m, "description", "")}
 
 
 def option_labels(options: list[Option]) -> dict[str, str]:

@@ -42,6 +42,7 @@ def build_payload(ev: Evaluation, option: Option, template: dict) -> dict:
     query = f"{template.get('configuration', '')} shopping for quotes independent agent lender requirements proof of insurance registration"
     chunks = payload.merge_chunks(payload.chunks_for_ids(cited), payload.retrieve_chunks(query, ev.module_id))
     return {
+        "module": payload.module_view(ev.module_id),
         "option": payload.option_view(option, ev.constraints),
         "template": template,
         "projection": payload.projection_view(ev.projections[option.id]),

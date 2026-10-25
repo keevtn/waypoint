@@ -46,6 +46,7 @@ def build_payload(ev: Evaluation) -> dict:
     cited = [cid for c in ev.constraints for cid in c.citation_ids]
     chunks = payload.merge_chunks(payload.chunks_for_ids(cited), payload.retrieve_chunks(payload.evaluation_query(ev), ev.module_id))
     return {
+        "module": payload.module_view(ev.module_id),
         "option_ids": [o.id for o in ev.options],
         "option_labels": payload.option_labels(ev.options),
         "inputs": payload.inputs_view(ev.inputs),

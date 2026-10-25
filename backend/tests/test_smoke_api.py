@@ -78,6 +78,9 @@ def test_decisions_list(client):
     assert "auto_insurance" in ids
     auto = next(d for d in r.json() if d["id"] == "auto_insurance")
     assert "financed" in auto["input_schema"]["properties"]
+    assert "rent" in ids  # SPEC §6.4 stretch module, registered
+    rent = next(d for d in r.json() if d["id"] == "rent")
+    assert "units" in rent["input_schema"]["properties"]
 
 
 def test_evaluate_state_minimum_disallowed(client):

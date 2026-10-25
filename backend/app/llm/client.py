@@ -89,12 +89,80 @@ _FAKE_RATIONALES = {
 }
 
 
+def _fixture_option_ids(name: str) -> set[str]:
+    f = fixtures.load(name)
+    if name == "explain_auto":
+        return {e["option_id"] for e in f["explanations"]}
+    if name == "action_auto":
+        return {f["option_id"]}
+    return {f["critique"]["preferred_option_id"]}
+
+
+def _payload_matches_fixture(option_ids: list[str | None], name: str) -> bool:
+    """The auto fixtures only fit the auto module; other modules get payload-derived fakes."""
+    ids = {i for i in option_ids if i}
+    return not ids or ids <= _fixture_option_ids(name)  # no ids (unit tests) -> the fixture
+
+
+def _generic_explain(payload: dict[str, Any]) -> dict[str, Any]:
+    """Number-free, payload-grounded explanation for any module (used under LLM_FAKE=1)."""
+    projections = payload.get("projections", {})
+    out = []
+    for o in payload.get("options", []):
+        cons_ = [c for c in o.get("constraints", []) if c["kind"] != "required"]
+        proj = projections.get(o["id"], {})
+        tight = proj.get("months_below_floor") or proj.get("months_negative") or []
+        verdict = {
+            "disallowed": f"{o['label']} is ruled out for you by a hard constraint.",
+            "flagged": f"{o['label']} is possible but carries a warning worth weighing.",
+        }.get(o.get("status"), f"{o['label']} fits your cash flow without a warning.")
+        out.append(
+            {
+                "option_id": o["id"],
+                "verdict": verdict,
+                "pros": [] if tight else ["It keeps your balance above your safety floor in every month of the plan."],
+                "cons": [f"{c['rule']} [c:{c['id']}]" for c in cons_],
+                "tight_months": [{"month": m, "why": "Your balance dips below your safety floor in this month under this option."} for m in tight],
+                "citation_ids": sorted({cid for c in cons_ for cid in c.get("citation_ids", [])}),
+            }
+        )
+    return {"explanations": out}
+
+
+def _generic_action(payload: dict[str, Any]) -> dict[str, Any]:
+    t = payload.get("template", {})
+    return {"headline": t.get("steps", ["Review the written terms before you commit."])[0], "steps": list(t.get("steps", [])), "questions_to_ask": list(t.get("questions_to_ask", [])), "citation_ids": []}
+
+
+def _generic_critique(payload: dict[str, Any]) -> dict[str, Any]:
+    pid = payload.get("preferred_option_id")
+    pref = next((o for o in payload.get("options", []) if o["id"] == pid), {})
+    cons_ = [c for c in pref.get("constraints", []) if c["kind"] != "required"]
+    stressed = [s["template_id"] for s in payload.get("scenarios", []) if (s.get("results", {}).get(pid) or {}).get("months_negative")]
+    against = [f"{c['rule']} [c:{c['id']}]" for c in cons_]
+    against += [f"In the {t} scenario this option drives your balance negative." for t in stressed]
+    return {
+        "case_against": against or ["No scenario in this test pushed this option negative, so the case against it rests on how little buffer it leaves."],
+        "case_for": [f"{pref.get('label', 'This option')} survives the scenarios that were run without going negative."] if not stressed else [f"{pref.get('label', 'This option')} is the one you leaned toward and nothing rules it out outright."],
+        "recommendation_shift": "reconsider" if (stressed or cons_) else "stay",
+        "summary": "",
+        "citation_ids": sorted({cid for c in cons_ for cid in c.get("citation_ids", [])}),
+    }
+
+
 class FakeLLM:
     """Returns canned objects derived from the fixtures. Ignores the payload text but
-    keeps option ids consistent with it where that matters for the pipeline."""
+    keeps option ids consistent with it where that matters for the pipeline; for a
+    module the auto fixtures do not fit (rent), it derives number-free answers from the payload."""
 
     def call(self, call_type: str, payload: dict[str, Any], output_type: type[T]) -> T:
-        if call_type == "explain":
+        if call_type == "explain" and not _payload_matches_fixture(payload.get("option_ids", []), "explain_auto"):
+            data = _generic_explain(payload)
+        elif call_type == "action" and not _payload_matches_fixture([payload.get("option", {}).get("id")], "action_auto"):
+            data = _generic_action(payload)
+        elif call_type == "critique" and not _payload_matches_fixture([payload.get("preferred_option_id")], "stress_auto"):
+            data = _generic_critique(payload)
+        elif call_type == "explain":
             data = fixtures.load("explain_auto")["explanations"]
             data = {
                 "explanations": [

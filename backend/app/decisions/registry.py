@@ -4,8 +4,9 @@ from __future__ import annotations
 from ..models import DecisionSummary
 from .auto_insurance import AutoInsuranceModule
 from .base import DecisionModule
+from .rent import RentModule
 
-MODULES: dict[str, DecisionModule] = {m.id: m for m in [AutoInsuranceModule()]}
+MODULES: dict[str, DecisionModule] = {m.id: m for m in [AutoInsuranceModule(), RentModule()]}
 
 
 def get(decision_id: str) -> DecisionModule | None:

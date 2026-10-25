@@ -102,6 +102,8 @@ export default function Moment() {
       setInputs(parsed);
       const result = await api.evaluate(moduleId, parsed);
       setEvaluation(result);
+      // /explain takes 10-20s live: start it now so Compare has it by the time the user clicks an option.
+      useAppState.getState().prefetchExplanations();
       navigate("/compare");
     } catch (e) {
       setSubmitError(errorMessage(e));

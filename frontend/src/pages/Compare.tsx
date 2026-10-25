@@ -1,11 +1,10 @@
 // Compare: option cards (left), projection chart + flags (right), explanation panel, Ask-with-sources.
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { api } from "../api";
 import { useAppState } from "../state";
 import type { Flag } from "../types";
 import { fmtCents, fmtDollars } from "../lib/format";
-import { errorMessage, useDarkMode } from "../lib/hooks";
+import { useDarkMode } from "../lib/hooks";
 import AskWithSources from "../components/AskWithSources";
 import ExplanationPanel, { ExplanationSkeleton, TightMonthPanel } from "../components/ExplanationPanel";
 import FlagList from "../components/FlagList";
@@ -14,29 +13,18 @@ import ProjectionChart, { BASELINE_KEY, seriesColor } from "../components/Projec
 import { Button, Card, Empty, ErrorNote } from "../components/ui";
 
 export default function Compare() {
-  const { profile, evaluation, explanations, selectedOptionId, decisionId, inputs, selectOption, setExplanations } = useAppState();
+  const { profile, evaluation, explanations, explainStatus, explainError, selectedOptionId, decisionId, inputs, selectOption, prefetchExplanations } =
+    useAppState();
   const dark = useDarkMode();
-  const [explainError, setExplainError] = useState<string | null>(null);
-  const [explainLoading, setExplainLoading] = useState(false);
   const [activeMonth, setActiveMonth] = useState<string | null>(null);
 
   const evalId = evaluation?.eval_id ?? null;
+  const explainLoading = explainStatus === "loading";
 
-  // Explanations are an LLM call: load after the chart renders, never block on it.
+  // Explanations are an LLM call (10-20s live). Moment already prefetched them; this covers a direct landing or a retry.
   useEffect(() => {
-    if (!evalId || explanations !== null) return;
-    let alive = true;
-    setExplainLoading(true);
-    setExplainError(null);
-    api
-      .explain(decisionId, evalId)
-      .then((r) => alive && setExplanations(r.explanations))
-      .catch((e: unknown) => alive && setExplainError(errorMessage(e)))
-      .finally(() => alive && setExplainLoading(false));
-    return () => {
-      alive = false;
-    };
-  }, [evalId, explanations, decisionId, setExplanations]);
+    if (evalId && explainStatus === "idle") prefetchExplanations();
+  }, [evalId, explainStatus, prefetchExplanations]);
 
   if (!evaluation) {
     return (
@@ -145,11 +133,11 @@ export default function Compare() {
       {selected &&
         (explainLoading && explanations === null ? (
           <ExplanationSkeleton />
-        ) : explainError ? (
+        ) : explainStatus === "error" ? (
           <Card title="Why this option">
-            <ErrorNote message={`Could not load the explanation: ${explainError}`} />
+            <ErrorNote message={explainError ?? "Could not load the explanation."} />
             <div className="mt-2">
-              <Button variant="secondary" onClick={() => setExplanations(null)}>
+              <Button variant="secondary" onClick={() => useAppState.setState({ explainStatus: "idle", explainError: null })}>
                 Retry
               </Button>
             </div>

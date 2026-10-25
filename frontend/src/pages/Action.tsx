@@ -5,10 +5,12 @@ import { api } from "../api";
 import { useAppState } from "../state";
 import type { ActionCard } from "../types";
 import { fmtCents, fmtDate } from "../lib/format";
-import { errorMessage } from "../lib/hooks";
+import { friendlyError } from "../lib/hooks";
 import CitationChip, { CitedText } from "../components/CitationChip";
 import { describeAttributes, PriceBadge } from "../components/OptionCard";
 import { Button, Empty, ErrorNote, Skeleton, SkeletonLines } from "../components/ui";
+
+const inflight = new Map<string, Promise<ActionCard>>();
 
 export default function Action() {
   const { evaluation, selectedOptionId, decisionId, actionCard, selectOption, setActionCard } = useAppState();
@@ -27,10 +29,14 @@ export default function Action() {
     let alive = true;
     setLoading(true);
     setError(null);
-    api
-      .action(decisionId, evalId, optionId)
+    // Share one in-flight request per (eval, option): StrictMode remounts and quick re-renders must not
+    // trigger a second 10-20s LLM call.
+    const key = `${evalId}:${optionId}`;
+    const req = inflight.get(key) ?? api.action(decisionId, evalId, optionId).finally(() => inflight.delete(key));
+    inflight.set(key, req);
+    req
       .then((c) => alive && setActionCard(c))
-      .catch((e: unknown) => alive && setError(errorMessage(e)))
+      .catch((e: unknown) => alive && setError(friendlyError(e)))
       .finally(() => alive && setLoading(false));
     return () => {
       alive = false;

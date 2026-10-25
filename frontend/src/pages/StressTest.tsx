@@ -5,9 +5,9 @@ import { api } from "../api";
 import { useAppState } from "../state";
 import type { Critique, RecommendationShift, Scenario, StressResult } from "../types";
 import { fmtCents, fmtMonth } from "../lib/format";
-import { errorMessage } from "../lib/hooks";
+import { friendlyError } from "../lib/hooks";
 import CitationChip, { CitedText } from "../components/CitationChip";
-import FlagList from "../components/FlagList";
+import FlagList, { dedupeFlags } from "../components/FlagList";
 import ProjectionChart, { BASELINE_KEY, type ChartSeries } from "../components/ProjectionChart";
 import { Badge, Button, Card, Empty, ErrorNote, Skeleton, SkeletonLines, type Tone } from "../components/ui";
 
@@ -73,7 +73,7 @@ export default function StressTest() {
     try {
       setStress(await api.stress(decisionId, evaluation.eval_id, preferred.id));
     } catch (e) {
-      setError(errorMessage(e));
+      setError(friendlyError(e));
     } finally {
       setLoading(false);
     }
@@ -221,7 +221,7 @@ export default function StressTest() {
               )}
             </Card>
             <Card title="Flags under this scenario">
-              {shownScenario ? <FlagList flags={shownScenario.flags} /> : <Empty>No flags.</Empty>}
+              {shownScenario ? <FlagList flags={dedupeFlags(shownScenario.flags)} /> : <Empty>No flags.</Empty>}
             </Card>
           </div>
 

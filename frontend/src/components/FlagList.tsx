@@ -1,4 +1,5 @@
 // Flag list for one projection. Each flag is clickable → parent shows "why this month is tight".
+import { useState } from "react";
 import type { Flag, FlagSeverity } from "../types";
 import { fmtCents, fmtDate, fmtMonth } from "../lib/format";
 import { Dot, Empty, type Tone } from "./ui";
@@ -58,21 +59,35 @@ export function flagSummary(f: Flag): string {
   }
 }
 
+/** Drop below_floor flags for months that also go negative: the negative flag already says it. */
+export function dedupeFlags(flags: Flag[]): Flag[] {
+  const negativeMonths = new Set(flags.filter((f) => f.code === "negative" && f.month).map((f) => f.month));
+  return flags.filter((f) => !(f.code === "below_floor" && f.month && negativeMonths.has(f.month)));
+}
+
+const INITIAL = 6;
+
 export default function FlagList({
   flags,
   activeMonth,
   onSelect,
+  collapse = true,
 }: {
   flags: Flag[];
   activeMonth?: string | null;
   onSelect?: (flag: Flag) => void;
+  /** Show the first few and a "show all" toggle when a projection has many flags (stress scenarios). */
+  collapse?: boolean;
 }) {
+  const [expanded, setExpanded] = useState(false);
   if (flags.length === 0) return <Empty>No flags for this option. Every month stays above your floor.</Empty>;
   const order: FlagSeverity[] = ["danger", "warn", "info"];
   const sorted = [...flags].sort((a, b) => order.indexOf(a.severity) - order.indexOf(b.severity) || (a.month ?? "").localeCompare(b.month ?? ""));
+  const shown = collapse && !expanded && sorted.length > INITIAL + 1 ? sorted.slice(0, INITIAL) : sorted;
+  const hidden = sorted.length - shown.length;
   return (
     <ul className="divide-y divide-slate-100 dark:divide-slate-800">
-      {sorted.map((f) => {
+      {shown.map((f) => {
         const active = !!f.month && f.month === activeMonth;
         return (
           <li key={f.id}>
@@ -93,6 +108,13 @@ export default function FlagList({
           </li>
         );
       })}
+      {hidden > 0 && (
+        <li>
+          <button type="button" onClick={() => setExpanded(true)} className="w-full px-2 py-2 text-left text-xs font-medium text-accent hover:underline dark:text-accent-light">
+            Show <span className="tabular">{hidden}</span> more {hidden === 1 ? "flag" : "flags"}
+          </button>
+        </li>
+      )}
     </ul>
   );
 }

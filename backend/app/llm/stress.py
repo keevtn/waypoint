@@ -130,7 +130,10 @@ def select_scenarios(ev: Evaluation, menu: list[ScenarioTemplate], preferred_opt
     chosen: list[Scenario] = []
     try:
         out = get_llm().call("select", data, SelectOut)
-        out = guardrail.apply(out, guardrail.allowed_numbers(data), where="select")
+        # A rationale may quote the scenario's own parameters ("a 30% cut in hours"), but only
+        # the values code will actually run: clamp first, then allow exactly those.
+        clamped = [normalize_scenario(by_id[s.template_id], s.params.model_dump(), "").params for s in out.scenarios if s.template_id in by_id]
+        out = guardrail.apply(out, guardrail.allowed_numbers(data) | guardrail.allowed_numbers({"params": clamped}), where="select")
         for s in out.scenarios:
             t = by_id.get(s.template_id)
             if t is None or any(c.template_id == t.id for c in chosen):

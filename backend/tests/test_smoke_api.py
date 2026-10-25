@@ -130,14 +130,36 @@ def test_unknown_decision_is_error_envelope(client):
     assert set(r.json()["error"]) == {"code", "message"}
 
 
+def _eval_id(client) -> str:
+    inputs = {
+        "vehicle_value_cents": 950000,
+        "financed": True,
+        "loan_payment_cents": 21200,
+        "loan_term_months": 48,
+        "driver_age": 21,
+        "deductible_comfort_cents": 60000,
+        "registration_deadline": "2026-11-23",
+    }
+    r = client.post("/api/decisions/auto_insurance/evaluate", json={"inputs": inputs})
+    assert r.status_code == 200
+    return r.json()["eval_id"]
+
+
 def test_explain_stress_action_fake_llm(client):
-    r = client.post("/api/decisions/auto_insurance/explain", json={"eval_id": "eval_fixture_auto_0001"})
+    eval_id = _eval_id(client)
+    r = client.post("/api/decisions/auto_insurance/explain", json={"eval_id": eval_id})
     assert r.status_code == 200
     assert r.json()["explanations"]
+    # Phase 6: explanations come from the LLM layer on the cached evaluation, citations rebuilt from the index
+    exps = {e["option_id"]: e for e in r.json()["explanations"]}
+    assert "std_limited_1000" in exps and "std_full_500" in exps
+    assert all(e["verdict"] for e in exps.values())
+    assert all(c["url"] and c["publisher"] for e in exps.values() for c in e["citations"])
+    assert client.post("/api/decisions/auto_insurance/explain", json={"eval_id": "eval_expired"}).status_code == 404
 
     r = client.post(
         "/api/decisions/auto_insurance/stress",
-        json={"eval_id": "eval_fixture_auto_0001", "preferred_option_id": "std_limited_1000"},
+        json={"eval_id": eval_id, "preferred_option_id": "std_limited_1000"},
     )
     assert r.status_code == 200
     s = r.json()
@@ -146,11 +168,17 @@ def test_explain_stress_action_fake_llm(client):
 
     r = client.post(
         "/api/decisions/auto_insurance/action",
-        json={"eval_id": "eval_fixture_auto_0001", "option_id": "std_full_500"},
+        json={"eval_id": eval_id, "option_id": "std_full_500"},
     )
     assert r.status_code == 200
     assert r.json()["option_id"] == "std_full_500"
     assert r.json()["steps"]
+    # Phase 6: deadline and reason come from code (registration deadline), never the model
+    card = r.json()
+    assert card["deadline"] == "2026-11-23"
+    assert card["headline"]
+    assert any("quote" in s.lower() for s in card["steps"]) and any("lender" in s.lower() for s in card["steps"])
+    assert card["questions_to_ask"]
 
 
 def test_rag_ask_refuses_investing(client):

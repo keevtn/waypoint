@@ -7,7 +7,7 @@ import json
 import pytest
 
 from app import config
-from app.decisions import cache
+from app.decisions import cache, registry
 from app.llm import action as llm_action
 from app.llm import client as llm_client
 from app.llm import explainer, guardrail, payload
@@ -242,3 +242,60 @@ def test_guardrail_allows_every_number_the_fake_explainer_uses(evaluation):
     data = explainer.build_payload(evaluation)
     out = FakeLLM().call("explain", data, explainer.ExplainOut)
     guardrail.apply(out, guardrail.allowed_numbers(data), raise_in_dev=True)
+
+
+# -- option labels in prose (Session B report: raw ids like std_limited_1000 leaked into text) ----
+
+
+def test_payloads_carry_option_labels(evaluation):
+    from app.llm import stress
+
+    labels = payload.option_labels(evaluation.options)
+    assert labels["std_limited_1000"] == next(o.label for o in evaluation.options if o.id == "std_limited_1000")
+    assert "baseline" in labels
+    data = explainer.build_payload(evaluation)
+    assert data["option_labels"] == labels
+    assert all(v["label"] == labels[k] for k, v in data["projections"].items())
+    menu = registry.get("auto_insurance").scenario_menu(evaluation.inputs, evaluation.profile)
+    sel = stress.select_payload(evaluation, menu, "std_limited_1000")
+    assert sel["preferred_option_label"] == labels["std_limited_1000"]
+    assert sel["projections"]["baseline"]["label"] == payload.BASELINE_LABEL
+
+
+def test_prompts_require_labels_not_ids():
+    for name in ("explainer", "action", "select", "critique"):
+        text = llm_client.load_prompt(name)
+        assert "never by its `id`" in text, name
+
+
+def test_replace_option_ids_rewrites_prose_but_not_markers(evaluation):
+    opts = evaluation.options
+    label = next(o.label for o in opts if o.id == "std_limited_1000")
+    out = payload.replace_option_ids("Under std_limited_1000 January goes negative [c:c_deductible_comfort] [s:naic-deductibles#2].", opts)
+    assert out == f"Under {label} January goes negative [c:c_deductible_comfort] [s:naic-deductibles#2]."
+    assert payload.replace_option_ids("Pick `std_full_500` instead.", opts) == f"Pick {next(o.label for o in opts if o.id == 'std_full_500')} instead."
+    # a marker that happens to contain an option id is left alone, and partial matches are not touched
+    assert payload.replace_option_ids("[c:std_full_500] std_full_500x", opts) == "[c:std_full_500] std_full_500x"
+
+
+def test_explain_and_critique_prose_uses_labels(client, evaluation, stub):
+    from app.llm import stress
+
+    label = next(o.label for o in evaluation.options if o.id == "std_limited_1000")
+    chunk = explainer.build_payload(evaluation)["chunks"][0]["id"]
+    resp = _explain_response(evaluation, chunk)
+    resp["explanations"][0]["verdict"] = "std_limited_1000 is the risky one."
+    crit = {
+        "case_against": ["In deductible_claim, std_limited_1000 goes negative in January."],
+        "case_for": ["std_limited_1000 is cheaper per month."],
+        "recommendation_shift": "reconsider",
+        "summary": "Reconsider std_limited_1000.",
+        "citation_ids": [],
+    }
+    stub({"explain": resp, "select": llm_client.LLMError("skip"), "critique": crit})
+    assert explainer.explain(evaluation)[0].verdict == f"{label} is the risky one."
+    r = client.post("/api/decisions/auto_insurance/stress", json={"eval_id": evaluation.eval_id, "preferred_option_id": "std_limited_1000"})
+    assert r.status_code == 200, r.text
+    body = r.json()["critique"]
+    for s in body["case_against"] + body["case_for"]:
+        assert "std_limited_1000" not in s and label in s

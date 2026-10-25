@@ -58,9 +58,13 @@ def action_card(ev: Evaluation, module, option: Option) -> ActionCard:
 
     chunk_ids = {c["id"] for c in data["chunks"]}
     allowed_c = set(option.constraint_ids)
-    headline = scrub_markers(out.headline, chunk_ids, allowed_c)
-    steps = [s for s in (scrub_markers(s, chunk_ids, allowed_c) for s in out.steps) if s]
-    questions = [q for q in (scrub_markers(q, chunk_ids, allowed_c) for q in out.questions_to_ask) if q]
+
+    def clean(text: str) -> str:
+        return payload.replace_option_ids(scrub_markers(text, chunk_ids, allowed_c), ev.options)
+
+    headline = clean(out.headline)
+    steps = [s for s in (clean(s) for s in out.steps) if s]
+    questions = [q for q in (clean(q) for q in out.questions_to_ask) if q]
     # The model may add at most two steps beyond the template (SPEC §6.6).
     steps = steps[: len(template["steps"]) + MAX_EXTRA_STEPS] or list(template["steps"])
     questions = questions or list(template["questions_to_ask"])

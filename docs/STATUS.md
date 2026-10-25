@@ -21,7 +21,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 
 | Session | Branch | Phase | Last merged to main | Blocked on | Updated |
 |---------|--------|-------|---------------------|------------|---------|
-| A llm | a/p6-p7 | done | P6 + P7 @ 2026-10-24 (explain/stress/action live; CI green) | — | 2026-10-24 |
+| A llm | a/p6-labels | done | P6 + P7 @ 2026-10-24 (explain/stress/action live; CI green); labels fix @ 2026-10-24 | — | 2026-10-24 |
 | B wire | b/p4-live | P4 live | All pages verified on live explain/stress/action @ 2026-10-24 (528e997) | — | 2026-10-24 |
 | D plaid | d/p8-plaid | P8 | — | A-P1 | — |
 
@@ -58,6 +58,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 3. `llm/guardrail.py`: every number in LLM output must be in the payload (numeric values, cents→dollars, numbers inside payload strings incl. chunk text and `*_display` labels; small ints 0-12 and years 2020-2030 whitelisted; ±1%). `DEV_MODE=1` → the route answers 502 `guardrail_violation` naming the numbers (pitch demo); `DEV_MODE=0` → the offending sentence is stripped and logged. **Set `DEV_MODE=0` on the presenting laptop and Render** unless you want a strict fail. LLM failures are 502 `llm_unavailable`.
 4. Citations are never model-generated: the model returns `[s:chunk]` / `[c:constraint]` markers and chunk ids; code drops markers for ids it was not given and rebuilds `Citation` objects via `rag.retrieve.citation_for`. Payloads (`llm/payload.py`) carry compact views with `*_display` strings ("$1,000") so the model copies figures instead of converting cents.
 5. Stress (`llm/stress.py`): the model picks 3 scenarios from the module's menu; code clamps params to the template's min/max, drops unknown templates/duplicates, forces a `deductible_claim` when any option has a deductible, and back-fills from deterministic defaults if the call fails. Scenarios run through `project()` via `one_off_overrides` (claim, shock, rent increase as monthly one-offs) and `income_multiplier` (gap, hours cut) for baseline + every non-disallowed option. On the persona the critique returns `reconsider` for `std_limited_1000` citing `naic-deductibles#2` (§11). Tests: `test_guardrail.py` (planted $1,337 caught), `test_llm.py`, `test_stress.py`; smoke extended.
+6. Labels fix (a/p6-labels, per B's report of raw ids like `std_limited_1000` in prose): every payload now carries `option_labels` (id→label, incl. `baseline`), `preferred_option_label`, and a `label` on each per-option projection/result; all four prompts say labels in prose, ids only inside `[c:]`/`[s:]`. As a safety net `payload.replace_option_ids` rewrites any leaked option id in explain/action/critique/rationale prose to its label (markers untouched). Verified on the persona with the real key: critique, rationales and explanations name options by label, zero raw ids.
 
 ## Session A notes (P1+P2 merged)
 

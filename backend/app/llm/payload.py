@@ -8,6 +8,7 @@ chunk ids and `citations_for()` turns them into `Citation` objects from the inde
 """
 from __future__ import annotations
 
+import re
 from datetime import date
 from typing import Any
 
@@ -16,6 +17,7 @@ from ..models import Citation, Constraint, Option, Profile, ProjectionResult
 
 MAX_CHUNKS = 8
 CHUNK_CHARS = 1600
+BASELINE_LABEL = "No new coverage (baseline)"
 
 
 def dollars(cents: int | None) -> str | None:
@@ -91,6 +93,42 @@ def projection_view(p: ProjectionResult, *, series: bool = False) -> dict[str, A
             for m in p.series
         ]
     return out
+
+
+def option_labels(options: list[Option]) -> dict[str, str]:
+    """id -> human label, plus the `baseline` key every projection map carries.
+
+    The model is told to use these labels in prose; option ids only ever appear as JSON keys."""
+    out = {o.id: o.label for o in options}
+    out["baseline"] = BASELINE_LABEL
+    return out
+
+
+def projections_view(projections: dict[str, ProjectionResult], options: list[Option], *, series: bool = False) -> dict[str, dict[str, Any]]:
+    """Per-option projection views, each carrying the option's `label` so the model never has to echo the id."""
+    labels = option_labels(options)
+    out: dict[str, dict[str, Any]] = {}
+    for k, p in projections.items():
+        view = {"label": labels.get(k, k)}
+        view.update(projection_view(p, series=series))
+        out[k] = view
+    return out
+
+
+_ID_CHARS = r"[A-Za-z0-9_]"
+
+
+def replace_option_ids(text: str, options: list[Option]) -> str:
+    """Deterministic safety net: a raw option id that leaked into prose becomes its label.
+
+    Ids inside `[c:...]`/`[s:...]` markers are constraint and chunk ids, never option ids,
+    so the markers are left untouched."""
+    if not text:
+        return text
+    for o in sorted(options, key=lambda o: -len(o.id)):
+        pattern = re.compile(rf"(?<!{_ID_CHARS})(?<!\[c:)(?<!\[s:)`?{re.escape(o.id)}`?(?!{_ID_CHARS})")
+        text = pattern.sub(o.label, text)
+    return text
 
 
 def profile_view(profile: Profile) -> dict[str, Any]:

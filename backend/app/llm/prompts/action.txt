@@ -13,4 +13,4 @@ Produce:
 - `questions_to_ask`: the template questions, rephrased if useful; you may add one more that follows from a constraint or flag.
 - `citation_ids`: chunk ids from `chunks` that support any factual claim you made about law, lenders, coverage or shopping for quotes. Put the marker `[s:<chunk id>]` at the end of the step or question that makes the claim.
 
-Rules: no numbers that are not in the input; no carrier names; no bank names; no investment advice; do not change the deadline (code sets it). Return only the JSON object.
+Rules: Refer to every option by its `label` (for example "Standard, limited tort, $1,000 deductible"), never by its `id`. Option ids such as `std_full_500` are JSON keys for your lookup only and must not appear in any sentence. The only ids that belong in prose are chunk ids inside `[s:...]` markers and constraint ids inside `[c:...]` markers. No numbers that are not in the input; no carrier names; no bank names; no investment advice; do not change the deadline (code sets it). Return only the JSON object.

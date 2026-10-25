@@ -47,10 +47,11 @@ def build_payload(ev: Evaluation) -> dict:
     chunks = payload.merge_chunks(payload.chunks_for_ids(cited), payload.retrieve_chunks(payload.evaluation_query(ev), ev.module_id))
     return {
         "option_ids": [o.id for o in ev.options],
+        "option_labels": payload.option_labels(ev.options),
         "inputs": payload.inputs_view(ev.inputs),
         "floor_display": payload.dollars(ev.profile.safety_floor_cents),
         "options": [payload.option_view(o, ev.constraints) for o in ev.options],
-        "projections": {k: payload.projection_view(p) for k, p in ev.projections.items()},
+        "projections": payload.projections_view(ev.projections, ev.options),
         "chunks": chunks,
     }
 
@@ -82,10 +83,14 @@ def explain(ev: Evaluation) -> list[Explanation]:
         if e is None:
             continue
         allowed_c = set(o.constraint_ids)
-        verdict = scrub_markers(e.verdict, chunk_ids, allowed_c)
-        pros = [scrub_markers(p, chunk_ids, allowed_c) for p in e.pros]
-        cons = [scrub_markers(c, chunk_ids, allowed_c) for c in e.cons]
-        tight = [{"month": t.month, "why": scrub_markers(t.why, chunk_ids, allowed_c)} for t in e.tight_months]
+
+        def clean(text: str) -> str:
+            return payload.replace_option_ids(scrub_markers(text, chunk_ids, allowed_c), ev.options)
+
+        verdict = clean(e.verdict)
+        pros = [clean(p) for p in e.pros]
+        cons = [clean(c) for c in e.cons]
+        tight = [{"month": t.month, "why": clean(t.why)} for t in e.tight_months]
         ids = used_chunk_ids(verdict, *pros, *cons, *(t["why"] for t in tight)) + [c for c in e.citation_ids if c in chunk_ids]
         results.append(
             Explanation(

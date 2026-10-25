@@ -115,7 +115,9 @@ def select_payload(ev: Evaluation, menu: list[ScenarioTemplate], preferred_optio
             for o in ev.options
         ],
         "preferred_option_id": preferred_option_id,
-        "projections": {k: payload.projection_view(p) for k, p in ev.projections.items()},
+        "preferred_option_label": next((o.label for o in ev.options if o.id == preferred_option_id), preferred_option_id),
+        "option_labels": payload.option_labels(ev.options),
+        "projections": payload.projections_view(ev.projections, ev.options),
         "plan_months": {str(k): v for k, v in payload.plan_months(ev.profile).items()},
         "menu": [t.model_dump() for t in menu],
     }
@@ -132,7 +134,7 @@ def select_scenarios(ev: Evaluation, menu: list[ScenarioTemplate], preferred_opt
             t = by_id.get(s.template_id)
             if t is None or any(c.template_id == t.id for c in chosen):
                 continue
-            chosen.append(normalize_scenario(t, s.params.model_dump(), s.rationale))
+            chosen.append(normalize_scenario(t, s.params.model_dump(), payload.replace_option_ids(s.rationale, ev.options)))
             if len(chosen) == N_SCENARIOS:
                 break
     except guardrail.GuardrailViolation:
@@ -233,16 +235,18 @@ def critique_payload(ev: Evaluation, preferred: Option, stress: list[StressResul
     chunks = payload.merge_chunks(payload.chunks_for_ids(cited), payload.retrieve_chunks(query, ev.module_id, k=4))
     return {
         "preferred_option_id": preferred.id,
+        "preferred_option_label": preferred.label,
+        "option_labels": payload.option_labels(ev.options),
         "options": [payload.option_view(o, ev.constraints) for o in ev.options],
         "inputs": payload.inputs_view(ev.inputs),
         "floor_display": payload.dollars(ev.profile.safety_floor_cents),
-        "evaluations": {k: payload.projection_view(p) for k, p in ev.projections.items()},
+        "evaluations": payload.projections_view(ev.projections, ev.options),
         "scenarios": [
             {
                 "template_id": s.scenario.template_id,
                 "params": s.scenario.params,
                 "rationale": s.scenario.rationale,
-                "results": {k: payload.projection_view(p) for k, p in s.results.items()},
+                "results": payload.projections_view(s.results, ev.options),
             }
             for s in stress
         ],
@@ -256,9 +260,13 @@ def critique(ev: Evaluation, preferred: Option, stress: list[StressResult]) -> C
     out = guardrail.apply(out, guardrail.allowed_numbers(data), where="critique")
     chunk_ids = {c["id"] for c in data["chunks"]}
     constraint_ids = {c.id for c in ev.constraints}
-    against = [x for x in (scrub_markers(s, chunk_ids, constraint_ids) for s in out.case_against) if x]
-    for_ = [x for x in (scrub_markers(s, chunk_ids, constraint_ids) for s in out.case_for) if x]
-    summary = scrub_markers(out.summary, chunk_ids, constraint_ids)
+
+    def clean(text: str) -> str:
+        return payload.replace_option_ids(scrub_markers(text, chunk_ids, constraint_ids), ev.options)
+
+    against = [x for x in (clean(s) for s in out.case_against) if x]
+    for_ = [x for x in (clean(s) for s in out.case_for) if x]
+    summary = clean(out.summary)
     if summary and summary not in against + for_:
         (against if out.recommendation_shift != "stay" else for_).append(summary)
     ids = used_chunk_ids(*against, *for_) + [c for c in out.citation_ids if c in chunk_ids]

@@ -64,8 +64,9 @@ def test_options_cash_plus_standard_terms_assumed_apr(module, profile):
         assert o.commitment.term_months == o.attributes["term_months"] and o.commitment.upfront_cents == 0
         assert o.attributes["interest_cents"] > 0
         assert o.status == "flagged" and f"c_interest_{o.id}" in o.constraint_ids
-    assert cash.status == "allowed"  # nothing is disallowed in this module
-    assert all(c.citation_ids == [] for c in r.constraints)
+    assert cash.status == "flagged"  # no module constraint, but the projection goes negative
+    assert {"below_floor_cash_now", "negative_cash_now"} <= set(cash.constraint_ids)
+    assert all(c.citation_ids == [] for c in r.constraints if not c.id.startswith(("below_floor_", "negative_")))
     assert set(r.projections) == {"baseline", *ids}
 
 

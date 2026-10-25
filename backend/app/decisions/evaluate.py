@@ -9,10 +9,60 @@ from typing import Any
 
 from pydantic import ValidationError
 
-from ..models import EvaluateResponse, Profile
+from datetime import date
+
+from ..models import Constraint, EvaluateResponse, Option, Profile, ProjectionResult
 from ..projection import project
 from . import cache
 from .base import DecisionModule, module_suggestions, resolve_statuses
+from .citations import PROJECTION_FLOOR
+
+HORIZON_MONTHS = 12
+
+
+def _dollars(cents: int) -> str:
+    sign = "-" if cents < 0 else ""
+    return f"{sign}${abs(int(cents)) // 100:,}"
+
+
+def _when(d: date) -> str:
+    return f"{d:%b} {d.day}"
+
+
+def projection_constraints(options: list[Option], projections: dict[str, ProjectionResult], profile: Profile) -> list[Constraint]:
+    """Module-agnostic flags derived from each option's own projection, so an option that dips
+    below the floor (or negative) reads "Flagged", never "Fits". Disallowed still wins in
+    `resolve_statuses`. Figures come from the engine; the rule text is templated here."""
+    out: list[Constraint] = []
+    floor = _dollars(profile.safety_floor_cents)
+    for o in options:
+        p = projections.get(o.id)
+        if p is None:
+            continue
+        low = f"lowest {_dollars(p.min_balance_cents)} on {_when(p.min_balance_date)}"
+        if p.months_below_floor:
+            n = len(p.months_below_floor)
+            out.append(
+                Constraint(
+                    id=f"below_floor_{o.id}",
+                    kind="flag",
+                    applies_to=[o.id],
+                    rule=f"Projected below your {floor} floor in {n} of the next {HORIZON_MONTHS} months ({low}).",
+                    citation_ids=PROJECTION_FLOOR,
+                )
+            )
+        if p.months_negative:
+            n = len(p.months_negative)
+            out.append(
+                Constraint(
+                    id=f"negative_{o.id}",
+                    kind="flag",
+                    applies_to=[o.id],
+                    rule=f"Projected to run out of money: the balance goes negative in {n} of the next {HORIZON_MONTHS} months ({low}).",
+                    citation_ids=PROJECTION_FLOOR,
+                )
+            )
+    return out
 
 
 class InvalidInputs(ValueError):
@@ -35,6 +85,9 @@ def evaluate(module: DecisionModule, raw_inputs: dict[str, Any], profile: Profil
     projections = {"baseline": project(profile, extra)}
     for o in options:  # disallowed options are projected too so the chart can grey them out
         projections[o.id] = project(profile, [*extra, o.commitment], option_id=o.id)
+
+    constraints = [*constraints, *projection_constraints(options, projections, profile)]
+    options = resolve_statuses(options, constraints)  # re-resolve: a below-floor option is "flagged", not "fits"
 
     suggestions = module_suggestions(module, inputs, profile, options, projections)
 

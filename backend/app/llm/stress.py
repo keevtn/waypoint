@@ -255,6 +255,7 @@ def critique_payload(ev: Evaluation, preferred: Option, stress: list[StressResul
         "floor_display": payload.dollars(ev.profile.safety_floor_cents),
         "evaluations": payload.projections_view(ev.projections, ev.options),
         "scenario_labels": labels,
+        "flag_labels": payload.flag_labels(),
         "scenarios": [
             {
                 "template_id": s.scenario.template_id,
@@ -278,7 +279,8 @@ def critique(ev: Evaluation, preferred: Option, stress: list[StressResult], menu
     constraint_ids = {c.id for c in ev.constraints}
 
     def clean(text: str) -> str:
-        return payload.replace_scenario_ids(payload.replace_option_ids(scrub_markers(text, chunk_ids, constraint_ids), ev.options), menu)
+        text = payload.replace_option_ids(scrub_markers(text, chunk_ids, constraint_ids), ev.options)
+        return payload.replace_flag_codes(payload.replace_scenario_ids(text, menu))
 
     against = [x for x in (clean(s) for s in out.case_against) if x]
     for_ = [x for x in (clean(s) for s in out.case_for) if x]

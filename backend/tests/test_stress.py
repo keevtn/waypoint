@@ -206,3 +206,23 @@ def test_stress_route_guardrail_rejects_invented_number(client, evaluation, stub
 def test_stress_unknown_option_is_404(client, evaluation):
     r = client.post("/api/decisions/auto_insurance/stress", json={"eval_id": evaluation.eval_id, "preferred_option_id": "nope"})
     assert r.status_code == 404
+
+
+def test_flag_codes_in_prose_become_labels(client, evaluation, stub):
+    assert payload.replace_flag_codes("The run flags 'deductible_unaffordable' and below_floor.") == (
+        "The run flags Deductible not affordable after a claim and Balance below your safety floor."
+    )
+    assert payload.replace_flag_codes("[c:below_floor_std_full_500]") == "[c:below_floor_std_full_500]"  # a derived constraint id, not a code
+    assert payload.replace_flag_codes("the balance goes negative in 2027-02") == "the balance goes negative in 2027-02"  # plain English stays
+    assert payload.replace_flag_codes("flagged `negative` there") == "flagged Balance goes negative there"
+    crit = {**CRITIQUE, "case_against": ["The unstressed run shows `deductible_unaffordable` for std_limited_1000. [s:naic-deductibles#2]"]}
+    s = stub({"select": llm_client.LLMError("skip"), "critique": crit})
+    r = client.post("/api/decisions/auto_insurance/stress", json={"eval_id": evaluation.eval_id, "preferred_option_id": "std_limited_1000"})
+    assert r.status_code == 200, r.text
+    body = r.json()["critique"]
+    assert any("Deductible not affordable after a claim" in x for x in body["case_against"])
+    assert not any("deductible_unaffordable" in x for x in body["case_against"] + body["case_for"])
+    sent = next(p for t, p in s.calls if t == "critique")
+    assert sent["flag_labels"]["deductible_unaffordable"] == "Deductible not affordable after a claim"
+    flags = sent["evaluations"]["std_limited_1000"]["flags"]
+    assert any(f.get("label") == "Deductible not affordable after a claim" for f in flags)

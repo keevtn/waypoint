@@ -73,6 +73,7 @@ def option_view(o: Option, constraints: list[Constraint]) -> dict[str, Any]:
 def _flag_view(f) -> dict[str, Any]:
     d = dict(f.detail)
     out: dict[str, Any] = {"code": f.code, "severity": f.severity, "month": f.month}
+    out["label"] = FLAG_LABELS.get(f.code, f.code)
     for key in ("min_balance_cents", "deductible_cents", "unstressed_min_balance_cents", "monthly_slack_cents", "threshold_cents"):
         if key in d:
             out[key[: -len("_cents")] + "_display"] = dollars(d[key])
@@ -157,6 +158,34 @@ def scenario_labels(menu: list[ScenarioTemplate]) -> dict[str, str]:
 
 def replace_scenario_ids(text: str, menu: list[ScenarioTemplate]) -> str:
     return replace_ids(text, scenario_labels(menu))
+
+
+FLAG_LABELS: dict[str, str] = {
+    "below_floor": "Balance below your safety floor",
+    "negative": "Balance goes negative",
+    "low_slack": "Little monthly slack left",
+    "deductible_unaffordable": "Deductible not affordable after a claim",
+    "deductible_ok": "Deductible affordable after a claim",
+    "target_reached": "Cushion target reached",
+}
+
+
+def flag_labels() -> dict[str, str]:
+    """flag code -> plain label; the model uses these in prose, codes only as JSON values."""
+    return dict(FLAG_LABELS)
+
+
+def replace_flag_codes(text: str) -> str:
+    """Safety net: a raw flag code in prose becomes its label. Snake_case codes match bare or quoted
+    (`deductible_unaffordable`, 'below_floor'); a code that is also an English word (`negative`) is
+    rewritten only when quoted or backticked, so "goes negative" stays as written. Derived constraint
+    ids such as `below_floor_std_full_500` are longer tokens and are not touched."""
+    if not text:
+        return text
+    for code, label in FLAG_LABELS.items():
+        quote = "['\"`]" if "_" not in code else "['\"`]?"
+        text = re.sub(rf"(?<![A-Za-z0-9_]){quote}{re.escape(code)}{quote}(?![A-Za-z0-9_])", label, text)
+    return text
 
 
 def suggestions_view(ev: Evaluation) -> list[dict[str, Any]]:

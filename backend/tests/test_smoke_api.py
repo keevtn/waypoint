@@ -131,7 +131,8 @@ def test_evaluate_state_minimum_disallowed(client):
     # Phase 3: computed by the real pipeline
     lender = next(c for c in ev["constraints"] if c["id"] == "c_lender_comp_coll")
     assert lender["kind"] == "disallowed" and "pa_min_limited" in lender["applies_to"]
-    assert by_id["std_limited_1000"]["status"] == "flagged" and by_id["std_full_500"]["status"] == "allowed"
+    assert by_id["std_limited_1000"]["status"] == "flagged" and by_id["std_full_500"]["status"] == "flagged"  # Jan-Mar below floor
+    assert any(c["id"] == "below_floor_std_full_500" and c["kind"] == "flag" for c in ev["constraints"])
     assert all(o["price"]["source_url"] and o["price"]["source_title"] for o in ev["options"])  # never "Unsourced"
     assert ev["projections"]["baseline"]["months_negative"] == []
     # §8 outcome 3: both standard options flag January; the $500/full-tort option dips lower

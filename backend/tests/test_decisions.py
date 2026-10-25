@@ -58,7 +58,9 @@ def test_demo_outcomes_2_to_4(profile, demo_inputs):
     assert "c_lender_comp_coll" in by_id["pa_min_limited"].constraint_ids
     assert by_id["std_limited_1000"].status == "flagged"
     assert {"c_deductible_comfort", "c_limited_tort"} <= set(by_id["std_limited_1000"].constraint_ids)
-    assert by_id["std_full_500"].status == "allowed"
+    assert by_id["std_full_500"].status == "flagged"  # no module constraint, but its own projection dips below the floor
+    assert "below_floor_std_full_500" in by_id["std_full_500"].constraint_ids and "negative_std_full_500" not in cons
+    assert cons["below_floor_std_full_500"].kind == "flag" and "floor" in cons["below_floor_std_full_500"].rule
     assert all(c.citation_ids for c in ev.constraints)
     assert cons["c_pa_minimum"].kind == "required" and set(cons["c_pa_minimum"].applies_to) == set(by_id)
 
@@ -166,3 +168,31 @@ def test_constraint_citations_are_real_chunk_ids(profile, demo_inputs):
     assert cons["c_pa_minimum"].citation_ids[0] == "pa-auto-insurance-guide#0"
     assert cons["c_limited_tort"].citation_ids == ["pa-auto-insurance-guide#1"]
     assert cons["c_lender_comp_coll"].citation_ids[0] == "cfpb-auto-loan-insurance#0"
+
+
+def test_projection_flags_derive_status_generically(profile):
+    """A below-floor or negative projection flags the option in every module; disallowed still wins."""
+    from app.decisions.evaluate import projection_constraints
+    from app.models import Constraint
+
+    bp = registry.get("big_purchase")
+    ev = evaluate(bp, {"name": "Laptop", "amount_cents": 180000, "date": "2026-11-01"}, profile)
+    by_id = {o.id: o for o in ev.options}
+    cons = {c.id: c for c in ev.constraints}
+    assert by_id["cash_now"].status == "flagged"
+    assert cons["negative_cash_now"].applies_to == ["cash_now"] and "negative" in cons["negative_cash_now"].rule
+    n = len(ev.projections["cash_now"].months_below_floor)
+    assert f"in {n} of the next 12 months" in cons["below_floor_cash_now"].rule
+    assert "$200 floor" in cons["below_floor_cash_now"].rule and "lowest -$" in cons["below_floor_cash_now"].rule
+    assert cons["below_floor_cash_now"].citation_ids  # the smoke test requires every constraint to cite
+    for o in ev.options:
+        p = ev.projections[o.id]
+        assert (f"below_floor_{o.id}" in cons) == bool(p.months_below_floor)
+        assert (f"negative_{o.id}" in cons) == bool(p.months_negative)
+        if p.months_below_floor:
+            assert o.status != "allowed"
+    # disallowed precedence: a disallowed option that also dips stays disallowed
+    opt = by_id["cash_now"].model_copy(update={"status": "allowed", "constraint_ids": []})
+    hard = [Constraint(id="d", kind="disallowed", applies_to=["cash_now"], rule="no", citation_ids=["x#0"])]
+    out = resolve_statuses([opt], hard + projection_constraints([opt], ev.projections, profile))
+    assert out[0].status == "disallowed" and out[0].constraint_ids == ["d", "below_floor_cash_now", "negative_cash_now"]

@@ -13,3 +13,7 @@ PA_MINIMUM_COVERAGE = [facts.PA_MIN_COVERAGE, facts.PA_LAPSE_SUSPENSION]
 PA_LIMITED_TORT = [facts.PA_TORT]
 DEDUCTIBLE_TRADEOFF = [facts.DEDUCTIBLE_AFFORDABLE, facts.DEDUCTIBLE_TRADEOFF]
 LOW_VALUE_COLLISION = [facts.DEDUCTIBLE_TRADEOFF, facts.LENDER_REQUIREMENT_ALT]
+
+# The safety floor is the user's emergency cushion; the derived below-floor/negative flags
+# (decisions/evaluate.py) cite it.
+PROJECTION_FLOOR = [facts.EMERGENCY_FUND]

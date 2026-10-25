@@ -85,6 +85,10 @@ export default function ProjectionChart({
   const idxOf = (month: string) => rows.findIndex((r) => r.month === month);
   const tinted = selected ? selected.result.months_below_floor.filter((m) => idxOf(m) >= 0) : [];
   const monthAt = (v: unknown) => rows[Number(v)]?.month ?? "";
+  // Past 12 months: one tick per January, labelled by year, and thinner lines; the 12-month layout is unchanged.
+  const long = rows.length > 12;
+  const ticks = long ? rows.filter((r) => r.month.endsWith("-01")).map((r) => r.idx) : rows.map((r) => r.idx);
+  const tickLabel = (v: number) => (long ? monthAt(v).slice(0, 4) : fmtMonthShort(monthAt(v)));
 
   const grid = dark ? "#252320" : "#ebe8e1";
   const axis = dark ? "#918b80" : "#787369";
@@ -127,8 +131,8 @@ export default function ProjectionChart({
               dataKey="idx"
               type="number"
               domain={[-0.5, rows.length - 0.5]}
-              ticks={rows.map((r) => r.idx)}
-              tickFormatter={(v: number) => fmtMonthShort(monthAt(v))}
+              ticks={ticks}
+              tickFormatter={tickLabel}
               stroke={axis}
               tick={{ fontSize: 12, fill: axis }}
               tickLine={false}
@@ -183,7 +187,7 @@ export default function ProjectionChart({
                   name={s.label}
                   hide={hidden.has(s.id)}
                   stroke={colorOf(s.id)}
-                  strokeWidth={isSel ? 2 : isBase ? 1 : 1.25}
+                  strokeWidth={long ? (isSel ? 1.5 : isBase ? 0.75 : 1) : isSel ? 2 : isBase ? 1 : 1.25}
                   strokeDasharray={isBase ? "4 4" : undefined}
                   strokeOpacity={selectedId && !isSel && !isBase ? 0.6 : 1}
                   dot={false}

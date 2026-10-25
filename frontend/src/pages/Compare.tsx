@@ -15,6 +15,7 @@ import FlagList from "../components/FlagList";
 import OptionCard from "../components/OptionCard";
 import ProjectionChart, { BASELINE_KEY, seriesColor } from "../components/ProjectionChart";
 import { Button, Card, Empty, ErrorNote } from "../components/ui";
+import HorizonSelect, { HorizonNote } from "../components/HorizonSelect";
 
 export default function Compare() {
   const { profile, evaluation, explanations, explainStatus, explainError, selectedOptionId, decisionId, inputs, selectOption, prefetchExplanations } =
@@ -33,7 +34,7 @@ export default function Compare() {
     setApplyingId(s.id);
     setApplyError(null);
     try {
-      const result = await api.evaluate(next.decisionId, next.inputs);
+      const result = await api.evaluate(next.decisionId, next.inputs, useAppState.getState().horizonMonths);
       setApplied({ id: s.id, evalId: result.eval_id, suggestions: from });
       const st = useAppState.getState();
       st.setInputs(next);
@@ -129,19 +130,23 @@ export default function Compare() {
 
         <div className="space-y-4">
           <Card
-            title="12-month projection"
+            title="Projection"
             aside={
-              selectedProjection && (
-                <span className="text-xs text-slate-500 dark:text-slate-400">
-                  {selected?.label}: lowest point{" "}
-                  <span className={`tabular font-medium ${selectedProjection.min_balance_cents < 0 ? "text-danger" : selectedProjection.min_balance_cents < floor ? "text-warn" : "text-ok"}`}>
-                    {fmtCents(selectedProjection.min_balance_cents)}
+              <span className="flex flex-wrap items-center gap-4">
+                {selectedProjection && (
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    {selected?.label}: lowest point{" "}
+                    <span className={`tabular font-medium ${selectedProjection.min_balance_cents < 0 ? "text-danger" : selectedProjection.min_balance_cents < floor ? "text-warn" : "text-ok"}`}>
+                      {fmtCents(selectedProjection.min_balance_cents)}
+                    </span>
                   </span>
-                </span>
-              )
+                )}
+                <HorizonSelect id="horizon-compare" />
+              </span>
             }
           >
             <ProjectionChart series={series} selectedId={selectedOptionId} floorCents={floor} height={300} onMonthClick={setActiveMonth} />
+            <HorizonNote source={evaluation} />
           </Card>
 
           <Card title={selected ? `Flags · ${selected.label}` : "Flags"}>

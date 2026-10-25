@@ -86,16 +86,18 @@ export const api = {
       ? Promise.resolve(fixture<Transaction[]>("transactions").slice(0, limit))
       : request<Transaction[]>(`/profile/transactions?limit=${limit}`),
 
-  baseline: () =>
-    USE_FIXTURES ? Promise.resolve(fixture<ProjectionResult>("baseline")) : request<ProjectionResult>("/projection/baseline"),
+  baseline: (horizonMonths = 12) =>
+    USE_FIXTURES
+      ? Promise.resolve(fixture<ProjectionResult>("baseline"))
+      : request<ProjectionResult>(`/projection/baseline?horizon_months=${horizonMonths}`),
 
   decisions: () =>
     USE_FIXTURES ? Promise.resolve(fixture<DecisionSummary[]>("decisions")) : request<DecisionSummary[]>("/decisions"),
 
-  evaluate: (decisionId: string, inputs: unknown) =>
+  evaluate: (decisionId: string, inputs: unknown, horizonMonths = 12) =>
     USE_FIXTURES
       ? Promise.resolve(fixture<EvaluateResponse>(`evaluate_${shortId(decisionId)}`))
-      : post<EvaluateResponse>(`/decisions/${decisionId}/evaluate`, { inputs }),
+      : post<EvaluateResponse>(`/decisions/${decisionId}/evaluate`, { inputs, horizon_months: horizonMonths }),
 
   explain: (decisionId: string, evalId: string) =>
     USE_FIXTURES

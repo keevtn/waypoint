@@ -33,7 +33,7 @@ export default function App() {
         if (!alive) return;
         setProfile(p);
         try {
-          setBaseline(await api.baseline());
+          setBaseline(await api.baseline(useAppState.getState().horizonMonths));
         } catch {
           /* chart stays in its loading state */
         }

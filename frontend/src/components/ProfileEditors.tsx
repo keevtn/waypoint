@@ -23,7 +23,7 @@ const newId = (prefix: string) => `${prefix}_${Date.now().toString(36)}${Math.ra
 /** Send one PUT /profile, then refetch profile + baseline and drop any cached evaluation. */
 export async function saveProfilePatch(patch: Partial<Pick<Profile, "balance_cents" | "income" | "recurring" | "one_offs" | "safety_floor_cents">>): Promise<Profile> {
   await api.updateProfile(patch);
-  const [p, b] = await Promise.all([api.profile(), api.baseline()]);
+  const [p, b] = await Promise.all([api.profile(), api.baseline(useAppState.getState().horizonMonths)]);
   const st = useAppState.getState();
   st.setProfile(p);
   st.setBaseline(b);
@@ -39,7 +39,7 @@ const sameRows = (a: { id: string; amount_cents: number }[], b: { id: string; am
 /** Replace the profile with the demo account: POST /bank/connect, then refetch. */
 export async function resetToDemo() {
   await api.connect();
-  const [p, b] = await Promise.all([api.profile(), api.baseline()]);
+  const [p, b] = await Promise.all([api.profile(), api.baseline(useAppState.getState().horizonMonths)]);
   const st = useAppState.getState();
   st.setProfile(p);
   st.setBaseline(b);

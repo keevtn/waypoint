@@ -3,12 +3,16 @@ import { create } from "zustand";
 import { ApiError, api } from "./api";
 import { friendlyError } from "./lib/hooks";
 import type { DecisionInputs } from "./lib/decisionInputs";
+import { DEFAULT_HORIZON_MONTHS } from "./lib/horizon";
+import { storeHorizon, storedHorizon } from "./lib/session";
 import type { ActionCard, EvaluateResponse, Explanation, Profile, ProjectionResult, StressResponse } from "./types";
 
 interface AppState {
   profile: Profile | null;
   baseline: ProjectionResult | null;
   decisionId: string;
+  /** Projection horizon in months (12, 60, 120); sent to /projection/baseline and every /evaluate. */
+  horizonMonths: number;
   /** The inputs behind `evaluation`, tagged with their module. */
   inputs: DecisionInputs | null;
   evaluation: EvaluateResponse | null;
@@ -22,6 +26,7 @@ interface AppState {
   actionCard: ActionCard | null; // for selectedOptionId; cleared when the option changes
   setProfile: (p: Profile | null) => void;
   setBaseline: (b: ProjectionResult | null) => void;
+  setHorizonMonths: (months: number) => void;
   /** Record the module + inputs about to be evaluated. */
   setInputs: (i: DecisionInputs) => void;
   setEvaluation: (e: EvaluateResponse | null) => void;
@@ -42,6 +47,7 @@ export const useAppState = create<AppState>((set, get) => ({
   profile: null,
   baseline: null,
   decisionId: "auto_insurance",
+  horizonMonths: storedHorizon(DEFAULT_HORIZON_MONTHS),
   inputs: null,
   evaluation: null,
   evalGen: 0,
@@ -53,6 +59,10 @@ export const useAppState = create<AppState>((set, get) => ({
   actionCard: null,
   setProfile: (profile) => set({ profile }),
   setBaseline: (baseline) => set({ baseline }),
+  setHorizonMonths: (horizonMonths) => {
+    storeHorizon(horizonMonths);
+    set({ horizonMonths });
+  },
   setInputs: (inputs) => set({ inputs, decisionId: inputs.decisionId }),
   setEvaluation: (evaluation) =>
     set((s) => ({
@@ -92,10 +102,10 @@ export const useAppState = create<AppState>((set, get) => ({
       return await call(first.eval_id);
     } catch (e) {
       if (!isUnknownEval(e)) throw e;
-      const { inputs, decisionId, evalGen } = get();
+      const { inputs, decisionId, evalGen, horizonMonths } = get();
       if (!inputs) throw e;
       // Re-evaluate silently with the inputs the user already entered; deterministic, so the options are the same.
-      const fresh = await (refreshing ??= api.evaluate(decisionId, inputs.inputs).finally(() => (refreshing = null)));
+      const fresh = await (refreshing ??= api.evaluate(decisionId, inputs.inputs, horizonMonths).finally(() => (refreshing = null)));
       if (get().evalGen !== evalGen) throw e; // user started a new evaluation meanwhile
       set((s) => ({
         evaluation: fresh,

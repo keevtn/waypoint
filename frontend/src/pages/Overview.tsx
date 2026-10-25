@@ -10,6 +10,7 @@ import { markConnected } from "../lib/session";
 import ProjectionChart, { BASELINE_KEY } from "../components/ProjectionChart";
 import { Badge, Button, Card, Dot, ErrorNote, Skeleton, Stat, inputClass, type Tone } from "../components/ui";
 import { BalanceEditor, ListEditorCard, resetToDemo } from "../components/ProfileEditors";
+import HorizonSelect, { HorizonNote } from "../components/HorizonSelect";
 
 const confidenceTone = (c: number): Tone => (c >= 0.9 ? "ok" : c >= 0.7 ? "warn" : "neutral");
 
@@ -42,7 +43,7 @@ export default function Overview() {
       const c = await api.connect();
       setInstitution(c.institution);
       markConnected();
-      const [p, b] = await Promise.all([api.profile(), api.baseline()]);
+      const [p, b] = await Promise.all([api.profile(), api.baseline(useAppState.getState().horizonMonths)]);
       setProfile(p);
       setBaseline(b);
     } catch (e) {
@@ -204,14 +205,17 @@ export default function Overview() {
       </div>
 
       <Card
-        title="12-month baseline"
+        title="Baseline"
         aside={
-          baseline && (
-            <span className="text-xs text-slate-500 dark:text-slate-400">
-              Lowest point <span className="tabular font-medium text-slate-700 dark:text-slate-200">{fmtCents(baseline.min_balance_cents)}</span> on{" "}
-              {fmtDate(baseline.min_balance_date)}
-            </span>
-          )
+          <span className="flex flex-wrap items-center gap-4">
+            {baseline && (
+              <span className="text-xs text-slate-500 dark:text-slate-400">
+                Lowest point <span className="tabular font-medium text-slate-700 dark:text-slate-200">{fmtCents(baseline.min_balance_cents)}</span> on{" "}
+                {fmtDate(baseline.min_balance_date)}
+              </span>
+            )}
+            <HorizonSelect id="horizon-overview" />
+          </span>
         }
       >
         {baseline ? (
@@ -227,6 +231,7 @@ export default function Overview() {
         <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
           End-of-month balance if your income, bills, one-time costs, and typical spending continue.
         </p>
+        <HorizonNote source={baseline} />
       </Card>
 
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -296,7 +301,7 @@ function FloorEditor({ profile, onSaved }: { profile: Profile; onSaved: (p: Prof
       const p = await api.updateProfile({ safety_floor_cents: cents });
       onSaved(p);
       try {
-        useAppState.getState().setBaseline(await api.baseline());
+        useAppState.getState().setBaseline(await api.baseline(useAppState.getState().horizonMonths));
       } catch {
         /* keep the old baseline if the refetch fails */
       }

@@ -21,7 +21,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 
 | Session | Branch | Phase | Last merged to main | Blocked on | Updated |
 |---------|--------|-------|---------------------|------------|---------|
-| A llm | a/import | done | P6 + P7 @ 2026-10-24; labels fix; S1 rent module; eval cache sqlite; S2 big_purchase module + suggestions @ 2026-10-25 ~03:30; scenario labels in stress prose; projection-derived status flags + flag labels; PUT /profile full edit; 12/60/120-month horizons; CSV import + product lookup @ 2026-10-25 09:40 | — | 2026-10-25 |
+| A llm | a/lookup-and-spend | done | P6 + P7 @ 2026-10-24; labels fix; S1 rent module; eval cache sqlite; S2 big_purchase module + suggestions @ 2026-10-25 ~03:30; scenario labels in stress prose; projection-derived status flags + flag labels; PUT /profile full edit; 12/60/120-month horizons; CSV import + product lookup; lookup hardening + spending_up scenario + variable spend edit @ 2026-10-25 | — | 2026-10-25 |
 | B wire | b/p4-live | P4 live | All pages verified on live explain/stress/action @ 2026-10-24 (528e997) | — | 2026-10-24 |
 | D plaid | d/p8-plaid | P8 | — | A-P1 | — |
 
@@ -69,6 +69,13 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 ## Session A note: evaluation cache persisted to sqlite (merged to main)
 
 `decisions/cache.py` now writes every evaluation through to a sqlite table (`evaluations` in `config.DB_PATH`, default `backend/waypoint.db`, already gitignored; override with `DB_PATH`) and reads it back on an in-memory miss, so a restart or redeploy between `/evaluate` and `/explain|/stress|/action` no longer yields 404 `unknown_eval`. TTL stays 1h in both layers (expired rows are evicted on every put/get). Rows are pydantic JSON dumps rehydrated through the module's `InputModel`; a row that no longer validates (contract change) or whose module is gone is treated as a miss. If the file cannot be created (read-only disk) the cache logs once and runs memory-only. Tests use a temp `DB_PATH` (`tests/conftest.py`). **Render: the disk is ephemeral per deploy, so this covers restarts within a deploy, not across deploys, unless a persistent disk is mounted and `DB_PATH` points at it.**
+
+## Session A note: lookup hardening, spending_up scenario, variable-spend edit (merged to main)
+
+- `/products/lookup` now sends browser-like headers (Chrome UA, `Accept: text/html...`, `Accept-Language: en-US`); parses every JSON-LD block (arrays, `@graph`, `Product` or `ProductGroup`; `offers.price`, `offers[].price`, `offers.lowPrice`, `offers.priceSpecification.price`), then Open Graph `product:price:amount` / `og:price:amount`, then microdata `itemprop="price"` (content or text), then `<title>` with a price, then a last-resort `"price":"12.34"` in inline JSON. HTTP 403 / 429 / 503 or a bot-challenge body ("access denied", "verify you are human", "enable JavaScript and cookies", "captcha") returns `confidence: "none"`, `note: "This store blocks automated lookups; enter the price manually."` with status 200, not an error.
+- **Live check (from a residential Windows machine, not Render; Render's datacenter IPs will do no better):** B&H 403 Cloudflare "Just a moment..." -> blocked note; Newegg 403 Cloudflare challenge -> blocked note; eBay 403 "Error Page" -> blocked note; Etsy 403 captcha -> blocked note. **None of the four parse.** All four return the blocked note cleanly in under a second. Stores without bot walls (Shopify-style pages with JSON-LD) are what the parser is good for; demo with one of those or the manual price field.
+- `PUT /profile` now also passes through `variable.mean_monthly_cents` and `variable.std_monthly_cents` (`months_observed` stays detector-measured) and recomputes slack.
+- New stress scenario `spending_up` in every module's menu: label "Your everyday spending runs higher than usual.", param `pct` 10-40 (default 25). Engine: `project(..., spend_multiplier=[...])` scales the variable-spend drip per emitted month, exactly like `income_multiplier`; no other engine change. **B:** no UI change needed; it appears in `/stress` results like any scenario. Note the persona baseline's minimum is on day 1 (rent), so the scenario lowers every month's end balance but may leave the *baseline* minimum unchanged; options' minima (January) do drop.
 
 ## Session A note: POST /api/products/lookup (merged to main)
 

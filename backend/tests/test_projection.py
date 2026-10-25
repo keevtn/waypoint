@@ -121,3 +121,23 @@ def test_persona_baseline_outcomes():
     loan = Commitment(id="cmt_loan", label="Car loan", recurring_cents=-21200, start_date=date(2026, 11, 17), term_months=48)
     r2 = project(profile, [loan])
     assert 36000 <= r2.monthly_slack_cents <= 45000  # ~$390 after the car loan
+
+
+def test_spend_multiplier_scales_the_drip():
+    from app.bank import local_loader
+    from app.profile import detect
+    from datetime import date
+
+    data = local_loader.load(date(2026, 10, 24))
+    p = detect.build_profile(data.transactions, data.balance_cents, data.as_of, user_one_offs=data.one_offs)
+    base = project(p, [], 12, derive_flags=False)
+    up = project(p, [], 12, derive_flags=False, spend_multiplier=[1.25] * 12)
+    assert up.min_balance_cents <= base.min_balance_cents  # the persona's baseline minimum is day 1 (rent), before the drip accumulates
+    assert up.series[-1].end_balance_cents < base.series[-1].end_balance_cents
+    assert all(u.end_balance_cents < b.end_balance_cents for u, b in zip(up.series, base.series))
+    # month 1's extra outflow is 25% of the variable mean (cumulative rounding sums the drip exactly)
+    assert up.series[0].outflow_cents - base.series[0].outflow_cents == int(round(p.variable.mean_monthly_cents * 1.25)) - p.variable.mean_monthly_cents
+    # a multiplier only on month 3 leaves months 1-2 untouched
+    only3 = project(p, [], 12, derive_flags=False, spend_multiplier=[1.0, 1.0, 1.4])
+    assert [m.end_balance_cents for m in only3.series[:2]] == [m.end_balance_cents for m in base.series[:2]]
+    assert only3.series[2].end_balance_cents < base.series[2].end_balance_cents

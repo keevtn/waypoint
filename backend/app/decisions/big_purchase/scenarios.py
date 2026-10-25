@@ -51,4 +51,13 @@ def scenario_menu(inputs: BigPurchaseInputs, profile: Profile) -> list[ScenarioT
                 "required": ["pct", "from_month"],
             },
         ),
+        ScenarioTemplate(
+            id="spending_up",
+            label="Your everyday spending runs higher than usual.",
+            params_schema={
+                "type": "object",
+                "properties": {"pct": _int(10, 40, "Percent increase in everyday (variable) spending for the whole horizon", 25)},
+                "required": ["pct"],
+            },
+        ),
     ]

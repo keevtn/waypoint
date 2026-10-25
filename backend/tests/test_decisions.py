@@ -146,7 +146,7 @@ def test_scenario_menu_and_action_template(profile, demo_inputs):
     mod = registry.get("auto_insurance")
     inputs = AutoInsuranceInputs.model_validate(demo_inputs)
     menu = {t.id: t for t in mod.scenario_menu(inputs, profile)}
-    assert set(menu) == {"deductible_claim", "shock_expense", "income_gap", "hours_cut", "rent_increase"}
+    assert set(menu) == {"deductible_claim", "shock_expense", "income_gap", "hours_cut", "rent_increase", "spending_up"}
     assert menu["shock_expense"].params_schema["properties"]["amount_cents"]["maximum"] == 150000
     option = next(o for o in mod.candidate_options(inputs, profile) if o.id == "std_full_500")
     tpl = mod.action_template(inputs, option, AS_OF)

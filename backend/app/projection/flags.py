@@ -74,6 +74,7 @@ def derive(
     start: date | None = None,
     one_off_overrides: list[OneOff] | None = None,
     income_multiplier: list[float] | None = None,
+    spend_multiplier: list[float] | None = None,
 ) -> list[Flag]:
     floor = profile.safety_floor_cents
     out: list[Flag] = []
@@ -130,6 +131,7 @@ def derive(
             income_multiplier,
             option_id=res.option_id,
             derive_flags=False,
+            spend_multiplier=spend_multiplier,
         )
         s_month = next(p for p in stressed.series if p.month == claim_month)
         b_month = next(p for p in res.series if p.month == claim_month)

@@ -14,8 +14,9 @@ Semantics
   cumulative rounding, so a month's drip sums exactly to the mean.
 - `one_off_overrides`: extra OneOffs; one whose id matches a profile one-off
   replaces it. `income_multiplier[i]` scales income events in emitted month i
-  (0 = first full month). Both exist so stress scenarios perturb inputs
-  without special-casing the engine.
+  (0 = first full month); `spend_multiplier[i]` scales the variable-spend drip
+  the same way. All three exist so stress scenarios perturb inputs without
+  special-casing the engine.
 """
 from __future__ import annotations
 
@@ -140,6 +141,7 @@ def walk(
     start: date | None = None,
     one_off_overrides: list[OneOff] | None = None,
     income_multiplier: list[float] | None = None,
+    spend_multiplier: list[float] | None = None,
 ) -> Walk:
     start = start or profile.as_of
     months = horizon_months(start, horizon)
@@ -177,6 +179,9 @@ def walk(
         mult = 1.0
         if income_multiplier and mk in month_index and month_index[mk] < len(income_multiplier):
             mult = income_multiplier[month_index[mk]]
+        smult = 1.0
+        if spend_multiplier and mk in month_index and month_index[mk] < len(spend_multiplier):
+            smult = spend_multiplier[month_index[mk]]
         todays = by_day.get(day, [])
         for e in todays:
             if e.amount_cents < 0:
@@ -188,7 +193,7 @@ def walk(
                 amt = int(round(e.amount_cents * mult)) if e.kind == "income" else e.amount_cents
                 balance += amt
                 m_in += amt
-        drip = _drip_for_day(day, profile.variable.mean_monthly_cents)
+        drip = _drip_for_day(day, int(round(profile.variable.mean_monthly_cents * smult)))
         balance -= drip
         m_out += drip
         w.drip_by_day[day] = drip
@@ -227,12 +232,13 @@ def project(
     *,
     option_id: str | None = None,
     derive_flags: bool = True,
+    spend_multiplier: list[float] | None = None,
 ) -> ProjectionResult:
     """SPEC.md §6.3 entry point. `option_id` labels the result; `derive_flags=False` skips flags (used by re-runs)."""
     from . import flags  # local import: flags re-enters project() for the deductible stress
 
-    w = walk(profile, commitments, horizon_months, start, one_off_overrides, income_multiplier)
+    w = walk(profile, commitments, horizon_months, start, one_off_overrides, income_multiplier, spend_multiplier)
     res = result_from_walk(w, profile, commitments, option_id)
     if derive_flags:
-        res.flags = flags.derive(profile, commitments, w, res, start=start, one_off_overrides=one_off_overrides, income_multiplier=income_multiplier)
+        res.flags = flags.derive(profile, commitments, w, res, start=start, one_off_overrides=one_off_overrides, income_multiplier=income_multiplier, spend_multiplier=spend_multiplier)
     return res

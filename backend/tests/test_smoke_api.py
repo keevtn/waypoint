@@ -343,3 +343,18 @@ def test_rag_ask_no_source_refusal(client):
     assert body["answer"] is None
     assert body["refusal"] == "I don't have a trusted source for that, so I won't guess."
     assert body["citations"] == []
+
+
+def test_put_profile_variable_spend_recomputes_slack(client):
+    client.post("/api/bank/connect", json={})
+    p = client.get("/api/profile").json()
+    mean, std, seen = p["variable"]["mean_monthly_cents"], p["variable"]["std_monthly_cents"], p["variable"]["months_observed"]
+    r = client.put("/api/profile", json={"variable": {"mean_monthly_cents": mean + 10000, "std_monthly_cents": std + 500, "months_observed": 99}})
+    assert r.status_code == 200, r.text
+    v = r.json()["variable"]
+    assert v["mean_monthly_cents"] == mean + 10000 and v["std_monthly_cents"] == std + 500 and v["months_observed"] == seen
+    assert r.json()["monthly_slack_cents"] == p["monthly_slack_cents"] - 10000
+    assert client.get("/api/projection/baseline").json()["monthly_slack_cents"] == p["monthly_slack_cents"] - 10000
+    assert client.put("/api/profile", json={"variable": {"mean_monthly_cents": "lots"}}).status_code == 422
+    client.post("/api/bank/connect", json={})
+    assert client.get("/api/profile").json() == p

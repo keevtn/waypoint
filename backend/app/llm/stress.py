@@ -172,9 +172,17 @@ def _rent_item(profile: Profile):
     return min(pool, key=lambda r: r.amount_cents) if pool else None  # most negative = largest outflow
 
 
+def spend_multiplier(scenario: Scenario, horizon: int = 12) -> list[float] | None:
+    """`spending_up`: the variable-spend drip scaled by 1 + pct/100 for the whole horizon."""
+    if scenario.template_id != "spending_up":
+        return None
+    return [1.0 + int(scenario.params["pct"]) / 100.0] * horizon
+
+
 def perturbation(scenario: Scenario, profile: Profile, option: Option | None, horizon: int = 12) -> tuple[list[OneOff], list[float] | None]:
     """(one_off_overrides, income_multiplier) that `project()` applies for this scenario, sized to
-    `horizon` months (an hours cut or a rent increase runs to the end of the horizon)."""
+    `horizon` months (an hours cut or a rent increase runs to the end of the horizon). `spending_up`
+    is handled by `spend_multiplier()`."""
     p = scenario.params
     tid = scenario.template_id
     start = lambda n: payload.plan_month_start(profile, n)  # noqa: E731
@@ -225,13 +233,14 @@ def perturbation(scenario: Scenario, profile: Profile, option: Option | None, ho
 def run_scenario(ev: Evaluation, scenario: Scenario) -> StressResult:
     results: dict[str, ProjectionResult] = {}
     horizon = ev.horizon_months  # the evaluation's horizon, so stressed series line up with the unstressed ones
+    smult = spend_multiplier(scenario, horizon)
     one_offs, mult = perturbation(scenario, ev.profile, None, horizon)
-    results["baseline"] = project(ev.profile, ev.extra_commitments, horizon, None, one_offs or None, mult)
+    results["baseline"] = project(ev.profile, ev.extra_commitments, horizon, None, one_offs or None, mult, spend_multiplier=smult)
     for o in ev.options:
         if o.status == "disallowed":
             continue
         one_offs, mult = perturbation(scenario, ev.profile, o, horizon)
-        results[o.id] = project(ev.profile, [*ev.extra_commitments, o.commitment], horizon, None, one_offs or None, mult, option_id=o.id)
+        results[o.id] = project(ev.profile, [*ev.extra_commitments, o.commitment], horizon, None, one_offs or None, mult, option_id=o.id, spend_multiplier=smult)
     return StressResult(scenario=scenario, results=results)
 
 
@@ -312,4 +321,4 @@ def stress_test(ev: Evaluation, module, preferred: Option) -> tuple[list[StressR
     return results, critique(ev, preferred, results, menu)
 
 
-__all__ = ["CritiqueOut", "SelectOut", "critique", "default_scenarios", "normalize_scenario", "perturbation", "run_scenario", "select_scenarios", "stress_test"]
+__all__ = ["CritiqueOut", "SelectOut", "critique", "default_scenarios", "normalize_scenario", "perturbation", "run_scenario", "select_scenarios", "spend_multiplier", "stress_test"]

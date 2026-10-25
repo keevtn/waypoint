@@ -226,3 +226,27 @@ def test_flag_codes_in_prose_become_labels(client, evaluation, stub):
     assert sent["flag_labels"]["deductible_unaffordable"] == "Deductible not affordable after a claim"
     flags = sent["evaluations"]["std_limited_1000"]["flags"]
     assert any(f.get("label") == "Deductible not affordable after a claim" for f in flags)
+
+
+def test_spending_up_scenario_lowers_min_balance(evaluation, menu):
+    from app.decisions import registry
+
+    for mid in ("auto_insurance", "rent", "big_purchase"):
+        mod = registry.get(mid)
+        ids = [t.id for t in mod.scenario_menu(evaluation.inputs if mid == "auto_insurance" else mod.InputModel.model_validate(
+            {"rent": {"units": [{"label": "A", "rent_cents": 85000, "deposit_cents": 85000, "utilities_cents": 0, "lease_months": 12, "start_date": "2026-11-01"}, {"label": "B", "rent_cents": 95000, "deposit_cents": 95000, "utilities_cents": 0, "lease_months": 12, "start_date": "2026-11-01"}]},
+             "big_purchase": {"name": "Laptop", "amount_cents": 180000, "date": "2026-11-01"}}[mid]), evaluation.profile)]
+        assert "spending_up" in ids, mid
+    t = next(t for t in menu if t.id == "spending_up")
+    assert t.label == "Your everyday spending runs higher than usual."
+    assert t.params_schema["properties"]["pct"]["minimum"] == 10 and t.params_schema["properties"]["pct"]["maximum"] == 40
+    sc = stress.normalize_scenario(t, {"pct": 25}, "spend up")
+    assert sc.params == {"pct": 25}
+    assert stress.normalize_scenario(t, {"pct": 90}, "x").params["pct"] == 40  # clamped
+    assert stress.spend_multiplier(sc, 12) == [1.25] * 12 and stress.perturbation(sc, evaluation.profile, None) == ([], None)
+    res = stress.run_scenario(evaluation, sc)
+    for oid, stressed in res.results.items():
+        if oid == "baseline":  # its minimum is day 1 (rent), before the extra drip accumulates
+            assert stressed.series[-1].end_balance_cents < evaluation.projections[oid].series[-1].end_balance_cents
+        else:
+            assert stressed.min_balance_cents < evaluation.projections[oid].min_balance_cents, oid

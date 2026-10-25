@@ -162,7 +162,7 @@ class Explanation(BaseModel):
 
 
 class ScenarioTemplate(BaseModel):
-    id: str  # "income_gap" | "shock_expense" | "deductible_claim" | "rent_increase" | "hours_cut"
+    id: str  # "income_gap" | "shock_expense" | "deductible_claim" | "rent_increase" | "hours_cut" | "spending_up"
     label: str
     params_schema: dict  # JSON schema for params
 

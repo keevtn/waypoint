@@ -87,7 +87,7 @@ def test_scenario_menu_has_summer_gap(body):
 
     ev = cache.get(body["eval_id"])
     menu = registry.get("rent").scenario_menu(ev.inputs, ev.profile)
-    assert [t.id for t in menu] == ["income_gap", "shock_expense", "rent_increase"]
+    assert [t.id for t in menu] == ["income_gap", "shock_expense", "rent_increase", "spending_up"]
     gap = menu[0].params_schema["properties"]
     assert gap["months"]["maximum"] == 3 and gap["months"]["default"] == 2
     assert "summer" in menu[0].label.lower() or "summer" in gap["months"]["description"].lower()
@@ -107,7 +107,7 @@ def test_explain_stress_action_work_on_the_fake_path(client, body):
     s = r.json()
     assert len(s["scenarios"]) == 3
     tids = {x["scenario"]["template_id"] for x in s["scenarios"]}
-    assert tids <= {"income_gap", "shock_expense", "rent_increase"} and "income_gap" in tids
+    assert tids <= {"income_gap", "shock_expense", "rent_increase", "spending_up"} and "income_gap" in tids
     for x in s["scenarios"]:
         assert set(x["results"]) == {"baseline", "unit_2"}  # disallowed units are not run
     inc = next(x for x in s["scenarios"] if x["scenario"]["template_id"] == "rent_increase")

@@ -170,7 +170,7 @@ def test_action_template_deadline_is_the_purchase_date(module, profile):
     assert any("bucket" in s for s in cash["steps"]) and any("prepayment" in s.lower() for s in fin["steps"])
     assert any("APR" in s for s in fin["steps"]) and len(fin["steps"]) == 5
     menu = {t.id for t in module.scenario_menu(inputs, profile)}
-    assert menu == {"shock_expense", "income_gap", "hours_cut"}
+    assert menu == {"shock_expense", "income_gap", "hours_cut", "spending_up"}
 
 
 def test_api_evaluate_explain_action_fake_llm(client):
@@ -191,7 +191,7 @@ def test_api_evaluate_explain_action_fake_llm(client):
     r = client.post("/api/decisions/big_purchase/stress", json={"eval_id": eval_id, "preferred_option_id": "financed_12"})
     assert r.status_code == 200, r.text
     assert len(r.json()["scenarios"]) == 3
-    assert {s["scenario"]["template_id"] for s in r.json()["scenarios"]} <= {"shock_expense", "income_gap", "hours_cut"}
+    assert {s["scenario"]["template_id"] for s in r.json()["scenarios"]} <= {"shock_expense", "income_gap", "hours_cut", "spending_up"}
     assert client.post("/api/decisions/big_purchase/evaluate", json={"inputs": {"name": "x", "amount_cents": -5, "date": "2026-11-01"}}).status_code == 422
 
 

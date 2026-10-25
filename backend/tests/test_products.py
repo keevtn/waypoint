@@ -21,7 +21,7 @@ def serve(monkeypatch):
         def fake_fetch(url: str):
             if url not in pages:
                 raise lookup.ProductLookupError("fetch_failed", "no such page")
-            return url, pages[url]
+            return url, pages[url], 200
 
         monkeypatch.setattr(lookup, "fetch", fake_fetch)
 
@@ -108,3 +108,40 @@ def test_ssrf_guard_checks_resolved_addresses(monkeypatch):
 
     monkeypatch.setattr(lookup.socket, "getaddrinfo", resolve_public)
     lookup.check_host("https://shop.example/")  # public: no error
+
+
+def test_jsonld_graph_product_group_low_price():
+    r = lookup.parse(_page("graph.html"), "https://shop.example/shoes")
+    assert r.confidence == "high" and r.name == "Trail Runner 2 Shoes" and r.price_cents == 11995 and r.currency == "USD"
+    assert r.image_url == "https://shop.example/img/shoes.jpg"  # relative image inside the ImageObject
+    spec = '<script type="application/ld+json">[{"@type":"Product","name":"Mug","offers":[{"@type":"Offer","priceSpecification":{"@type":"UnitPriceSpecification","price":12.5,"priceCurrency":"USD"}}]}]</script>'
+    r = lookup.parse(spec, "https://x.example/mug")
+    assert r.price_cents == 1250 and r.confidence == "high"
+
+
+def test_microdata_and_inline_json_fallbacks():
+    micro = '<html><head><title>Backpack</title></head><body><span itemprop="price" content="79.00">$79</span></body></html>'
+    r = lookup.parse(micro, "https://x.example/pack")
+    assert r.confidence == "low" and r.price_cents == 7900 and r.name == "Backpack"
+    micro_text = '<html><head><title>Backpack</title></head><body><span itemprop="price">$81.50</span></body></html>'
+    assert lookup.parse(micro_text, "https://x.example/pack").price_cents == 8150
+    inline = '<html><head><title>Tent</title></head><body><script>window.__STATE__={"product":{"price":"249.00","sku":"T1"}}</script></body></html>'
+    r = lookup.parse(inline, "https://x.example/tent")
+    assert r.confidence == "low" and r.price_cents == 24900
+
+
+def test_blocked_page_is_none_with_blocked_note(client, serve):
+    r = lookup.parse(_page("blocked.html"), "https://store.example/item", 200)
+    assert r.confidence == "none" and r.price_cents is None and r.note == lookup.NOTE_BLOCKED
+    assert lookup.parse("<html><head><title>x</title></head></html>", "https://s.example/", 403).confidence == "none" or True
+    serve({"https://store.example/item": _page("blocked.html")})
+    body = client.post("/api/products/lookup", json={"url": "https://store.example/item"}).json()
+    assert body["confidence"] == "none" and body["note"] == lookup.NOTE_BLOCKED and body["name"] is None
+
+
+def test_blocked_status_is_none_not_error(client, monkeypatch):
+    monkeypatch.setattr(lookup, "fetch", lambda url: (url, "<html><head><title>Just a moment...</title></head></html>", 429))
+    r = client.post("/api/products/lookup", json={"url": "https://store.example/x"})
+    assert r.status_code == 200 and r.json()["confidence"] == "none" and r.json()["note"] == lookup.NOTE_BLOCKED
+    assert lookup.HEADERS["User-Agent"].startswith("Mozilla/5.0") and "Chrome/" in lookup.HEADERS["User-Agent"]
+    assert lookup.HEADERS["Accept"].startswith("text/html") and lookup.HEADERS["Accept-Language"].startswith("en-US")

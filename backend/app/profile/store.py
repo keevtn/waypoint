@@ -80,12 +80,14 @@ def get_transactions(limit: int = 50) -> list[Transaction]:
 
 
 EDITABLE_FIELDS = ("balance_cents", "income", "recurring", "one_offs", "safety_floor_cents")
+VARIABLE_FIELDS = ("mean_monthly_cents", "std_monthly_cents")
 
 
 def update_profile(patch: dict[str, Any]) -> Profile:
     """PUT /profile: a partial Profile body. `balance_cents`, `income`, `recurring`, `one_offs`
-    (each list replaced whole) and `safety_floor_cents` are user-editable; everything else in the
-    body (unknown keys, `as_of`, `variable`, the computed `monthly_slack_cents`) is ignored. The
+    (each list replaced whole), `safety_floor_cents` and `variable.mean_monthly_cents` /
+    `variable.std_monthly_cents` are user-editable; everything else in the body (unknown keys,
+    `as_of`, `variable.months_observed`, the computed `monthly_slack_cents`) is ignored. The
     merged profile is validated by the Profile model (pydantic.ValidationError on bad input),
     slack is recomputed, and the result persists in the single-user store so /projection/baseline
     and every later /evaluate see it. POST /bank/connect rebuilds from the persona and discards edits."""
@@ -94,6 +96,11 @@ def update_profile(patch: dict[str, Any]) -> Profile:
     for key in EDITABLE_FIELDS:
         if key in patch:
             data[key] = patch[key]
+    var = patch.get("variable")
+    if isinstance(var, dict):  # mean / std are editable; months_observed stays what the detector measured
+        for key in VARIABLE_FIELDS:
+            if key in var:
+                data["variable"][key] = var[key]
     new = Profile.model_validate(data)
     new = new.model_copy(update={"monthly_slack_cents": detect.compute_slack(new.income, new.recurring, new.variable)})
     with _lock:

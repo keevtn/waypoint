@@ -10,13 +10,16 @@ const KIND_TONE: Record<Constraint["kind"], Tone> = { required: "accent", disall
 export function PriceBadge({ price }: { price: Option["price"] }) {
   if (price.kind === "user_quote") return <Badge tone="accent">Your quote</Badge>;
   if (price.source_url || price.source_title) {
-    const inner = <>Estimate · {price.source_title ?? "source"}</>;
+    // Short badge; the full source title (often a sentence) lives in the tooltip and the link.
+    const tip = [price.source_title, price.retrieved ? `Retrieved ${price.retrieved}` : null].filter(Boolean).join(" · ");
     return price.source_url ? (
-      <a href={price.source_url} target="_blank" rel="noopener noreferrer" title={price.source_title ?? undefined}>
-        <Badge tone="neutral">{inner}</Badge>
+      <a href={price.source_url} target="_blank" rel="noopener noreferrer" title={tip} className="hover:opacity-80">
+        <Badge tone="neutral">Estimate · source</Badge>
       </a>
     ) : (
-      <Badge tone="neutral">{inner}</Badge>
+      <Badge tone="neutral" title={tip}>
+        Estimate · source
+      </Badge>
     );
   }
   // Estimate with no source attached: say so loudly (design rule §3.6).

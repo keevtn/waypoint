@@ -1,6 +1,6 @@
 // Flag list for one projection. Each flag is clickable → parent shows "why this month is tight".
 import type { Flag, FlagSeverity } from "../types";
-import { fmtCents, fmtMonth } from "../lib/format";
+import { fmtCents, fmtDate, fmtMonth } from "../lib/format";
 import { Dot, Empty, type Tone } from "./ui";
 
 const SEV_TONE: Record<FlagSeverity, Tone> = { info: "ok", warn: "warn", danger: "danger" };
@@ -24,6 +24,14 @@ export function flagTitle(f: Flag): string {
 
 const num = (d: Record<string, unknown>, k: string): number | null => (typeof d[k] === "number" ? (d[k] as number) : null);
 
+/** Deductible flag details: fixtures use claim_month/resulting_min_balance_cents, the engine uses claim_date/min_balance_cents. */
+function deductibleBits(d: Record<string, unknown>): { ded: string; when: string; res: string | null } {
+  const dedC = num(d, "deductible_cents");
+  const resC = num(d, "resulting_min_balance_cents") ?? num(d, "min_balance_cents");
+  const claim = typeof d.claim_month === "string" ? fmtMonth(d.claim_month) : typeof d.claim_date === "string" ? fmtDate(d.claim_date) : null;
+  return { ded: dedC !== null ? fmtCents(dedC) : "deductible", when: claim ? ` on ${claim}` : "", res: resC !== null ? fmtCents(resC) : null };
+}
+
 export function flagSummary(f: Flag): string {
   const d = f.detail;
   const min = num(d, "min_balance_cents");
@@ -34,14 +42,12 @@ export function flagSummary(f: Flag): string {
     case "negative":
       return min !== null ? `Lowest point ${fmtCents(min)}.` : "Projected balance goes below zero.";
     case "deductible_unaffordable": {
-      const ded = num(d, "deductible_cents");
-      const res = num(d, "resulting_min_balance_cents");
-      return `A ${ded !== null ? fmtCents(ded) : ""} claim${d.claim_month ? ` in ${fmtMonth(String(d.claim_month))}` : ""} would leave you at ${res !== null ? fmtCents(res) : "below the floor"}.`;
+      const { ded, when, res } = deductibleBits(d);
+      return `A ${ded} claim${when} would leave you at ${res ?? "below the floor"}${floor !== null ? ` against a ${fmtCents(floor)} floor` : ""}.`;
     }
     case "deductible_ok": {
-      const ded = num(d, "deductible_cents");
-      const res = num(d, "resulting_min_balance_cents");
-      return `A ${ded !== null ? fmtCents(ded) : ""} claim${d.claim_month ? ` in ${fmtMonth(String(d.claim_month))}` : ""} would still leave ${res !== null ? fmtCents(res) : "you above the floor"}.`;
+      const { ded, when, res } = deductibleBits(d);
+      return `A ${ded} claim${when} would still leave ${res ?? "you above the floor"}${floor !== null ? ` against a ${fmtCents(floor)} floor` : ""}.`;
     }
     case "low_slack":
       return "Recurring costs leave little room for variable spending.";

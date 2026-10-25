@@ -1,7 +1,8 @@
 // Product link lookup for the Big purchase form. POST /products/lookup; on high or low confidence the
 // parent prefills name and price (still editable); on none the note shows inline. Never blocks the form.
 import { useState } from "react";
-import { api, type ProductLookupResponse } from "../api";
+import { api } from "../api";
+import type { ProductLookupResponse } from "../types";
 import { errorMessage } from "../lib/hooks";
 import { Button, Field, inputClass } from "./ui";
 
@@ -31,9 +32,9 @@ export default function ProductLookup({ onFound }: { onFound: (r: ProductLookupR
     }
   };
 
-  const domain = result?.source_domain ?? (() => {
+  const domain = (() => {
     try {
-      return new URL(url.trim()).hostname.replace(/^www\./, "");
+      return new URL(result?.source_url || url.trim()).hostname.replace(/^www\./, "");
     } catch {
       return null;
     }

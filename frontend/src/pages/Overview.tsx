@@ -66,7 +66,7 @@ export default function Overview() {
             {connecting ? "Connecting…" : "Connect your bank"}
           </Button>
           <span className="text-xs text-slate-500 dark:text-slate-400">Demo bank · Plaid sandbox</span>
-          <CsvImport onImported={(inst) => setInstitution(inst ?? "Imported CSV")} />
+          <CsvImport onImported={(n) => setInstitution(`Imported CSV · ${n} transactions`)} />
         </div>
         {connecting && (
           <div className="mt-6 space-y-3">

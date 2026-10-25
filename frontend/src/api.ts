@@ -3,11 +3,13 @@
 import type {
   ActionCard,
   ConnectResponse,
+  CsvImportResponse,
   DecisionSummary,
   ErrorResponse,
   EvaluateResponse,
   ExplainResponse,
   HealthResponse,
+  ProductLookupResponse,
   Profile,
   ProjectionResult,
   RagAskResponse,
@@ -83,24 +85,7 @@ async function postForm<T>(path: string, form: FormData): Promise<T> {
   return (await res.json()) as T;
 }
 
-// Shapes read tolerantly until the contract commit lands in types.ts; unknown fields are ignored.
-export interface ImportCsvResponse {
-  institution: string | null;
-  transactions: number | null;
-  warnings: string[];
-}
 
-export interface ProductLookupResponse {
-  confidence: "high" | "low" | "none";
-  name: string | null;
-  price_cents: number | null;
-  image_url: string | null;
-  source_domain: string | null;
-  note: string | null;
-}
-
-const str = (v: unknown): string | null => (typeof v === "string" && v.trim() ? v : null);
-const int = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? Math.round(v) : null);
 
 export const api = {
   health: () =>
@@ -114,31 +99,19 @@ export const api = {
   profile: () => (USE_FIXTURES ? Promise.resolve(fixture<Profile>("profile")) : request<Profile>("/profile")),
 
   /** POST /bank/import_csv (multipart: `file`, optional `balance_cents`). The file is read once, never stored. */
-  importCsv: async (file: File, balanceCents: number | null): Promise<ImportCsvResponse> => {
-    if (USE_FIXTURES) return { institution: "CSV import", transactions: null, warnings: [] };
+  importCsv: async (file: File, balanceCents: number | null): Promise<CsvImportResponse> => {
+    if (USE_FIXTURES) return { imported: 0, skipped: 0, profile: fixture<Profile>("profile"), warnings: [] };
     const form = new FormData();
     form.append("file", file, file.name);
     if (balanceCents !== null) form.append("balance_cents", String(balanceCents));
-    const r = (await postForm<Record<string, unknown>>("/bank/import_csv", form)) ?? {};
-    const warnings = Array.isArray(r.warnings) ? (r.warnings as unknown[]).map((w) => (typeof w === "string" ? w : (w as { message?: string })?.message ?? String(w))) : [];
-    return { institution: str(r.institution), transactions: int(r.transactions), warnings };
+    return postForm<CsvImportResponse>("/bank/import_csv", form);
   },
 
   /** POST /products/lookup { url }. Confidence high/low prefill the form; none leaves it alone. */
-  productLookup: async (url: string): Promise<ProductLookupResponse> => {
-    if (USE_FIXTURES) return { confidence: "none", name: null, price_cents: null, image_url: null, source_domain: null, note: "Lookup is unavailable in fixture mode." };
-    const r = (await post<Record<string, unknown>>("/products/lookup", { url })) ?? {};
-    const c = r.confidence;
-    const confidence: ProductLookupResponse["confidence"] = c === "high" || c === "low" ? c : "none";
-    return {
-      confidence,
-      name: str(r.name) ?? str(r.title),
-      price_cents: int(r.price_cents) ?? int(r.amount_cents),
-      image_url: str(r.image_url) ?? str(r.image),
-      source_domain: str(r.source_domain) ?? str(r.domain) ?? str(r.source),
-      note: str(r.note) ?? str(r.message),
-    };
-  },
+  productLookup: (url: string): Promise<ProductLookupResponse> =>
+    USE_FIXTURES
+      ? Promise.resolve({ name: null, price_cents: null, currency: null, source_url: url, image_url: null, confidence: "none", note: "Lookup is unavailable in fixture mode." })
+      : post<ProductLookupResponse>("/products/lookup", { url }),
 
   updateProfile: (patch: Partial<Pick<Profile, "safety_floor_cents" | "one_offs" | "recurring">>) =>
     USE_FIXTURES

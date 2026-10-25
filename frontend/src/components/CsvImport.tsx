@@ -8,7 +8,7 @@ import { errorMessage } from "../lib/hooks";
 import { markConnected } from "../lib/session";
 import { Button, Field, inputClass } from "./ui";
 
-export default function CsvImport({ onImported }: { onImported?: (institution: string | null) => void }) {
+export default function CsvImport({ onImported }: { onImported?: (imported: number, skipped: number) => void }) {
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [balance, setBalance] = useState("");
@@ -37,11 +37,11 @@ export default function CsvImport({ onImported }: { onImported?: (institution: s
       setWarnings(r.warnings);
       markConnected();
       const st = useAppState.getState();
-      const [p, b] = await Promise.all([api.profile(), api.baseline(st.horizonMonths)]);
-      st.setProfile(p);
+      const b = await api.baseline(st.horizonMonths);
+      st.setProfile(r.profile);
       st.setBaseline(b);
       if (st.evaluation) st.setEvaluation(null);
-      onImported?.(r.institution);
+      onImported?.(r.imported, r.skipped);
     } catch (err) {
       setError(errorMessage(err));
     } finally {

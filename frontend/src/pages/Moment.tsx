@@ -306,7 +306,7 @@ export default function Moment() {
   return (
     <section className="space-y-4">
       <header>
-        <h1 className="text-xl font-semibold tracking-tight">What are you deciding?</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">What are you deciding?</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">Each option is run through your projection; tight months are flagged.</p>
       </header>
 
@@ -440,7 +440,7 @@ export default function Moment() {
 
             <ul className="space-y-4">
               {rentForm.units.map((u, i) => (
-                <li key={i} className="rounded-md border border-slate-200 p-3 dark:border-slate-800">
+                <li key={i} className="rounded-md bg-slate-50 p-4 dark:bg-slate-950/60">
                   <div className="mb-3 flex items-center justify-between gap-2">
                     <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Unit {i + 1}</span>
                     {rentForm.units.length > MIN_UNITS && (
@@ -595,10 +595,10 @@ function ModuleCard({ decision, selected, onSelect }: { decision: DecisionSummar
       onClick={onSelect}
       aria-pressed={selected}
       className={[
-        "rounded-lg border p-4 text-left",
+        "rounded-md border p-5 text-left",
         soon ? "cursor-not-allowed border-slate-200 bg-slate-50 opacity-70 dark:border-slate-800 dark:bg-slate-900/50" : "",
-        !soon && selected ? "border-accent ring-1 ring-accent dark:border-accent-light dark:ring-accent-light" : "",
-        !soon && !selected ? "border-slate-200 hover:border-slate-400 dark:border-slate-800" : "",
+        !soon && selected ? "border-accent bg-white ring-1 ring-inset ring-accent dark:border-accent-light dark:bg-slate-900 dark:ring-accent-light" : "",
+        !soon && !selected ? "border-slate-200 bg-white hover:border-slate-400 dark:border-slate-800 dark:bg-slate-900" : "",
       ].join(" ")}
     >
       <div className="flex items-center justify-between gap-2">

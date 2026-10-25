@@ -47,7 +47,7 @@ export default function Action() {
   if (!evaluation || !option) {
     return (
       <section className="space-y-4">
-        <h1 className="text-xl font-semibold tracking-tight">Action card</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Action card</h1>
         <Empty>
           No option chosen yet.{" "}
           <Link to={evaluation ? "/compare" : "/moment"} className="font-medium text-accent hover:underline dark:text-accent-light">
@@ -76,7 +76,7 @@ export default function Action() {
     <section className="space-y-4">
       <header className="flex flex-wrap items-end justify-between gap-2 print:hidden">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Your next action</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Your next action</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
             {decisionId === "rent"
               ? "A unit and a plan, not a landlord's pitch. Get everything in writing before you pay."
@@ -165,7 +165,7 @@ export default function Action() {
 
             {card.deadline && (
               <div className="mt-4 border-l-2 border-warn pl-3 dark:border-amber-300">
-                <div className="text-[11px] text-slate-500 dark:text-slate-400">Deadline</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400">Deadline</div>
                 <div className="tabular text-xl font-semibold leading-none">{fmtDate(card.deadline)}</div>
                 {card.deadline_reason && <div className="mt-1 text-xs text-slate-600 dark:text-slate-300">{card.deadline_reason}</div>}
               </div>
@@ -202,7 +202,7 @@ export default function Action() {
             )}
 
             {card.talk_to_human_url && (
-              <section className="mt-6 rounded-md border border-slate-200 p-4 dark:border-slate-800 print:hidden">
+              <section className="mt-6 rounded-md bg-slate-50 p-4 dark:bg-slate-950/60 print:hidden">
                 <div className="text-sm font-medium">Talk to a human</div>
                 <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
                   {decisionId === "rent"
@@ -240,7 +240,7 @@ export default function Action() {
             )}
           </>
         )}
-        <p className="mt-6 text-[11px] text-slate-400">
+        <p className="mt-6 text-xs text-slate-400">
           Estimates and educational information, not financial advice.{" "}
           {decisionId === "auto_insurance"
             ? "Premiums shown are estimates until you enter a quote."

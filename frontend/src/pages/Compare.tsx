@@ -61,8 +61,8 @@ export default function Compare() {
 
   if (!evaluation) {
     return (
-      <section className="space-y-4">
-        <h1 className="text-xl font-semibold tracking-tight">Compare options</h1>
+      <section className="space-y-6">
+        <h1 className="text-2xl font-semibold tracking-tight">Compare options</h1>
         <Empty>
           Nothing to compare yet.{" "}
           <Link to="/moment" className="font-medium text-accent hover:underline dark:text-accent-light">
@@ -89,10 +89,10 @@ export default function Compare() {
   const colorFor = (optionId: string) => seriesColor(options.findIndex((o) => o.id === optionId), dark);
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Compare options</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Compare options</h1>
           {inputs && <p className="text-xs text-slate-500 dark:text-slate-400">{inputsSummary(inputs)}</p>}
         </div>
         <div className="flex gap-2">

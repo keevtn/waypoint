@@ -216,3 +216,22 @@ Frontend only; no API, store, or data-flow change. Verified in headless Chrome, 
 3. Module order is fixed in the frontend (`lib/modules.ts`: Big purchase, Rent, Auto insurance), independent of what `GET /decisions` returns: the Moment picker sorts through `orderModules`, the landing list uses the same constant, and Big purchase is the default-selected module on Moment when there is no prior evaluation. The picker's title and one-line copy per module come from `MODULE_COPY` (the API description is used only for unknown modules).
 4. The landing's decision links go to `/moment` with the module preselected via router location state (read once in Moment's initial state) when a profile is loaded, otherwise to `/overview` so the user connects first. Note: Chrome keeps that location state on a same-URL reload, so refreshing `/moment` after such a link keeps the preselection; harmless.
 5. Headless-Chrome checks for the landing live in Session B's scratch scripts (not in the repo): 44 assertions across light/dark (route, stepper visibility, chart line and tint counts, order, copy, refresh, preselection).
+
+## Session B — design v2 (measured reference rules) merged (2026-10-25)
+
+`docs/DESIGN_NOTES.md` holds the measured observations from mercury.com (home, /treasury), copilot.money (home, /download) and linear.app (home, /features) at 1280 wide: type scale, line-height ratios, content widths, section rhythm, card padding/border/background, number display, chart clear space, button tiers, and colour counts, plus the 24 rules derived from them and what was applied. Frontend only; no route, state, data-flow, or API change. Tokens for colour and typeface are unchanged.
+
+Applied, in impact order:
+1. Type scale: Tailwind `fontSize` redefined to 8 steps (12/18, 14/21, 15/22, 18/26, 22/28, 26/32, 32/36, 44/48, 52/56); body is 15/22; nothing under 12px (all `text-[10px]`/`text-[11px]` → `text-xs`); page titles 26px; landing h1 44 → 52px at ≥ 640px; large figures weight 500.
+2. Width and rhythm: content 1200px with 24px gutters (was 1152/16); landing sections 96px apart (was 56), hero copy capped at 620px; Compare and Overview blocks 24px apart (was 16), card grids stay at 16px.
+3. One card: `cardClass` in `ui.tsx` (6px radius, 1px `slate-200`, paper on a `slate-50` page in light, `slate-900` on `slate-950` in dark, 20px padding, no shadow) used by Card, option cards, module cards, scenario cards, suggestion cards, landing hero and the Overview feature list. Boxes that sit inside a card (rent units, ask-with-sources answers, "talk to a human") are a background shift with no border, and the suggestions panel is a section with its own cards instead of cards inside a card.
+4. Chart: plot margin 16px top/right, axis labels 12px, legend 16px below the plot.
+5. Buttons: primary and secondary share 36px height, 14px/500 type and 16px side padding; secondary is transparent with a 1px border (was filled).
+
+Verified in headless Chrome, light and dark, against the local backend (`LLM_FAKE=1`): auto, rent, and big-purchase flows through Compare, Stress and Action including the suggestion tap, plus the 44 landing assertions; no console errors, no 4xx/5xx.
+
+Before/after screenshots (1280 wide, full page), committed under `docs/screenshots/design-v2/`:
+- landing: `before_light_landing.png` / `after_light_landing.png`, `before_dark_landing.png` / `after_dark_landing.png`
+- Overview: `before_light_overview.png` / `after_light_overview.png`, `before_dark_overview.png` / `after_dark_overview.png`
+- Compare: `before_light_compare.png` / `after_light_compare.png`, `before_dark_compare.png` / `after_dark_compare.png`
+Reference screenshots and the raw measurement JSON are in Session B's scratch folder (`scratchpad/refs/`), not in the repo.

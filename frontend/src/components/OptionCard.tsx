@@ -122,7 +122,7 @@ export default function OptionCard({
       onClick={onSelect}
       aria-pressed={selected}
       className={[
-        "w-full rounded-md border p-4 text-left",
+        "w-full rounded-md border p-5 text-left",
         selected
           ? "border-accent ring-1 ring-inset ring-accent dark:border-accent-light dark:ring-accent-light"
           : "border-slate-200 hover:border-slate-400 dark:border-slate-800 dark:hover:border-slate-600",
@@ -147,7 +147,7 @@ export default function OptionCard({
           </div>
         </div>
         <div className="shrink-0 text-right">
-          <div className={`tabular text-2xl font-semibold leading-none tracking-tightest ${disallowed ? "text-slate-500 dark:text-slate-400" : ""}`}>
+          <div className={`tabular text-2xl font-medium leading-none tracking-tightest ${disallowed ? "text-slate-500 dark:text-slate-400" : ""}`}>
             {fmtCents(option.price.cents)}
           </div>
           <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">{priceCadence(option)}</div>
@@ -171,7 +171,7 @@ export default function OptionCard({
       {projection && (
         <div className="mt-3 flex items-end justify-between gap-3 border-t border-slate-100 pt-3 dark:border-slate-800">
           <div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400">Lowest point</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">Lowest point</div>
             <div className={`tabular mt-0.5 flex items-center gap-1.5 text-base font-semibold leading-none ${MIN_TEXT[minTone]}`}>
               <Dot tone={minTone} />
               {fmtDollars(projection.min_balance_cents)}
@@ -179,7 +179,7 @@ export default function OptionCard({
           </div>
           {projection.months_below_floor.length > 0 && (
             <div className="text-right">
-              <div className="text-[11px] text-slate-500 dark:text-slate-400">Below floor</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">Below floor</div>
               <div className="tabular mt-0.5 text-base font-semibold leading-none">
                 {projection.months_below_floor.length} <span className="text-xs font-normal text-slate-500 dark:text-slate-400">{projection.months_below_floor.length === 1 ? "month" : "months"}</span>
               </div>

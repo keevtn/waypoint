@@ -7,7 +7,8 @@
 }
 
 body {
-  @apply bg-white text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
+  /* Page one step darker than cards (R9): cards are paper on a slate-50 page in light, slate-900 on slate-950 in dark. */
+  @apply bg-slate-50 text-base text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
   /* Every number lines up: tabular figures everywhere, not only where .tabular is set. */
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "calt" 1;

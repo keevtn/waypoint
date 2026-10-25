@@ -80,19 +80,19 @@ export default function AskWithSources({ module }: { module: string | null }) {
         <div className="mt-4">
           <div className="mb-1.5 text-xs text-slate-500 dark:text-slate-400">You asked: {asked}</div>
           {loading && (
-            <div className="rounded-md border border-slate-200 p-3 dark:border-slate-800">
+            <div className="rounded-md bg-slate-50 p-4 dark:bg-slate-950/60">
               <SkeletonLines n={2} />
             </div>
           )}
           {error && <ErrorNote message={error} />}
           {result && result.refusal && (
-            <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
+            <div className="rounded-md bg-slate-50 p-4 dark:bg-slate-950/60 text-sm text-slate-700 dark:text-slate-200">
               <div className="mb-0.5 text-xs font-medium text-slate-500 dark:text-slate-400">Not answered</div>
               {result.refusal}
             </div>
           )}
           {result && result.answer && (
-            <div className="rounded-md border border-slate-200 p-3 text-sm leading-6 dark:border-slate-800">
+            <div className="rounded-md bg-slate-50 p-4 dark:bg-slate-950/60 text-sm leading-6">
               <CitedText text={result.answer} citations={result.citations} />
               {result.citations.length > 0 && (
                 <div className="mt-2 flex flex-wrap items-center gap-1.5 border-t border-slate-100 pt-2 text-xs text-slate-500 dark:text-slate-400 dark:border-slate-800">

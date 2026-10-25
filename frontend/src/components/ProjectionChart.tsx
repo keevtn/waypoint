@@ -116,7 +116,7 @@ export default function ProjectionChart({
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={rows}
-            margin={{ top: 8, right: 12, bottom: 4, left: 4 }}
+            margin={{ top: 16, right: 16, bottom: 8, left: 4 }}
             onClick={(e) => {
               const m = monthAt((e as { activeLabel?: string | number } | null)?.activeLabel);
               if (m && onMonthClick) onMonthClick(m);
@@ -130,14 +130,14 @@ export default function ProjectionChart({
               ticks={rows.map((r) => r.idx)}
               tickFormatter={(v: number) => fmtMonthShort(monthAt(v))}
               stroke={axis}
-              tick={{ fontSize: 11, fill: axis }}
+              tick={{ fontSize: 12, fill: axis }}
               tickLine={false}
               axisLine={{ stroke: grid }}
             />
             <YAxis
               tickFormatter={(v: number) => fmtDollars(v)}
               stroke={axis}
-              tick={{ fontSize: 11, fill: axis }}
+              tick={{ fontSize: 12, fill: axis }}
               tickLine={false}
               axisLine={false}
               width={64}
@@ -167,7 +167,7 @@ export default function ProjectionChart({
                           <span className="tabular font-medium">{fmtCents(Number(p.value))}</span>
                         </div>
                       ))}
-                    {onMonthClick && <div className="mt-1 text-[10px] text-slate-400">Click for why this month</div>}
+                    {onMonthClick && <div className="mt-1 text-xs text-slate-400">Click for why this month</div>}
                   </div>
                 );
               }}
@@ -199,7 +199,7 @@ export default function ProjectionChart({
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
         {series.map((s) => {
           const off = hidden.has(s.id);
           const isBase = s.id === BASELINE_KEY;

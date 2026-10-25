@@ -1,6 +1,9 @@
 // Small shared primitives. One accent color; semantic colors only for flags.
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
+/** The one card treatment (DESIGN_NOTES.md R9-R11): 6px radius, 1px border, paper on the slate-50 page, 20px padding, no shadow. */
+export const cardClass = "rounded-md border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900";
+
 export function Card({
   children,
   className = "",
@@ -13,7 +16,7 @@ export function Card({
   aside?: ReactNode;
 }) {
   return (
-    <section className={`rounded-md border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 ${className}`}>
+    <section className={`${cardClass} ${className}`}>
       {(title || aside) && (
         <header className="mb-3 flex items-baseline justify-between gap-2">
           {title && <h2 className="text-xs font-medium text-slate-500 dark:text-slate-400">{title}</h2>}
@@ -38,7 +41,7 @@ export function Stat({ label, value, sub, tone = "neutral" }: { label: string; v
   return (
     <div>
       <div className="text-xs font-medium text-slate-500 dark:text-slate-400">{label}</div>
-      <div className={`tabular mt-1 text-3xl font-semibold leading-none tracking-tightest ${color}`}>{value}</div>
+      <div className={`tabular mt-1 text-3xl font-medium leading-none tracking-tightest ${color}`}>{value}</div>
       {sub && <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">{sub}</div>}
     </div>
   );
@@ -65,11 +68,11 @@ export function Button({
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant }) {
   const base =
-    "inline-flex items-center justify-center gap-2 rounded px-3.5 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50";
+    "inline-flex items-center justify-center gap-2 rounded px-4 py-2 text-sm font-medium leading-5 disabled:cursor-not-allowed disabled:opacity-50";
   const styles: Record<Variant, string> = {
     primary: "bg-accent text-white hover:bg-[#0b4a48] dark:bg-accent-light dark:text-slate-950 dark:hover:bg-[#56b3ad]",
     secondary:
-      "border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800",
+      "border border-slate-300 bg-transparent text-slate-800 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800",
     ghost: "text-accent hover:bg-accent-soft dark:text-accent-light dark:hover:bg-slate-800",
   };
   return <button className={`${base} ${styles[variant]} ${className}`} {...rest} />;
@@ -97,7 +100,7 @@ export function Badge({
   return (
     <span
       title={title}
-      className={`inline-flex items-center gap-1 rounded-sm border px-1.5 py-0.5 text-[11px] font-medium leading-4 ${toneClass[tone]} ${className}`}
+      className={`inline-flex items-center gap-1 rounded-sm border px-1.5 py-0.5 text-xs font-medium leading-4 ${toneClass[tone]} ${className}`}
     >
       {children}
     </span>

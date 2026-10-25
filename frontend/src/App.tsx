@@ -55,7 +55,7 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
-        <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3">
+        <div className="mx-auto flex max-w-[1200px] items-center gap-6 px-6 py-3">
           <NavLink to="/" className="font-semibold tracking-tight text-accent dark:text-accent-light">
             Waypoint
           </NavLink>
@@ -78,7 +78,7 @@ export default function App() {
                     enabled ? "hover:bg-slate-100 dark:hover:bg-slate-800" : "cursor-default",
                   ].join(" ")}
                 >
-                  <span className="tabular text-[11px]">{i + 1}</span>
+                  <span className="tabular text-xs">{i + 1}</span>
                   <span className="hidden sm:inline">{s.label}</span>
                   {i < STEPS.length - 1 && <span aria-hidden className="ml-2 h-3 w-px bg-slate-300 dark:bg-slate-700" />}
                 </NavLink>
@@ -93,7 +93,7 @@ export default function App() {
           )}
         </div>
       </header>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+      <main className="mx-auto w-full max-w-[1200px] flex-1 px-6 py-8">
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/overview" element={<Overview />} />
@@ -104,7 +104,7 @@ export default function App() {
         </Routes>
       </main>
       <footer className="border-t border-slate-200 dark:border-slate-800">
-        <div className="mx-auto max-w-6xl px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
+        <div className="mx-auto max-w-[1200px] px-6 py-4 text-xs text-slate-500 dark:text-slate-400">
           Estimates and educational information, not financial advice. Numbers are computed from your transactions; facts are cited.
         </div>
       </footer>

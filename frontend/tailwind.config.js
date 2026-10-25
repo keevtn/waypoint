@@ -25,6 +25,18 @@ export default {
       "3xl": "6px",
       full: "9999px",
     },
+    // Eight sizes (DESIGN_NOTES.md R1-R3): 1.5 at <= 16px, 1.3-1.4 at 18-32px, 1.08 at >= 44px. Nothing below 12px.
+    fontSize: {
+      xs: ["12px", { lineHeight: "18px" }],
+      sm: ["14px", { lineHeight: "21px" }],
+      base: ["15px", { lineHeight: "22px" }],
+      lg: ["18px", { lineHeight: "26px" }],
+      xl: ["22px", { lineHeight: "28px" }],
+      "2xl": ["26px", { lineHeight: "32px" }],
+      "3xl": ["32px", { lineHeight: "36px" }],
+      "4xl": ["44px", { lineHeight: "48px" }],
+      "5xl": ["52px", { lineHeight: "56px" }],
+    },
     // No drop shadows: depth comes from 1px borders and background shifts.
     boxShadow: {
       none: "none",

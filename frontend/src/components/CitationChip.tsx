@@ -11,7 +11,7 @@ export default function CitationChip({ citation, index }: { citation: Citation; 
       target="_blank"
       rel="noopener noreferrer"
       title={tip}
-      className="inline-flex max-w-full items-center gap-1 rounded-sm border border-slate-300 bg-slate-50 px-1.5 py-0.5 align-baseline text-[11px] font-medium leading-4 text-slate-700 hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+      className="inline-flex max-w-full items-center gap-1 rounded-sm border border-slate-300 bg-slate-50 px-1.5 py-0.5 align-baseline text-xs font-medium leading-4 text-slate-700 hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
     >
       {index !== undefined && <span className="tabular">[{index}]</span>}
       <span className="truncate">{citation.publisher}</span>
@@ -24,7 +24,7 @@ export function UnsourcedChip({ id }: { id: string }) {
   return (
     <span
       title={`No citation found for ${id}`}
-      className="inline-flex items-center rounded border border-danger/40 bg-red-50 px-1.5 py-0.5 text-[11px] font-medium leading-4 text-danger dark:bg-red-950/40 dark:text-red-300"
+      className="inline-flex items-center rounded border border-danger/40 bg-red-50 px-1.5 py-0.5 text-xs font-medium leading-4 text-danger dark:bg-red-950/40 dark:text-red-300"
     >
       Unsourced
     </span>
@@ -69,7 +69,7 @@ export function CitedText({
         <span
           key={key++}
           title={rule ?? id}
-          className={`${gap} inline-flex items-center rounded border border-slate-300 bg-slate-50 px-1 py-0.5 align-baseline text-[11px] leading-4 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300`}
+          className={`${gap} inline-flex items-center rounded border border-slate-300 bg-slate-50 px-1 py-0.5 align-baseline text-xs leading-4 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300`}
         >
           rule
         </span>,

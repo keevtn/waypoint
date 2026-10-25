@@ -61,15 +61,15 @@ export default function Overview() {
           </div>
         )}
         <ul className="mt-10 grid gap-3 text-sm text-slate-600 dark:text-slate-300 sm:grid-cols-3">
-          <li className="rounded-md border border-slate-200 p-3 dark:border-slate-800">
+          <li className="rounded-md border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
             <div className="font-medium text-slate-900 dark:text-slate-100">Numbers come from code</div>
             The model never produces a figure you act on.
           </li>
-          <li className="rounded-md border border-slate-200 p-3 dark:border-slate-800">
+          <li className="rounded-md border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
             <div className="font-medium text-slate-900 dark:text-slate-100">Facts come with sources</div>
             Every claim links to a regulator or non-profit page.
           </li>
-          <li className="rounded-md border border-slate-200 p-3 dark:border-slate-800">
+          <li className="rounded-md border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
             <div className="font-medium text-slate-900 dark:text-slate-100">No carrier, no bank</div>
             You get a configuration, not a product.
           </li>
@@ -83,10 +83,10 @@ export default function Overview() {
   const past = sortedOneOffs.filter((o) => o.date < profile.as_of);
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Your cash flow</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Your cash flow</h1>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             {institution ?? "Demo bank · Plaid sandbox"} · as of {fmtDate(profile.as_of)}
           </p>
@@ -235,7 +235,7 @@ function RecurringRow({ item }: { item: RecurringItem }) {
 
 function ConfidenceLegend() {
   return (
-    <span className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+    <span className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
       <span className="flex items-center gap-1">
         <Dot tone="ok" /> high
       </span>

@@ -49,7 +49,7 @@ export default function StressTest() {
   if (!evaluation) {
     return (
       <section className="space-y-4">
-        <h1 className="text-xl font-semibold tracking-tight">Stress test</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Stress test</h1>
         <Empty>
           Nothing to test yet.{" "}
           <Link to="/moment" className="font-medium text-accent hover:underline dark:text-accent-light">
@@ -100,7 +100,7 @@ export default function StressTest() {
     <section className="space-y-4">
       <header className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Try to break my plan</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Try to break my plan</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
             Three scenarios chosen for your cash flow, run by the projection engine. The model then argues against your pick.
           </p>
@@ -181,7 +181,7 @@ export default function StressTest() {
                   type="button"
                   onClick={() => setActiveIdx(i)}
                   aria-pressed={on}
-                  className={`rounded-md border p-4 text-left ${
+                  className={`rounded-md border p-5 text-left ${
                     on ? "border-accent ring-1 ring-inset ring-accent dark:border-accent-light dark:ring-accent-light" : "border-slate-200 hover:border-slate-400 dark:border-slate-800"
                   } bg-white dark:bg-slate-900`}
                 >
@@ -193,7 +193,7 @@ export default function StressTest() {
                   <p className="mt-2 text-sm leading-5 text-slate-700 dark:text-slate-300">{s.scenario.rationale}</p>
                   {r && (
                     <div className="mt-3 border-t border-slate-100 pt-2 dark:border-slate-800">
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400">Lowest point{r.min_balance_date && <>, {fmtMonth(r.min_balance_date.slice(0, 7))}</>}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">Lowest point{r.min_balance_date && <>, {fmtMonth(r.min_balance_date.slice(0, 7))}</>}</div>
                       <div className={`tabular mt-0.5 text-xl font-semibold leading-none ${tone === "danger" ? "text-danger dark:text-red-300" : tone === "warn" ? "text-warn dark:text-amber-300" : tone === "ok" ? "text-ok dark:text-green-300" : ""}`}>
                         {fmtCents(r.min_balance_cents)}
                       </div>

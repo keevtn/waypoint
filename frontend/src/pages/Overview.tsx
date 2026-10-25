@@ -9,6 +9,7 @@ import { errorMessage } from "../lib/hooks";
 import { markConnected } from "../lib/session";
 import ProjectionChart, { BASELINE_KEY } from "../components/ProjectionChart";
 import { Badge, Button, Card, Dot, ErrorNote, Skeleton, Stat, inputClass, type Tone } from "../components/ui";
+import { BalanceEditor, ListEditorCard, resetToDemo } from "../components/ProfileEditors";
 
 const confidenceTone = (c: number): Tone => (c >= 0.9 ? "ok" : c >= 0.7 ? "warn" : "neutral");
 
@@ -18,6 +19,21 @@ export default function Overview() {
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [institution, setInstitution] = useState<string | null>(null);
+  const [resetting, setResetting] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
+
+  const reset = async () => {
+    if (!window.confirm("Reset to the demo account? Your edits will be discarded.")) return;
+    setResetting(true);
+    setResetError(null);
+    try {
+      await resetToDemo();
+    } catch (e) {
+      setResetError(errorMessage(e));
+    } finally {
+      setResetting(false);
+    }
+  };
 
   const connect = async () => {
     setConnecting(true);
@@ -98,7 +114,7 @@ export default function Overview() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <Stat label="Current balance" value={fmtCents(profile.balance_cents)} sub="Checking" />
+          <BalanceEditor profile={profile} />
         </Card>
         <Card>
           <Stat
@@ -125,7 +141,7 @@ export default function Overview() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <Card title="Income" className="lg:col-span-1">
+        <ListEditorCard kind="income" profile={profile} className="lg:col-span-1">
           <ul className="divide-y divide-slate-100 dark:divide-slate-800">
             {profile.income.map((s) => (
               <li key={s.id} className="flex items-start justify-between gap-3 py-2 text-sm">
@@ -142,17 +158,28 @@ export default function Overview() {
               </li>
             ))}
           </ul>
-        </Card>
+        </ListEditorCard>
 
-        <Card title="Recurring payments" className="lg:col-span-1" aside={<ConfidenceLegend />}>
+        <ListEditorCard kind="recurring" profile={profile} className="lg:col-span-1" aside={<ConfidenceLegend />}>
           <ul className="divide-y divide-slate-100 dark:divide-slate-800">
             {[...profile.recurring].sort((a, b) => a.amount_cents - b.amount_cents).map((r) => (
               <RecurringRow key={r.id} item={r} />
             ))}
           </ul>
-        </Card>
+        </ListEditorCard>
 
-        <Card title="Upcoming one-time costs" className="lg:col-span-1">
+        <ListEditorCard
+          kind="one_offs"
+          profile={profile}
+          className="lg:col-span-1"
+          footnote={
+            past.length > 0 && (
+              <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                <span className="tabular">{past.length}</span> past one-time {past.length === 1 ? "cost" : "costs"} ({past.map((o) => o.label).join(", ")}) already in your balance.
+              </p>
+            )
+          }
+        >
           {upcoming.length === 0 ? (
             <p className="text-sm text-slate-500 dark:text-slate-400">None.</p>
           ) : (
@@ -173,12 +200,7 @@ export default function Overview() {
               ))}
             </ul>
           )}
-          {past.length > 0 && (
-            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-              <span className="tabular">{past.length}</span> past one-time {past.length === 1 ? "cost" : "costs"} ({past.map((o) => o.label).join(", ")}) already in your balance.
-            </p>
-          )}
-        </Card>
+        </ListEditorCard>
       </div>
 
       <Card
@@ -207,7 +229,13 @@ export default function Overview() {
         </p>
       </Card>
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <span className="text-xs text-slate-500 dark:text-slate-400">
+          <button type="button" onClick={reset} disabled={resetting} className="hover:underline disabled:opacity-50">
+            {resetting ? "Resetting…" : "Reset to demo account"}
+          </button>
+          {resetError && <span className="ml-2 text-danger">{resetError}</span>}
+        </span>
         <Link to="/moment" className="text-sm font-medium text-accent hover:underline dark:text-accent-light">
           Pick a decision to test against this
         </Link>

@@ -212,6 +212,29 @@ export interface HealthResponse {
   index_chunks: number;
 }
 
+// POST /api/bank/import_csv (multipart: `file`, optional `mapping` JSON, optional `balance_cents`).
+export interface CsvImportResponse {
+  imported: number;
+  skipped: number;
+  profile: Profile;
+  warnings: string[];
+}
+
+// POST /api/products/lookup
+export interface ProductLookupRequest {
+  url: string;
+}
+
+export interface ProductLookupResponse {
+  name: string | null;
+  price_cents: number | null; // null when unparsed or not USD
+  currency: string | null;
+  source_url: string;
+  image_url: string | null;
+  confidence: "high" | "low" | "none"; // high = JSON-LD, low = Open Graph / <title>, none = nothing parsed
+  note: string | null;
+}
+
 export interface ConnectResponse {
   item_id: string;
   institution: string;

@@ -214,6 +214,32 @@ class ConnectResponse(BaseModel):
     transactions: int
 
 
+class CsvImportResponse(BaseModel):
+    """POST /bank/import_csv: the store's transactions replaced by the upload, profile rebuilt."""
+
+    imported: int
+    skipped: int
+    profile: Profile
+    warnings: list[str]
+
+
+class ProductLookupRequest(BaseModel):
+    url: str
+
+
+class ProductLookupResponse(BaseModel):
+    """POST /products/lookup: server-side read of a product page. `price_cents` is null when no
+    price was parsed or the currency is not USD; `confidence` says how it was found."""
+
+    name: str | None
+    price_cents: int | None
+    currency: str | None
+    source_url: str
+    image_url: str | None
+    confidence: Literal["high", "low", "none"]
+    note: str | None
+
+
 class DecisionSummary(BaseModel):
     id: str
     title: str

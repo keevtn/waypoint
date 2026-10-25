@@ -12,6 +12,11 @@ never projects a minimum below the floor, and a patch never changes `name` or ra
 - safest_financing: scan term in {3, 6, 12, 24} x down payment in {0%, 25%, 50%} of the price
   (the user's APR when given, else the assumed APR); keep plans whose minimum stays at or above
   the floor with non-negative slack; return the cheapest total (`patch = {"financing": {...}}`).
+
+Horizons: suggestions always use the 12-month view (cost), whatever horizon the evaluation ran
+at, except that safest_financing judges each candidate over its own full term (`full_term_horizon`:
+months until the purchase date + the term + 1, at least 12), so a long plan cannot pass on year one
+and breach in year two.
 """
 from __future__ import annotations
 
@@ -33,6 +38,12 @@ def horizon_end(profile: Profile) -> date:
     return last_of_month(date.fromisoformat(horizon_months(profile.as_of, HORIZON_MONTHS)[-1] + "-01"))
 
 
+def full_term_horizon(profile: Profile, on: date, term_months: int) -> int:
+    """Months of projection needed to see a plan starting `on` through its last payment."""
+    until = (on.year - profile.as_of.year) * 12 + on.month - profile.as_of.month
+    return max(HORIZON_MONTHS, until + term_months + 1)
+
+
 def _projected(r: ProjectionResult, option_id: str, total_cost_cents: int) -> dict:
     return {
         "option_id": option_id,
@@ -45,7 +56,7 @@ def _projected(r: ProjectionResult, option_id: str, total_cost_cents: int) -> di
 
 
 def _cash_result(inputs: BigPurchaseInputs, profile: Profile, on: date) -> ProjectionResult:
-    return project(profile, [cash_option(inputs, on, profile.as_of).commitment], option_id=CASH_ID, derive_flags=False)
+    return project(profile, [cash_option(inputs, on, profile.as_of).commitment], HORIZON_MONTHS, option_id=CASH_ID, derive_flags=False)
 
 
 def _safe_for(r: ProjectionResult, profile: Profile) -> bool:
@@ -104,7 +115,7 @@ def safest_financing(inputs: BigPurchaseInputs, profile: Profile) -> Suggestion 
         for p in SCAN_DOWN_PCTS:
             fin = Financing(apr_bps=apr, term_months=term, down_payment_cents=inputs.amount_cents * p // 100)
             o = financed_option(inputs, fin, inputs.date, profile.as_of, assumed=assumed)
-            r = project(profile, [o.commitment], option_id=o.id, derive_flags=False)
+            r = project(profile, [o.commitment], full_term_horizon(profile, inputs.date, term), option_id=o.id, derive_flags=False)
             if not _safe_for(r, profile) or r.monthly_slack_cents < 0:
                 continue
             total = int(o.attributes["total_cost_cents"])

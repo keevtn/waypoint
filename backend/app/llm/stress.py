@@ -28,7 +28,6 @@ from .explainer import scrub_markers, used_chunk_ids
 log = logging.getLogger(__name__)
 
 N_SCENARIOS = 3
-HORIZON = 12
 
 
 class ScenarioParamsOut(BaseModel):
@@ -109,6 +108,7 @@ def default_scenarios(menu: list[ScenarioTemplate], ev: Evaluation) -> list[Scen
 def select_payload(ev: Evaluation, menu: list[ScenarioTemplate], preferred_option_id: str) -> dict:
     return {
         "module": payload.module_view(ev.module_id),
+        **payload.horizon_view(ev),
         "profile": payload.profile_view(ev.profile),
         "inputs": payload.inputs_view(ev.inputs),
         "options": [
@@ -172,8 +172,9 @@ def _rent_item(profile: Profile):
     return min(pool, key=lambda r: r.amount_cents) if pool else None  # most negative = largest outflow
 
 
-def perturbation(scenario: Scenario, profile: Profile, option: Option | None) -> tuple[list[OneOff], list[float] | None]:
-    """(one_off_overrides, income_multiplier) that `project()` applies for this scenario."""
+def perturbation(scenario: Scenario, profile: Profile, option: Option | None, horizon: int = 12) -> tuple[list[OneOff], list[float] | None]:
+    """(one_off_overrides, income_multiplier) that `project()` applies for this scenario, sized to
+    `horizon` months (an hours cut or a rent increase runs to the end of the horizon)."""
     p = scenario.params
     tid = scenario.template_id
     start = lambda n: payload.plan_month_start(profile, n)  # noqa: E731
@@ -188,14 +189,14 @@ def perturbation(scenario: Scenario, profile: Profile, option: Option | None) ->
         return [OneOff(id="stress_shock_expense", label="Unexpected expense", amount_cents=-abs(int(p["amount_cents"])), date=start(p["month"]), source="module")], None
 
     if tid == "income_gap":
-        mult = [1.0] * HORIZON
-        for i in range(p["start_month"] - 1, min(HORIZON, p["start_month"] - 1 + p["months"])):
+        mult = [1.0] * horizon
+        for i in range(p["start_month"] - 1, min(horizon, p["start_month"] - 1 + p["months"])):
             mult[i] = 0.0
         return [], mult
 
     if tid == "hours_cut":
-        mult = [1.0] * HORIZON
-        for i in range(p["from_month"] - 1, HORIZON):
+        mult = [1.0] * horizon
+        for i in range(p["from_month"] - 1, horizon):
             mult[i] = 1.0 - p["pct"] / 100.0
         return [], mult
 
@@ -213,7 +214,7 @@ def perturbation(scenario: Scenario, profile: Profile, option: Option | None) ->
         if extra == 0:
             return [], None
         one_offs = []
-        for n in range(p["from_month"], HORIZON + 1):
+        for n in range(p["from_month"], horizon + 1):
             d = start(n).replace(day=day)
             one_offs.append(OneOff(id=f"stress_rent_increase_{n}", label=f"Rent increase ({p['pct']}%)", amount_cents=extra, date=d, source="module"))
         return one_offs, None
@@ -223,13 +224,14 @@ def perturbation(scenario: Scenario, profile: Profile, option: Option | None) ->
 
 def run_scenario(ev: Evaluation, scenario: Scenario) -> StressResult:
     results: dict[str, ProjectionResult] = {}
-    one_offs, mult = perturbation(scenario, ev.profile, None)
-    results["baseline"] = project(ev.profile, ev.extra_commitments, HORIZON, None, one_offs or None, mult)
+    horizon = ev.horizon_months  # the evaluation's horizon, so stressed series line up with the unstressed ones
+    one_offs, mult = perturbation(scenario, ev.profile, None, horizon)
+    results["baseline"] = project(ev.profile, ev.extra_commitments, horizon, None, one_offs or None, mult)
     for o in ev.options:
         if o.status == "disallowed":
             continue
-        one_offs, mult = perturbation(scenario, ev.profile, o)
-        results[o.id] = project(ev.profile, [*ev.extra_commitments, o.commitment], HORIZON, None, one_offs or None, mult, option_id=o.id)
+        one_offs, mult = perturbation(scenario, ev.profile, o, horizon)
+        results[o.id] = project(ev.profile, [*ev.extra_commitments, o.commitment], horizon, None, one_offs or None, mult, option_id=o.id)
     return StressResult(scenario=scenario, results=results)
 
 
@@ -247,6 +249,7 @@ def critique_payload(ev: Evaluation, preferred: Option, stress: list[StressResul
     chunks = payload.merge_chunks(payload.chunks_for_ids(cited), payload.retrieve_chunks(query, ev.module_id, k=4))
     return {
         "module": payload.module_view(ev.module_id),
+        **payload.horizon_view(ev),
         "preferred_option_id": preferred.id,
         "preferred_option_label": preferred.label,
         "option_labels": payload.option_labels(ev.options),

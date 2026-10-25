@@ -43,6 +43,7 @@ def build_payload(ev: Evaluation, option: Option, template: dict) -> dict:
     chunks = payload.merge_chunks(payload.chunks_for_ids(cited), payload.retrieve_chunks(query, ev.module_id))
     return {
         "module": payload.module_view(ev.module_id),
+        **payload.horizon_view(ev),
         "option": payload.option_view(option, ev.constraints),
         "template": template,
         "projection": payload.projection_view(ev.projections[option.id]),

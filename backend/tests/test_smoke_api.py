@@ -123,6 +123,33 @@ def test_horizon_contract(client):
     assert r.status_code == 422 and r.json()["error"]["code"] == "invalid_horizon"
     assert client.get("/api/projection/baseline?horizon_months=12").status_code == 200
     assert len(client.get("/api/projection/baseline?horizon_months=60").json()["series"]) == 60
+    assert len(client.get("/api/projection/baseline?horizon_months=120").json()["series"]) == 120
+
+
+def test_evaluate_stress_at_60_months(client):
+    """/evaluate at 60 months projects 60 points everywhere, caches the horizon, and the stress run
+    (deductible claim + scenarios) uses the same horizon; the LLM payloads carry the assumption."""
+    from app.decisions import cache
+    from app.decisions.evaluate import HORIZON_ASSUMPTION
+
+    client.post("/api/bank/connect", json={})
+    inputs = {"vehicle_value_cents": 950000, "financed": True, "loan_payment_cents": 21200, "loan_term_months": 48, "driver_age": 21, "deductible_comfort_cents": 60000, "registration_deadline": "2026-11-23"}
+    r = client.post("/api/decisions/auto_insurance/evaluate", json={"inputs": inputs, "horizon_months": 60})
+    assert r.status_code == 200, r.text
+    ev = r.json()
+    assert all(len(p["series"]) == 60 for p in ev["projections"].values())
+    assert all(o["attributes"]["horizon_assumption"] == HORIZON_ASSUMPTION for o in ev["options"])
+    cached = cache.get(ev["eval_id"])
+    assert cached.horizon_months == 60
+    cache.forget_memory()
+    assert cache.get(ev["eval_id"]).horizon_months == 60  # survives the sqlite round trip
+    r = client.post("/api/decisions/auto_insurance/stress", json={"eval_id": ev["eval_id"], "preferred_option_id": "std_full_500"})
+    assert r.status_code == 200, r.text
+    for sc in r.json()["scenarios"]:
+        assert all(len(p["series"]) == 60 for p in sc["results"].values())
+    r = client.post("/api/decisions/auto_insurance/evaluate", json={"inputs": inputs})
+    assert all(len(p["series"]) == 12 for p in r.json()["projections"].values())
+    assert "horizon_assumption" not in r.json()["options"][0]["attributes"]
 
 def test_baseline_no_negative_months(client):
     """§8 outcome 5: no month goes negative in the baseline."""

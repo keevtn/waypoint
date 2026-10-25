@@ -90,9 +90,9 @@ def list_decisions() -> list[DecisionSummary]:
 @router.post("/{decision_id}/evaluate", response_model=EvaluateResponse)
 def evaluate(decision_id: str, body: EvaluateRequest) -> EvaluateResponse:
     mod = _module(decision_id)
-    check_horizon(body.horizon_months)
+    horizon = check_horizon(body.horizon_months)
     try:
-        return run_evaluate(mod, body.inputs, store.get_profile())
+        return run_evaluate(mod, body.inputs, store.get_profile(), horizon)
     except InvalidInputs as e:
         raise HTTPException(status_code=422, detail={"code": "invalid_inputs", "message": "; ".join(f"{'.'.join(str(p) for p in err['loc'])}: {err['msg']}" for err in e.errors)})
 

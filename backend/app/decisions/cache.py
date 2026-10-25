@@ -41,6 +41,7 @@ class Evaluation:
     projections: dict[str, ProjectionResult]
     created: float = field(default_factory=time.time)
     suggestions: list[Suggestion] = field(default_factory=list)
+    horizon_months: int = 12
 
 
 _store: dict[str, Evaluation] = {}
@@ -137,6 +138,7 @@ def _dump(ev: Evaluation) -> str:
             "extra_commitments": [c.model_dump(mode="json") for c in ev.extra_commitments],
             "projections": {k: p.model_dump(mode="json") for k, p in ev.projections.items()},
             "suggestions": [s.model_dump(mode="json") for s in ev.suggestions],
+            "horizon_months": ev.horizon_months,
         },
         separators=(",", ":"),
     )
@@ -160,6 +162,7 @@ def _load(eval_id: str, module_id: str, created: float, payload: str) -> Evaluat
         projections={k: ProjectionResult.model_validate(p) for k, p in d["projections"].items()},
         created=created,
         suggestions=[Suggestion.model_validate(s) for s in d.get("suggestions", [])],
+        horizon_months=int(d.get("horizon_months", 12)),
     )
 
 

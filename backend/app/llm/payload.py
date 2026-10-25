@@ -274,6 +274,18 @@ def evaluation_query(ev: Evaluation) -> str:
     return " ".join(parts)
 
 
+def horizon_view(ev) -> dict:
+    """`horizon_months` for every LLM payload, plus the assumption text beyond 12 months (the same
+    string the options carry in `attributes.horizon_assumption`)."""
+    n = int(getattr(ev, "horizon_months", 12))
+    out: dict = {"horizon_months": n}
+    if n > 12:
+        from ..decisions.evaluate import HORIZON_ASSUMPTION
+
+        out["horizon_assumption"] = HORIZON_ASSUMPTION
+    return out
+
+
 def plan_months(profile: Profile, horizon: int = 12) -> dict[int, str]:
     """Plan month n (1 = first full month after as_of) -> 'YYYY-MM'."""
     y, m = profile.as_of.year, profile.as_of.month
@@ -287,4 +299,4 @@ def plan_months(profile: Profile, horizon: int = 12) -> dict[int, str]:
 
 
 def plan_month_start(profile: Profile, n: int) -> date:
-    return date.fromisoformat(plan_months(profile)[n] + "-01")
+    return date.fromisoformat(plan_months(profile, max(12, n))[n] + "-01")

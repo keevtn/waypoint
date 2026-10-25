@@ -193,3 +193,59 @@ def test_api_evaluate_explain_action_fake_llm(client):
     assert len(r.json()["scenarios"]) == 3
     assert {s["scenario"]["template_id"] for s in r.json()["scenarios"]} <= {"shock_expense", "income_gap", "hours_cut"}
     assert client.post("/api/decisions/big_purchase/evaluate", json={"inputs": {"name": "x", "amount_cents": -5, "date": "2026-11-01"}}).status_code == 422
+
+
+def test_safest_financing_judges_each_plan_over_its_full_term(module, profile):
+    """A 24-month plan that clears the floor in year one but breaches in year two is excluded,
+    even though evaluation projections (and the other suggestions) use a 12-month view."""
+    from app.models import OneOff
+
+    buy = {"name": "Bike", "amount_cents": 300000, "date": "2026-11-01"}
+    inputs = BigPurchaseInputs.model_validate(buy)
+    base = suggest.safest_financing(inputs, profile)
+    assert base is not None and base.patch["financing"]["term_months"] == 24  # on the persona the 24-month plan is the cheapest safe one
+    fin = bp_options.Financing(**base.patch["financing"])
+    plan = bp_options.financed_option(inputs, fin, inputs.date, AS_OF, assumed=True)
+    # year two: a large one-time cost in plan month 18 (user-entered, so the engine projects it); the balance is ~$8,350 by then
+    later = profile.model_copy(update={"one_offs": [*profile.one_offs, OneOff(id="oo_abroad", label="Study abroad deposit", amount_cents=-750000, date=date(2028, 4, 15), source="user")]})
+    year_one = project(later, [plan.commitment], 12, derive_flags=False)
+    assert year_one.min_balance_cents >= later.safety_floor_cents and not year_one.months_below_floor  # safe on a 12-month view
+    full = project(later, [plan.commitment], suggest.full_term_horizon(later, inputs.date, 24), derive_flags=False)
+    assert full.months_below_floor and all(m >= "2027-11" for m in full.months_below_floor)  # breaches only in year two
+    assert suggest.full_term_horizon(later, inputs.date, 24) == 26 and len(full.series) == 26  # 1 month to the purchase + 24 payments + 1
+    s = suggest.safest_financing(inputs, later)
+    assert s is None or s.patch["financing"]["term_months"] != 24
+    r = evaluate(module, buy, later)  # the evaluation itself still projects 12 months
+    assert all(len(p.series) == 12 for p in r.projections.values())
+    assert "safest_financing" not in {x.type for x in r.suggestions} or next(x for x in r.suggestions if x.type == "safest_financing").patch["financing"]["term_months"] != 24
+
+
+def test_long_horizon_and_long_user_term(module, profile):
+    """Evaluation at 60 months: every projection has 60 points, financed options still amortize
+    over their own term, each option carries the horizon assumption, and a 120-month term is allowed."""
+    from app.decisions.evaluate import HORIZON_ASSUMPTION
+
+    inputs = {**LAPTOP, "financing": {"apr_bps": 600, "term_months": 120, "down_payment_cents": 0}}
+    r = evaluate(module, inputs, profile, 60)
+    assert all(len(p.series) == 60 for p in r.projections.values())
+    ids = [o.id for o in r.options]
+    assert ids == ["cash_now", "financed_6", "financed_12", "financed_24", "financed_120"]
+    f120 = next(o for o in r.options if o.id == "financed_120")
+    assert f120.commitment.term_months == 120 and f120.attributes["monthly_payment_cents"] == bp_options.monthly_payment_cents(180000, 600, 120)
+    assert f120.attributes["total_cost_cents"] == f120.attributes["monthly_payment_cents"] * 120
+    f6 = next(o for o in r.options if o.id == "financed_6")
+    # a 6-month plan stops paying after 6 months even on a 60-month horizon: later months match the baseline's monthly flow
+    base, six = r.projections["baseline"].series, r.projections["financed_6"].series
+    assert six[2].outflow_cents > base[2].outflow_cents and six[30].outflow_cents == base[30].outflow_cents
+    for o in r.options:
+        assert o.attributes["horizon_months"] == 60 and o.attributes["horizon_assumption"] == HORIZON_ASSUMPTION
+    for c in r.constraints:
+        if c.id.startswith(("below_floor_", "negative_")):
+            assert "of the next 60 months" in c.rule
+    # suggestions are still computed on the 12-month view
+    s = next(x for x in r.suggestions if x.type == "earliest_safe_date")
+    assert date.fromisoformat(s.patch["date"]) <= suggest.horizon_end(profile)
+    r12 = evaluate(module, LAPTOP, profile)
+    assert "horizon_assumption" not in r12.options[0].attributes and all(len(p.series) == 12 for p in r12.projections.values())
+    with pytest.raises(Exception):
+        BigPurchaseInputs.model_validate({**LAPTOP, "financing": {"apr_bps": 600, "term_months": 121, "down_payment_cents": 0}})

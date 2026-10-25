@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 
 class Financing(BaseModel):
     apr_bps: int = Field(ge=0, le=10000, description="Annual percentage rate in basis points (2499 = 24.99%). 0 allowed.")
-    term_months: int = Field(ge=1, le=84, description="Number of monthly payments")
+    term_months: int = Field(ge=1, le=120, description="Number of monthly payments")
     down_payment_cents: int = Field(default=0, ge=0, description="Paid upfront on the purchase date, in cents")
 
 

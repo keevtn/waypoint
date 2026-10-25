@@ -21,7 +21,7 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 
 | Session | Branch | Phase | Last merged to main | Blocked on | Updated |
 |---------|--------|-------|---------------------|------------|---------|
-| A llm | a/profile-edit | done | P6 + P7 @ 2026-10-24; labels fix; S1 rent module; eval cache sqlite; S2 big_purchase module + suggestions @ 2026-10-25 ~03:30; scenario labels in stress prose; projection-derived status flags + flag labels; PUT /profile full edit @ 2026-10-25 | — | 2026-10-25 |
+| A llm | a/horizon | done | P6 + P7 @ 2026-10-24; labels fix; S1 rent module; eval cache sqlite; S2 big_purchase module + suggestions @ 2026-10-25 ~03:30; scenario labels in stress prose; projection-derived status flags + flag labels; PUT /profile full edit; 12/60/120-month horizons @ 2026-10-25 | — | 2026-10-25 |
 | B wire | b/p4-live | P4 live | All pages verified on live explain/stress/action @ 2026-10-24 (528e997) | — | 2026-10-24 |
 | D plaid | d/p8-plaid | P8 | — | A-P1 | — |
 
@@ -67,6 +67,14 @@ Tiny, human-readable sync point (SPEC.md §15.6). Git log is the truth. Every se
 ## Session A note: evaluation cache persisted to sqlite (merged to main)
 
 `decisions/cache.py` now writes every evaluation through to a sqlite table (`evaluations` in `config.DB_PATH`, default `backend/waypoint.db`, already gitignored; override with `DB_PATH`) and reads it back on an in-memory miss, so a restart or redeploy between `/evaluate` and `/explain|/stress|/action` no longer yields 404 `unknown_eval`. TTL stays 1h in both layers (expired rows are evicted on every put/get). Rows are pydantic JSON dumps rehydrated through the module's `InputModel`; a row that no longer validates (contract change) or whose module is gone is treated as a miss. If the file cannot be created (read-only disk) the cache logs once and runs memory-only. Tests use a temp `DB_PATH` (`tests/conftest.py`). **Render: the disk is ephemeral per deploy, so this covers restarts within a deploy, not across deploys, unless a persistent disk is mounted and `DB_PATH` points at it.**
+
+## Session A note: projection horizons 12 / 60 / 120 (merged to main)
+
+- `POST /evaluate` body `horizon_months` (contract 17936e9; default 12) and `GET /projection/baseline?horizon_months=` run every projection (baseline + each option) over that many months. Anything but 12/60/120 is `422 invalid_horizon`. The horizon is stored in the eval record (sqlite too), so `/stress` scenario runs and the deductible-claim flag use the same horizon as the evaluation (stressed series line up with the unstressed ones).
+- Beyond 12 months every option's `attributes` gains `horizon_months` (int) and `horizon_assumption` (the string "Beyond 12 months this assumes income and recurring bills stay as they are today and one-time costs are not repeated."). No new model field. **B:** render it once above the chart when present; it is absent at 12 months. The LLM payloads (explain / action / select / critique) carry the same two keys and the prompts say to restate the assumption once when they discuss later years.
+- Derived flag rules now read "in N of the next {horizon} months".
+- big_purchase: financed plans amortize over their own term regardless of horizon (a 6-month plan stops paying after 6 months on a 60-month chart); `Financing.term_months` now allows up to 120 (was 84). Suggestions stay on the 12-month view for cost, except `safest_financing` projects each candidate over its full term (months to the purchase date + term + 1, min 12), so a 24-month plan that is fine in year one but breaches in year two is excluded.
+- Tests: baseline at 60/120 points; evaluate+stress at 60 months end to end with the cached horizon surviving a restart; 120-month user term; the year-two-breach exclusion; horizon 36 rejected.
 
 ## Session A note: PUT /profile edits the whole profile (merged to main)
 

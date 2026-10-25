@@ -33,7 +33,7 @@ export default function Landing() {
             you&rsquo;re clear or shows you the paths to get there.
           </p>
           <div className="mt-8">
-            <Button onClick={() => navigate("/overview")}>Try it with a demo account</Button>
+            <Button onClick={() => navigate("/overview")}>Try our demo</Button>
           </div>
         </div>
         <div className="lg:col-span-3" aria-hidden>

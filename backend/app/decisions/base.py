@@ -11,7 +11,7 @@ from typing import Any, ClassVar, Protocol, runtime_checkable
 
 from pydantic import BaseModel
 
-from ..models import Commitment, Constraint, Option, Profile, ScenarioTemplate
+from ..models import Commitment, Constraint, Option, Profile, ProjectionResult, ScenarioTemplate, Suggestion
 
 
 @runtime_checkable
@@ -35,6 +35,15 @@ class DecisionModule(Protocol):
     def action_template(self, inputs: Any, option: Option) -> dict[str, Any]:
         """Seeds (steps, questions, deadline) for the action-card LLM call."""
         ...
+
+    def suggestions(self, inputs: Any, profile: Profile, options: list[Option], projections: dict[str, ProjectionResult]) -> list[Suggestion]:
+        """Optional: code-generated alternatives (input patches) once the projections are known. Default none."""
+        ...
+
+
+def module_suggestions(module: Any, inputs: Any, profile: Profile, options: list[Option], projections: dict[str, ProjectionResult]) -> list[Suggestion]:
+    fn = getattr(module, "suggestions", None)
+    return list(fn(inputs, profile, options, projections)) if callable(fn) else []
 
 
 def resolve_statuses(options: list[Option], constraints: list[Constraint]) -> list[Option]:

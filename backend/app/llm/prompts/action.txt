@@ -5,6 +5,7 @@ You receive one JSON object:
 - `template`: seed content from the decision module: `configuration` (a plain-language description of the option), `steps`, `questions_to_ask`, `deadline` (ISO date) and `deadline_reason`.
 - `projection`: the user's 12-month result for this option: `months_below_floor`, `months_negative`, `min_balance` with its date, and `flags` with contributing items and amounts (all `*_display` strings are exact).
 - `floor_display`: the user's safety floor.
+- `suggestions`: code-generated alternatives (possibly empty): `type`, `label`, `rationale`, `patch`, `projected` with `*_display` strings. If present, you may add one step that points the user to a suggestion using only its displayed values.
 - `chunks`: retrieved passages from government and regulator sources (`id`, `title`, `publisher`, `text`).
 
 Produce:

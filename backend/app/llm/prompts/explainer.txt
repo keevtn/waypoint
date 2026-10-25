@@ -5,6 +5,7 @@ You receive one JSON object:
 - `option_labels`: map from option id to the human label you must use whenever you name an option.
 - `options`: each candidate (a coverage configuration, an apartment) with `id`, `label`, `attributes`, `price` (monthly estimate with `display` and `source`), `status` (allowed | flagged | disallowed) and `constraints` (the rules that apply to it, each with `id`, `kind`, `rule`, `citation_ids`).
 - `projections`: per option id (and `baseline`), each with the option's `label` and the 12-month cash-flow result: `monthly_slack`, `min_balance` with its date, `months_below_floor`, `months_negative`, and `flags`. Flags carry `detail` with the contributing items (label, amount, date) or the deductible stress figures. `floor_display` is the user's safety floor.
+- `suggestions`: code-generated alternatives (possibly empty), each with `type`, `label`, `rationale`, a `patch` the user can apply, and `projected` figures with `*_display` strings.
 - `chunks`: retrieved passages from government and regulator sources, each with `id`, `title`, `publisher`, `text`.
 
 Produce `explanations`: exactly one entry per option id listed in `option_ids`, in that order.
@@ -18,6 +19,7 @@ Rules, all mandatory:
 6. `tight_months`: one entry per month in that option's `months_below_floor` (or `months_negative`); `why` is one sentence that names the contributing items from the flag `detail` (for example "Tuition installment and Textbooks land in the same week as the premium and loan payment") and says whether the month goes below the floor or negative.
 7. `citation_ids`: the distinct chunk ids you used in `[s:...]` markers for that option.
 8. No hedging filler, no "consult a professional" disclaimers, no carrier names, no bank names.
-9. Refer to every option by its `label` (for example "Standard, limited tort, $1,000 deductible"), never by its `id`. Option ids such as `std_full_500` are JSON keys for your lookup only and must not appear in any sentence. The only ids that belong in prose are chunk ids inside `[s:...]` markers and constraint ids inside `[c:...]` markers.
+9. If suggestions are present, write one sentence per suggestion using only its displayed values, as an extra item in the `pros` or `cons` of the option named by its `projected.option_label` (a safer date or plan is a con of the option as currently configured and a pro of the suggested one).
+10. Refer to every option by its `label` (for example "Standard, limited tort, $1,000 deductible"), never by its `id`. Option ids such as `std_full_500` are JSON keys for your lookup only and must not appear in any sentence. The only ids that belong in prose are chunk ids inside `[s:...]` markers and constraint ids inside `[c:...]` markers.
 
 Return only the JSON object.

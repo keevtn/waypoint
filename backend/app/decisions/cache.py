@@ -21,7 +21,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .. import config
-from ..models import Commitment, Constraint, Option, Profile, ProjectionResult
+from ..models import Commitment, Constraint, Option, Profile, ProjectionResult, Suggestion
 
 log = logging.getLogger(__name__)
 
@@ -40,6 +40,7 @@ class Evaluation:
     extra_commitments: list[Commitment]
     projections: dict[str, ProjectionResult]
     created: float = field(default_factory=time.time)
+    suggestions: list[Suggestion] = field(default_factory=list)
 
 
 _store: dict[str, Evaluation] = {}
@@ -135,6 +136,7 @@ def _dump(ev: Evaluation) -> str:
             "constraints": [c.model_dump(mode="json") for c in ev.constraints],
             "extra_commitments": [c.model_dump(mode="json") for c in ev.extra_commitments],
             "projections": {k: p.model_dump(mode="json") for k, p in ev.projections.items()},
+            "suggestions": [s.model_dump(mode="json") for s in ev.suggestions],
         },
         separators=(",", ":"),
     )
@@ -157,6 +159,7 @@ def _load(eval_id: str, module_id: str, created: float, payload: str) -> Evaluat
         extra_commitments=[Commitment.model_validate(c) for c in d["extra_commitments"]],
         projections={k: ProjectionResult.model_validate(p) for k, p in d["projections"].items()},
         created=created,
+        suggestions=[Suggestion.model_validate(s) for s in d.get("suggestions", [])],
     )
 
 

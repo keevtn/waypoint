@@ -46,6 +46,7 @@ def build_payload(ev: Evaluation, option: Option, template: dict) -> dict:
         "option": payload.option_view(option, ev.constraints),
         "template": template,
         "projection": payload.projection_view(ev.projections[option.id]),
+        "suggestions": payload.suggestions_view(ev),
         "floor_display": payload.dollars(ev.profile.safety_floor_cents),
         "chunks": chunks,
     }

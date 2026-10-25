@@ -147,6 +147,18 @@ def replace_option_ids(text: str, options: list[Option]) -> str:
     return text
 
 
+def suggestions_view(ev: Evaluation) -> list[dict[str, Any]]:
+    """Code-generated alternatives (big purchase: earliest safe date, safest financing) with `*_display`
+    strings for every cents figure, so the model can restate them without converting anything."""
+    labels = option_labels(ev.options)
+    out: list[dict[str, Any]] = []
+    for s in ev.suggestions:
+        d = with_displays(s.model_dump(mode="json"))
+        d["projected"]["option_label"] = labels.get(str(d["projected"].get("option_id")), d["projected"].get("option_id"))
+        out.append(d)
+    return out
+
+
 def profile_view(profile: Profile) -> dict[str, Any]:
     return {
         "as_of": profile.as_of.isoformat(),

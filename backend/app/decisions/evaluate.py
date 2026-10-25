@@ -12,7 +12,7 @@ from pydantic import ValidationError
 from ..models import EvaluateResponse, Profile
 from ..projection import project
 from . import cache
-from .base import DecisionModule, resolve_statuses
+from .base import DecisionModule, module_suggestions, resolve_statuses
 
 
 class InvalidInputs(ValueError):
@@ -36,6 +36,8 @@ def evaluate(module: DecisionModule, raw_inputs: dict[str, Any], profile: Profil
     for o in options:  # disallowed options are projected too so the chart can grey them out
         projections[o.id] = project(profile, [*extra, o.commitment], option_id=o.id)
 
+    suggestions = module_suggestions(module, inputs, profile, options, projections)
+
     ev = cache.Evaluation(
         eval_id=cache.new_id(),
         module_id=module.id,
@@ -45,6 +47,7 @@ def evaluate(module: DecisionModule, raw_inputs: dict[str, Any], profile: Profil
         constraints=constraints,
         extra_commitments=extra,
         projections=projections,
+        suggestions=suggestions,
     )
     cache.put(ev)
-    return EvaluateResponse(options=options, constraints=constraints, projections=projections, eval_id=ev.eval_id)
+    return EvaluateResponse(options=options, constraints=constraints, projections=projections, eval_id=ev.eval_id, suggestions=suggestions)

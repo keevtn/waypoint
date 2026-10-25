@@ -81,6 +81,29 @@ def test_decisions_list(client):
     assert "rent" in ids  # SPEC §6.4 stretch module, registered
     rent = next(d for d in r.json() if d["id"] == "rent")
     assert "units" in rent["input_schema"]["properties"]
+    assert "big_purchase" in ids  # Session A big-purchase module, registered
+    bp = next(d for d in r.json() if d["id"] == "big_purchase")
+    assert {"name", "amount_cents", "date", "financing"} <= set(bp["input_schema"]["properties"])
+
+
+def test_evaluate_big_purchase_suggests_alternatives(client):
+    """A cash purchase that breaks the floor comes back with code-generated alternatives."""
+    inputs = {"name": "Laptop", "amount_cents": 180000, "date": "2026-11-01"}
+    r = client.post("/api/decisions/big_purchase/evaluate", json={"inputs": inputs})
+    assert r.status_code == 200, r.text
+    ev = r.json()
+    assert ev["eval_id"] and "baseline" in ev["projections"]
+    assert {o["id"] for o in ev["options"]} == {"cash_now", "financed_6", "financed_12", "financed_24"}
+    assert all(o["status"] != "disallowed" for o in ev["options"])
+    assert ev["projections"]["cash_now"]["months_negative"]  # $1,800 against the persona's balance
+    types = {s["type"] for s in ev["suggestions"]}
+    assert types == {"earliest_safe_date", "safest_financing"}
+    floor = client.get("/api/profile").json()["safety_floor_cents"]
+    for s in ev["suggestions"]:
+        assert s["projected"]["min_balance_cents"] >= floor and s["projected"]["months_below_floor"] == []
+        assert "name" not in s["patch"]
+    # the auto module is unchanged by the contract: no suggestions there
+    assert "suggestions" in ev
 
 
 def test_evaluate_state_minimum_disallowed(client):

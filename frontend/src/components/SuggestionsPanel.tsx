@@ -32,7 +32,6 @@ export default function SuggestionsPanel({
     <section>
       <header className="mb-3 flex items-baseline justify-between gap-2">
         <h2 className="text-xs font-medium text-slate-500 dark:text-slate-400">Ways to keep your floor</h2>
-        <span className="text-xs text-slate-500 dark:text-slate-400">Computed, not generated</span>
       </header>
       <ul className="grid gap-3 md:grid-cols-2">
         {suggestions.map((s) => {
